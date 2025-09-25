@@ -36,6 +36,8 @@ export default function MoneyCube({
   const edgeMeshRef = useRef<THREE.InstancedMesh | null>(null);
 
   const pressingRef = useRef(false);
+  const hoveringRef = useRef(false);
+  const emitterRunningRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
   const [active, setActive] = useState(true);
 
@@ -43,6 +45,9 @@ export default function MoneyCube({
   const hoverRef = useRef({ x: 0, y: 0 });
   const targetRef = useRef({ x: 0, y: 0 });
   const angleRef = useRef(0); // idle rotation accumulator (deg)
+
+  // Multi-cube state
+  const selectedIndexRef = useRef(0);
 
   // Drag/spin inertia state
   const dragStateRef = useRef({ dragging: false, lastX: 0, lastY: 0, lastT: 0 });
@@ -153,14 +158,16 @@ export default function MoneyCube({
     ro.observe(host);
 
     // Lights
-    const ambient = new THREE.AmbientLight(0xffffff, 0.85); // brighter
+    // Lower ambient to deepen dark regions
+    const ambient = new THREE.AmbientLight(0xffffff, 0.25);
     scene.add(ambient);
 
     // Soft sky/ground light for lift
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x888888, 0.6);
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x666666, 0.35);
     scene.add(hemi);
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.2); // brighter key
+    // Stronger key to increase contrast while ambient is lower
+    const key = new THREE.DirectionalLight(0xffffff, 1.6);
     key.position.set(-3.0, 4.0, 2.5);
     key.castShadow = false;
     key.shadow.mapSize.width = 1024;
@@ -175,7 +182,8 @@ export default function MoneyCube({
     key.shadow.normalBias = 0.02;
     scene.add(key);
 
-    const rim = new THREE.DirectionalLight(0xffffff, 0.75); // brighter rim
+    // Modest rim to keep silhouettes without lifting dark faces too much
+    const rim = new THREE.DirectionalLight(0xffffff, 0.45);
     rim.position.set(3.0, 2.0, -2.5);
     scene.add(rim);
 
@@ -183,7 +191,7 @@ export default function MoneyCube({
     floorRef.current = null;
 
     // Cube
-    const cubeSize = 1.2; // smaller cube
+    const cubeSize = 0.6; // way smaller
     const geo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
 
     const texLoader = new THREE.TextureLoader();
@@ -205,10 +213,11 @@ export default function MoneyCube({
 
     const faceMat = new THREE.MeshStandardMaterial({
       map: tex,
-      metalness: 0.05,
-      roughness: 0.45,
-      emissive: new THREE.Color(0xffffff),
-      emissiveIntensity: 0.16, // brighter lift
+      color: new THREE.Color(0xf3ffee), // a bit lighter with soft green tint
+      metalness: 0.02,
+      roughness: 0.66, // slightly smoother for brightness
+      emissive: new THREE.Color(0x136d13), // dark green emissive for a subtle lift
+      emissiveIntensity: 0.08,
     });
 
     // One material for all faces (cheap). If you want per-face variety, duplicate faceMat.
@@ -216,63 +225,105 @@ export default function MoneyCube({
     cube.castShadow = false;
     cubeRef.current = cube;
 
-    // Group to allow subtle translation separate from rotation
-    const group = new THREE.Group();
-    group.add(cube);
-    scene.add(group);
-    groupRef.current = group;
-
-    // CHUNKY 3D EDGES: Instanced cylinders along the 12 edges of the cube
-    const isDark = resolvedTheme === "dark";
-    const edgeRadius = 0.02; // much thinner edge bars
-    const edgeLength = cubeSize * 1.02; // slightly longer than the cube to ensure coverage
-    const radialSegments = 12; // low for performance, still roundish
-    const edgeGeo = new THREE.CylinderGeometry(edgeRadius, edgeRadius, edgeLength, radialSegments, 1, false);
-    // Cylinder axis is Y; we'll rotate per edge
-    const edgeMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(isDark ? 0xffffff : 0x000000),
+    // Theme-aware edge material (defined BEFORE makeCube to avoid TDZ issues)
+    const baseEdgeMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(resolvedTheme === "dark" ? 0xffffff : 0x000000),
       metalness: 0.05,
       roughness: 0.35,
-      emissive: isDark ? new THREE.Color(0xffffff) : new THREE.Color(0x000000),
-      emissiveIntensity: isDark ? 0.2 : 0.05,
+      emissive: resolvedTheme === "dark" ? new THREE.Color(0xffffff) : new THREE.Color(0x000000),
+      emissiveIntensity: resolvedTheme === "dark" ? 0.2 : 0.05,
     });
-    const edges = new THREE.InstancedMesh(edgeGeo, edgeMat, 12);
-    edgeMeshRef.current = edges;
-    const s = cubeSize / 2;
-    const tmpMat = new THREE.Matrix4();
-    const tmpQuat = new THREE.Quaternion();
-    const tmpPos = new THREE.Vector3();
-    let i = 0;
-    // X-directed edges (rotate cylinder from Y to X via Z-rotation)
-    for (const y of [-s, s]) {
-      for (const z of [-s, s]) {
-        tmpPos.set(0, y, z);
-        tmpQuat.setFromEuler(new THREE.Euler(0, 0, Math.PI / 2));
-        tmpMat.compose(tmpPos, tmpQuat, new THREE.Vector3(1, 1, 1));
-        edges.setMatrixAt(i++, tmpMat);
+
+    // Helper to make a cube group with edges at given size
+    const makeCube = (size: number) => {
+      const g = new THREE.Group();
+      const geoLocal = new THREE.BoxGeometry(size, size, size);
+      const cubeLocal = new THREE.Mesh(geoLocal, faceMat.clone());
+      cubeLocal.castShadow = false;
+      g.add(cubeLocal);
+      // Additive 'screen' tint overlay for greener, lighter look
+      const tintMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(0x5cff9d),
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        opacity: 0.22,
+        depthWrite: false,
+      });
+      const tintMesh = new THREE.Mesh(geoLocal.clone(), tintMat);
+      cubeLocal.add(tintMesh);
+      // edges instanced for this cube
+      const edgeThickness = 0.008;
+      const edgeLength = size * 1.02;
+      const edgeGeo = new THREE.BoxGeometry(1, 1, 1);
+      const edgeMatLocal = baseEdgeMat.clone();
+      const edgesLocal = new THREE.InstancedMesh(edgeGeo, edgeMatLocal, 12);
+      const sLocal = size / 2;
+      const tmpMatL = new THREE.Matrix4();
+      const tmpQuatL = new THREE.Quaternion();
+      const tmpPosL = new THREE.Vector3();
+      let ii = 0;
+      for (const y of [-sLocal, sLocal]) {
+        for (const z of [-sLocal, sLocal]) {
+          tmpPosL.set(0, y, z);
+          tmpQuatL.set(0, 0, 0, 1);
+          tmpMatL.compose(tmpPosL, tmpQuatL, new THREE.Vector3(edgeLength, edgeThickness, edgeThickness));
+          edgesLocal.setMatrixAt(ii++, tmpMatL);
+        }
       }
-    }
-    // Y-directed edges (default orientation)
-    for (const x of [-s, s]) {
-      for (const z of [-s, s]) {
-        tmpPos.set(x, 0, z);
-        tmpQuat.set(0, 0, 0, 1);
-        tmpMat.compose(tmpPos, tmpQuat, new THREE.Vector3(1, 1, 1));
-        edges.setMatrixAt(i++, tmpMat);
+      for (const x of [-sLocal, sLocal]) {
+        for (const z of [-sLocal, sLocal]) {
+          tmpPosL.set(x, 0, z);
+          tmpQuatL.set(0, 0, 0, 1);
+          tmpMatL.compose(tmpPosL, tmpQuatL, new THREE.Vector3(edgeThickness, edgeLength, edgeThickness));
+          edgesLocal.setMatrixAt(ii++, tmpMatL);
+        }
       }
-    }
-    // Z-directed edges (rotate cylinder from Y to Z via X-rotation)
-    for (const x of [-s, s]) {
-      for (const y of [-s, s]) {
-        tmpPos.set(x, y, 0);
-        tmpQuat.setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0));
-        tmpMat.compose(tmpPos, tmpQuat, new THREE.Vector3(1, 1, 1));
-        edges.setMatrixAt(i++, tmpMat);
+      for (const x of [-sLocal, sLocal]) {
+        for (const y of [-sLocal, sLocal]) {
+          tmpPosL.set(x, y, 0);
+          tmpQuatL.set(0, 0, 0, 1);
+          tmpMatL.compose(tmpPosL, tmpQuatL, new THREE.Vector3(edgeThickness, edgeThickness, edgeLength));
+          edgesLocal.setMatrixAt(ii++, tmpMatL);
+        }
       }
-    }
-    edges.instanceMatrix.needsUpdate = true;
-    // Attach edges to the cube so they share rotation; position remains at origin
-    cube.add(edges);
+      edgesLocal.instanceMatrix.needsUpdate = true;
+      // Parent edges to cube so they inherit exact rotation
+      cubeLocal.add(edgesLocal);
+      return { group: g, mesh: cubeLocal };
+    };
+
+    // Create three cubes with different sizes
+    const sizes = [0.5, 0.65, 0.75]; // make the biggest cube smaller
+    const cubes: { group: THREE.Group; mesh: THREE.Mesh }[] = sizes.map((s) => makeCube(s));
+    cubes.forEach((c) => scene.add(c.group));
+    // Raycasting support
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+
+    // Small three-body-like system near the origin
+    const masses = [1.0, 1.2, 0.8];
+    const pos = [
+      new THREE.Vector3(0.20, 0.05, 0.02),
+      new THREE.Vector3(-0.18, 0.07, 0.10),
+      new THREE.Vector3(0.02, -0.15, -0.12),
+    ];
+    const vel = [
+      new THREE.Vector3(0.0, 0.14, 0.12),
+      new THREE.Vector3(-0.12, 0.0, -0.10),
+      new THREE.Vector3(0.11, -0.09, 0.0),
+    ];
+    const G = 0.4;          // gravitation-like strength
+    const eps2 = 0.02 * 0.02; // softening to avoid singularities
+    const kCenter = 1.2;    // strong but slightly relaxed to allow wider spacing
+    const damp = 0.55;      // damping
+
+    // Per-cube spin/translation inertia
+    const spinAngles = sizes.map(() => ({ x: 0, y: 0 }));
+    const spinVels = sizes.map(() => ({ x: 0, y: 0 }));
+    const transPos = sizes.map(() => ({ x: 0, y: 0 }));
+    const transVel = sizes.map(() => ({ x: 0, y: 0 }));
+
+    // (Single-cube edges below were replaced by per-cube edges inside makeCube.)
 
     // Base orientation and hover smoothing
     const baseRX = THREE.MathUtils.degToRad(-22);
@@ -299,25 +350,39 @@ export default function MoneyCube({
         const dx = e.clientX - ds.lastX;
         const dy = e.clientY - ds.lastY;
 
-        // Update instantaneous angles and velocities
-        spinAngleRef.current.x += dy * spinFactor;
-        spinAngleRef.current.y += dx * spinFactor;
-        spinVelRef.current.x = (dy * spinFactor) / dt;
-        spinVelRef.current.y = (dx * spinFactor) / dt;
+        // Update instantaneous angles and velocities for selected cube
+        const idx = selectedIndexRef.current;
+        spinAngles[idx].x += dy * spinFactor;
+        spinAngles[idx].y += dx * spinFactor;
+        spinVels[idx].x = (dy * spinFactor) / dt;
+        spinVels[idx].y = (dx * spinFactor) / dt;
 
         // Slight translation for fun
-        transPosRef.current.x = THREE.MathUtils.clamp(
-          transPosRef.current.x + dx * transFactor,
+        transPos[idx].x = THREE.MathUtils.clamp(
+          transPos[idx].x + dx * transFactor,
           -0.6,
           0.6
         );
-        transPosRef.current.y = THREE.MathUtils.clamp(
-          transPosRef.current.y - dy * transFactor,
+        transPos[idx].y = THREE.MathUtils.clamp(
+          transPos[idx].y - dy * transFactor,
           -0.6,
           0.6
         );
-        transVelRef.current.x = (dx * transFactor) / dt;
-        transVelRef.current.y = (-dy * transFactor) / dt;
+        transVel[idx].x = (dx * transFactor) / dt;
+        transVel[idx].y = (-dy * transFactor) / dt;
+
+        // Nudge orbital velocity of the selected cube in camera-right/up directions
+        const cam = cameraRef.current;
+        if (cam) {
+          const dir = new THREE.Vector3();
+          cam.getWorldDirection(dir); // camera forward
+          const right = new THREE.Vector3();
+          right.crossVectors(dir, cam.up).normalize();
+          const upWorld = cam.up.clone().normalize();
+          const velFactor = 0.0035; // tune impulse strength from drag
+          vel[idx].add(right.multiplyScalar(dx * velFactor));
+          vel[idx].add(upWorld.multiplyScalar(-dy * velFactor));
+        }
 
         ds.lastX = e.clientX;
         ds.lastY = e.clientY;
@@ -328,6 +393,7 @@ export default function MoneyCube({
       targetRef.current.x = 0;
       targetRef.current.y = 0;
       pointerPosRef.current = null;
+      hoveringRef.current = false;
     };
     // UX: better dragging feel
     try { (host.style as any).cursor = "grab"; } catch {}
@@ -382,16 +448,21 @@ export default function MoneyCube({
     };
 
     let emitterId: number | null = null;
-    const schedule = () => {
-      if (!pressingRef.current) return;
-      const perSec = 2 + Math.random() * 3; // 2–5/sec (lighter than before)
-      const delay = 1000 / perSec;
-      emitterId = window.setTimeout(() => {
+    const startEmitter = () => {
+      if (emitterRunningRef.current) return; // already running
+      if (!(pressingRef.current || hoveringRef.current)) return;
+      emitterRunningRef.current = true;
+      const loop = () => {
+        if (!emitterRunningRef.current) return;
         spawn();
-        schedule();
-      }, delay);
+        const perSec = 2 + Math.random() * 3; // 2–5/sec
+        const delay = 1000 / perSec;
+        emitterId = window.setTimeout(loop, delay);
+      };
+      loop();
     };
-    const stopSchedule = () => {
+    const stopEmitter = () => {
+      emitterRunningRef.current = false;
       if (emitterId) {
         window.clearTimeout(emitterId);
         emitterId = null;
@@ -401,6 +472,17 @@ export default function MoneyCube({
     const onDown = (e: PointerEvent) => {
       pressingRef.current = true;
       pointerPosRef.current = { x: e.clientX, y: e.clientY };
+      // Raycast to select cube under pointer
+      const rect = host.getBoundingClientRect();
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const intersects = raycaster.intersectObjects(cubes.map(c => c.mesh));
+      if (intersects.length > 0) {
+        const hit = intersects[0].object as THREE.Mesh;
+        const idx = cubes.findIndex(c => c.mesh === hit);
+        if (idx >= 0) selectedIndexRef.current = idx;
+      }
       const ds = dragStateRef.current;
       ds.dragging = true;
       ds.lastX = e.clientX;
@@ -408,25 +490,27 @@ export default function MoneyCube({
       ds.lastT = performance.now();
       try { (host as any).setPointerCapture?.(e.pointerId); } catch {}
       try { (host.style as any).cursor = "grabbing"; } catch {}
-      schedule();
+      startEmitter();
     };
     const onUpOrCancel = (e: PointerEvent) => {
       pressingRef.current = false;
       dragStateRef.current.dragging = false;
       try { (host as any).releasePointerCapture?.(e.pointerId); } catch {}
-      stopSchedule();
+      // If still hovering, continue spawning
+      if (!hoveringRef.current) stopEmitter();
       try { (host.style as any).cursor = "grab"; } catch {}
     };
     const onEnter = (e: PointerEvent) => {
       pointerPosRef.current = { x: e.clientX, y: e.clientY };
-      pressingRef.current = true; // match previous behavior while hovering on desktop
-      schedule();
+      hoveringRef.current = true;
+      startEmitter();
     };
     const onLeaveAll = () => {
       pressingRef.current = false;
       pointerPosRef.current = null;
       dragStateRef.current.dragging = false;
-      stopSchedule();
+      hoveringRef.current = false;
+      stopEmitter();
       try { (host.style as any).cursor = "grab"; } catch {}
     };
 
@@ -454,51 +538,166 @@ export default function MoneyCube({
     // Animation loop
     let raf = 0;
     let last = performance.now();
+    let randAccum = 0; // timer for periodic random variations
 
     const animate = (now: number) => {
       const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
+      randAccum += dt;
 
-      // Smooth hover towards target
+      // Smooth hover towards target (unused for multi-cube rotation now, but kept for possible tilt)
       const ease = 1 - Math.exp(-dt * 6);
       hoverRef.current.x += (targetRef.current.x - hoverRef.current.x) * ease;
       hoverRef.current.y += (targetRef.current.y - hoverRef.current.y) * ease;
 
       // Idle rotation (reduced while spinning/dragging)
-      const spinSpeedMag = Math.hypot(spinVelRef.current.x, spinVelRef.current.y);
+      const idxSel = selectedIndexRef.current;
+      const spinSpeedMag = Math.hypot(spinVels[idxSel].x, spinVels[idxSel].y);
       const idleScale = (dragStateRef.current.dragging || spinSpeedMag > 0.3) ? 0.2 : 1.0;
       angleRef.current += idleSpeedDegPerSec * idleScale * dt;
 
-      // Integrate spin inertia
+      // Integrate spin inertia for all cubes
       const spinDamp = 2.2;
-      spinAngleRef.current.x += spinVelRef.current.x * dt;
-      spinAngleRef.current.y += spinVelRef.current.y * dt;
-      spinVelRef.current.x *= Math.exp(-spinDamp * dt);
-      spinVelRef.current.y *= Math.exp(-spinDamp * dt);
+      for (let i = 0; i < sizes.length; i++) {
+        spinAngles[i].x += spinVels[i].x * dt;
+        spinAngles[i].y += spinVels[i].y * dt;
+        spinVels[i].x *= Math.exp(-spinDamp * dt);
+        spinVels[i].y *= Math.exp(-spinDamp * dt);
+      }
 
-      // Translate group slightly with inertia and gentle return
+      // Translate groups slightly with inertia and gentle return per cube
       const transDamp = 4.0;
       const returnDamp = 1.2;
-      transPosRef.current.x += transVelRef.current.x * dt;
-      transPosRef.current.y += transVelRef.current.y * dt;
-      transVelRef.current.x *= Math.exp(-transDamp * dt);
-      transVelRef.current.y *= Math.exp(-transDamp * dt);
-      if (!dragStateRef.current.dragging) {
-        transPosRef.current.x *= Math.exp(-returnDamp * dt);
-        transPosRef.current.y *= Math.exp(-returnDamp * dt);
-      }
-      transPosRef.current.x = THREE.MathUtils.clamp(transPosRef.current.x, -0.6, 0.6);
-      transPosRef.current.y = THREE.MathUtils.clamp(transPosRef.current.y, -0.6, 0.6);
-      if (groupRef.current) {
-        groupRef.current.position.set(transPosRef.current.x, transPosRef.current.y, 0);
+      for (let i = 0; i < sizes.length; i++) {
+        transPos[i].x += transVel[i].x * dt;
+        transPos[i].y += transVel[i].y * dt;
+        transVel[i].x *= Math.exp(-transDamp * dt);
+        transVel[i].y *= Math.exp(-transDamp * dt);
+        if (!(dragStateRef.current.dragging && selectedIndexRef.current === i)) {
+          transPos[i].x *= Math.exp(-returnDamp * dt);
+          transPos[i].y *= Math.exp(-returnDamp * dt);
+        }
+        transPos[i].x = THREE.MathUtils.clamp(transPos[i].x, -0.6, 0.6);
+        transPos[i].y = THREE.MathUtils.clamp(transPos[i].y, -0.6, 0.6);
       }
 
-      // Apply to cube
-      if (cubeRef.current) {
-        const rx = baseRX + THREE.MathUtils.degToRad(hoverRef.current.x) + spinAngleRef.current.x;
-        const ry = baseRY + THREE.MathUtils.degToRad(angleRef.current + hoverRef.current.y) + spinAngleRef.current.y;
-        cubeRef.current.rotation.x = rx;
-        cubeRef.current.rotation.y = ry;
+      // N-body like update for tight three-body motion
+      const acc = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+      for (let i = 0; i < 3; i++) acc[i].set(0, 0, 0);
+      for (let i = 0; i < 3; i++) {
+        for (let j = i + 1; j < 3; j++) {
+          const r = new THREE.Vector3().subVectors(pos[j], pos[i]);
+          const r2 = Math.max(eps2, r.lengthSq());
+          const invR3 = 1 / Math.pow(r2, 1.5);
+          const f = r.clone().multiplyScalar(G * invR3);
+          acc[i].add(f.clone().multiplyScalar(masses[j]));
+          acc[j].add(f.clone().multiplyScalar(-masses[i]));
+        }
+      }
+      // Add tiny global precession to promote x/y/z coupling
+      const wx = 0.35, wy = 0.27, wz = 0.19; // rad/s (small)
+      const qx = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0), wx * dt);
+      const qy = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), wy * dt);
+      const qz = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), wz * dt);
+      const q = new THREE.Quaternion();
+      q.multiply(qx).multiply(qy).multiply(qz);
+      for (let i = 0; i < 3; i++) {
+        // Centering spring and damping
+        acc[i].add(pos[i].clone().multiplyScalar(-kCenter));
+        acc[i].add(vel[i].clone().multiplyScalar(-damp));
+        if (!(dragStateRef.current.dragging && selectedIndexRef.current === i)) {
+          vel[i].add(acc[i].multiplyScalar(dt));
+          vel[i].applyQuaternion(q); // gentle precession
+          pos[i].add(vel[i].clone().multiplyScalar(dt));
+        }
+        // Clamp radius to keep tight cluster
+        const maxR = 0.35;
+        const L = pos[i].length();
+        if (L > maxR) pos[i].multiplyScalar(maxR / L);
+      }
+
+      // Periodic random speed variations for each cube
+      if (randAccum > 0.65) {
+        randAccum = 0;
+        for (let i = 0; i < 3; i++) {
+          if (dragStateRef.current.dragging && selectedIndexRef.current === i) continue;
+          const jitter = new THREE.Vector3(
+            (Math.random() - 0.5) * 0.08,
+            (Math.random() - 0.5) * 0.08,
+            (Math.random() - 0.5) * 0.08
+          );
+          vel[i].add(jitter);
+          // slight spin variance
+          spinVels[i].x += (Math.random() - 0.5) * 0.12;
+          spinVels[i].y += (Math.random() - 0.5) * 0.12;
+        }
+      }
+
+      // Soft minimum-distance repulsion to prevent sticking/vibration
+      for (let i = 0; i < 3; i++) {
+        for (let j = i + 1; j < 3; j++) {
+          const p1 = pos[i];
+          const p2 = pos[j];
+          const delta = new THREE.Vector3().subVectors(p2, p1);
+          const dist = Math.max(1e-6, delta.length());
+          const r1 = sizes[i] * 0.5;
+          const r2 = sizes[j] * 0.5;
+          const sepScale = 1.6; // enlarge minimum separation
+          const minDist = (r1 + r2) * sepScale;
+          if (dist < minDist) {
+            const n = delta.clone().multiplyScalar(1 / dist);
+            const overlap = minDist - dist;
+            // split positional correction
+            p1.add(n.clone().multiplyScalar(-overlap * 0.5));
+            p2.add(n.clone().multiplyScalar(overlap * 0.5));
+
+            const mi = masses[i], mj = masses[j];
+            // Non-linear proximity factor (0..1) => cubic to ramp up hard when very close
+            const pf = Math.min(1, Math.max(0, overlap / minDist));
+            const baseK = 22.0; // base repulsion strength
+            const jRepel = baseK * (pf * pf * pf) * dt;
+            vel[i].add(n.clone().multiplyScalar(-jRepel / mi));
+            vel[j].add(n.clone().multiplyScalar(jRepel / mj));
+
+            // Burst when extremely close
+            if (pf > 0.6) {
+              const burstK = 35.0;
+              const jBurst = burstK * (pf - 0.6) * (pf - 0.6) * dt;
+              // add small randomization to direction for variation
+              const randDir = n.clone().add(new THREE.Vector3(
+                (Math.random() - 0.5) * 0.25,
+                (Math.random() - 0.5) * 0.25,
+                (Math.random() - 0.5) * 0.25
+              )).normalize();
+              vel[i].add(randDir.clone().multiplyScalar(-jBurst / mi));
+              vel[j].add(randDir.clone().multiplyScalar(jBurst / mj));
+            }
+
+            // damp relative normal velocity to kill vibration
+            const rv = vel[i].clone().sub(vel[j]);
+            const vn = rv.dot(n);
+            const dampN = 0.7 * vn; // stronger damping on the normal
+            vel[i].add(n.clone().multiplyScalar(-dampN / mi));
+            vel[j].add(n.clone().multiplyScalar(dampN / mj));
+
+            // spin kick (stronger on burst)
+            let torque = 0.25;
+            if (pf > 0.6) torque = 0.75;
+            spinVels[i].x += (Math.random() - 0.5) * torque;
+            spinVels[i].y += (Math.random() - 0.5) * torque;
+            spinVels[j].x += (Math.random() - 0.5) * torque;
+            spinVels[j].y += (Math.random() - 0.5) * torque;
+          }
+        }
+      }
+
+      // Apply transforms
+      for (let i = 0; i < cubes.length; i++) {
+        cubes[i].group.position.set(pos[i].x + transPos[i].x, transPos[i].y + pos[i].y, pos[i].z);
+        const rx = baseRX + THREE.MathUtils.degToRad(hoverRef.current.x) + spinAngles[i].x;
+        const ry = baseRY + THREE.MathUtils.degToRad(angleRef.current + hoverRef.current.y) + spinAngles[i].y;
+        cubes[i].mesh.rotation.x = rx;
+        cubes[i].mesh.rotation.y = ry;
       }
 
       // Update particles (DOM)
@@ -537,7 +736,7 @@ export default function MoneyCube({
       document.removeEventListener("visibilitychange", onVis);
       io.disconnect();
       ro.disconnect();
-      stopSchedule();
+      stopEmitter();
 
       host.removeEventListener("pointermove", onPointerMove);
       host.removeEventListener("pointerleave", onPointerLeave);
