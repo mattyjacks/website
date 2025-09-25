@@ -10,12 +10,10 @@ export default function Home() {
         <AnimatedClouds
           imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
           opacity={0.35}
-          verticalSpeedSec={50}
+          verticalSpeedSec={18}
           horizontalRangePx={3000}
           // Slower, exploratory horizontal drift
           horizontalPixelsPerSecond={8}
-          minDriftSec={6}
-          maxDriftSec={18}
           // Keep from zooming out too much
           minScale={0.6}
           maxScale={1}
@@ -23,8 +21,9 @@ export default function Home() {
           showBeams
           beamsOpacity={0.32}
           beamsSpeedSec={28}
+          verticalMultiplier={2.5}
         />
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center px-4 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center px-4 py-24 md:py-32">
           <div className="relative">
             {/* Contrast helper behind text for readability over beams */}
             <div
@@ -36,7 +35,7 @@ export default function Home() {
               }}
             />
             <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
-            <h1 className="mt-3 text-4xl md:text-5xl font-extrabold leading-tight">We make you money and/or DIE TRYING!</h1>
+            <h1 className="mt-3 text-5xl md:text-6xl font-extrabold leading-tight">We make you money and/or DIE TRYING!</h1>
             <p className="mt-5 text-zinc-600 dark:text-zinc-300">MattyJacks delivers custom AI solutions, elite freelancers, and idea-to-income execution with unusual speed and care. We operate like a special forces unit for growth: small, senior, and ruthless about outcomes.</p>
             <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">You bring the goal. We assemble the right talent, spin up the plan, and ship. No bloated teams. No endless decks. Just results.</p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -44,7 +43,7 @@ export default function Home() {
               <a href="tel:+16039999420" className="inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 px-5 py-3 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-900">Call Us</a>
             </div>
           </div>
-          <HeroCube className="rounded-2xl border border-zinc-200 dark:border-zinc-800" />
+          <HeroCube className="rounded-2xl" />
         </div>
       </section>
 
@@ -107,46 +106,6 @@ export default function Home() {
                 <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{s.d}</p>
                 <Link href="/contact" className="mt-4 inline-flex text-sm text-emerald-700 dark:text-emerald-300 hover:underline">Learn More</Link>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Results / Stats */}
-      <section className="px-4 py-16 bg-zinc-50 dark:bg-zinc-900/30">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold">Selected Results</h2>
-          <p className="mt-3 text-zinc-600 dark:text-zinc-300 max-w-prose">Every project is different, but the pattern is the same: tight scopes, fast shipping, measurable wins.</p>
-          <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-            {[
-              {k:"-47%",v:"Support costs",d:"AI + workflow fixes"},
-              {k:"3.2x",v:"Lead volume",d:"Landing page + offer"},
-              {k:"12 days",v:"MVP to revenue",d:"Validation-first build"},
-              {k:"<1 sec",v:"TTFB",d:"Performance + caching"},
-            ].map((s,i)=> (
-              <div key={i} className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
-                <div className="text-3xl font-extrabold">{s.k}</div>
-                <div className="mt-1 font-semibold">{s.v}</div>
-                <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{s.d}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="px-4 py-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold">What clients say</h2>
-          <div className="mt-8 grid sm:grid-cols-2 gap-6">
-            {[ 
-              {q:"They shipped an MVP in under two weeks and it actually made money.",a:"Founder, SaaS"},
-              {q:"Clear plan, clean execution, no drama. We&apos;re keeping them on retainer.",a:"COO, E-commerce"},
-            ].map((t,i)=> (
-              <blockquote key={i} className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
-                <p className="text-zinc-800 dark:text-zinc-100">“{t.q}”</p>
-                <footer className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{t.a}</footer>
-              </blockquote>
             ))}
           </div>
         </div>

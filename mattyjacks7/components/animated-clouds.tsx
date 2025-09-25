@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type AnimatedCloudsProps = {
   imageSrc: string;
   opacity?: number; // 0..1
   verticalSpeedSec?: number; // time to scroll background vertically once
   horizontalRangePx?: number; // max left/right drift from center
-  minDriftSec?: number;
-  maxDriftSec?: number;
   minScale?: number; // min zoom scale
   maxScale?: number; // max zoom scale
   tileSizePx?: number; // base tile width in px for perfect tiling
@@ -25,8 +23,6 @@ export default function AnimatedClouds({
   opacity = 0.25,
   verticalSpeedSec = 60,
   horizontalRangePx = 240,
-  minDriftSec = 3,
-  maxDriftSec = 10,
   minScale = 0.9,
   maxScale = 1.1,
   tileSizePx = 1024,
@@ -45,28 +41,52 @@ export default function AnimatedClouds({
   const [bgXSmooth, setBgXSmooth] = useState(0);
   const [scale, setScale] = useState(1);
   const scaleTargetRef = useRef(1);
-  const [mounted, setMounted] = useState(false);
   // Effective tile size; half-pixel rounding to reduce visible stepping during zoom
   const effectiveSize = Math.max(16, Math.round((tileSizePx * scale) * 2) / 2);
   const effectiveBgX = Math.round(bgXSmooth * 2) / 2; // half-pixel rounding reduces jitter
-  const [y, setY] = useState(0); // vertical offset in px, negative scroll
+  const [y, setY] = useState(0); // vertical offset in px, positive = move background downward
   const vMultRef = useRef(1); // current vertical speed multiplier
   const vTargetRef = useRef(1); // target multiplier we ease toward
   const vxRef = useRef(0); // current horizontal px/sec
   const vxTargetRef = useRef(0); // target horizontal px/sec
+  const [active, setActive] = useState(true);
 
   // Keep ref in sync with state
   useEffect(() => {
     bgXRef.current = bgX;
   }, [bgX]);
 
-  // Start motion after mount
+  // (removed) start-on-mount flag; not needed
+
+  // Visibility: pause when offscreen for 10s or tab hidden
   useEffect(() => {
-    setMounted(true);
+    const el = outerRef.current;
+    if (!el) return;
+    let offTimer: number | null = null;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        if (offTimer) { window.clearTimeout(offTimer); offTimer = null; }
+        setActive(true);
+      } else {
+        if (offTimer) window.clearTimeout(offTimer);
+        offTimer = window.setTimeout(() => setActive(false), 10000);
+      }
+    }, { threshold: 0 });
+    obs.observe(el);
+    const onVis = () => {
+      setActive(document.visibilityState === 'visible');
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      obs.disconnect();
+      if (offTimer) window.clearTimeout(offTimer);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, []);
 
   // Smooth, continuous vertical scroll with wrapping (no resets)
   useEffect(() => {
+    if (!active) return;
     let raf: number;
     let last = performance.now();
     // Randomly change vertical speed multiplier every few seconds for exploration
@@ -95,7 +115,7 @@ export default function AnimatedClouds({
       // Clamp dt to avoid large jumps causing visible stutter
       const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
-      let pxPerSec = (effectiveSize / Math.max(1, verticalSpeedSec)) * Math.max(0.1, verticalMultiplier);
+      const pxPerSec = (effectiveSize / Math.max(1, verticalSpeedSec)) * Math.max(0.1, verticalMultiplier);
       // Ease current multiplier toward target
       const ease = Math.min(1, dt * 0.8); // responsiveness of modulation
       vMultRef.current = vMultRef.current + (vTargetRef.current - vMultRef.current) * ease;
@@ -128,12 +148,11 @@ export default function AnimatedClouds({
         }
         return desired;
       });
-      // accumulate and wrap to [-effectiveSize, 0)
+      // accumulate and wrap within [0, effectiveSize); increasing Y moves background downward
       setY((prev) => {
-        let next = prev - pxPerSec * vMultRef.current * dt;
-        // robust wrapping to keep in [-effectiveSize, 0)
-        while (next <= -effectiveSize) next += effectiveSize;
-        while (next > 0) next -= effectiveSize;
+        let next = prev + pxPerSec * vMultRef.current * dt;
+        while (next >= effectiveSize) next -= effectiveSize;
+        while (next < 0) next += effectiveSize;
         return next;
       });
       raf = requestAnimationFrame(tick);
@@ -143,7 +162,7 @@ export default function AnimatedClouds({
       cancelAnimationFrame(raf);
       if (changeTimer) window.clearTimeout(changeTimer);
     };
-  }, [effectiveSize, verticalSpeedSec, horizontalPixelsPerSecond, horizontalRangePx, minScale, maxScale, horizontalSmoothingMs, verticalMultiplier]);
+  }, [active, effectiveSize, verticalSpeedSec, horizontalPixelsPerSecond, horizontalRangePx, minScale, maxScale, horizontalSmoothingMs, verticalMultiplier]);
 
   return (
     <div
@@ -188,18 +207,27 @@ export default function AnimatedClouds({
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10"
-          style={{ opacity: beamsOpacity, mixBlendMode: "screen" as any }}
+          style={{ opacity: beamsOpacity, mixBlendMode: ("screen" as React.CSSProperties['mixBlendMode']) }}
         >
-          <div className="absolute inset-0 beams-layer beams-1" />
-          <div className="absolute inset-0 beams-layer beams-2" />
-          <div className="absolute inset-0 beams-layer beams-3" />
+          {(() => {
+            const animState1: React.CSSProperties = { animationPlayState: active ? 'running' : 'paused' };
+            const animState2: React.CSSProperties = { animationPlayState: active ? 'running' : 'paused' };
+            const animState3: React.CSSProperties = { animationPlayState: active ? 'running' : 'paused' };
+            return (
+              <>
+                <div className="absolute inset-0 beams-layer beams-1" style={animState1} />
+                <div className="absolute inset-0 beams-layer beams-2" style={animState2} />
+                <div className="absolute inset-0 beams-layer beams-3" style={animState3} />
+              </>
+            );
+          })()}
           {/* Directional sun vignette (warm) from top-left */}
           <div
             className="absolute inset-0"
             style={{
               background:
                 "radial-gradient(1200px 600px at 5% 0%, rgba(255, 245, 170, 0.25), rgba(255, 245, 170, 0.0) 60%)",
-              mixBlendMode: "screen" as any,
+              mixBlendMode: ("screen" as React.CSSProperties['mixBlendMode']),
             }}
           />
           {/* Soft edge vignette to subtly frame and aid contrast */}
@@ -208,7 +236,7 @@ export default function AnimatedClouds({
             style={{
               background:
                 "radial-gradient(120% 120% at 50% 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.12) 100%)",
-              mixBlendMode: "multiply" as any,
+              mixBlendMode: ("multiply" as React.CSSProperties['mixBlendMode']),
             }}
           />
           <style jsx>{`
