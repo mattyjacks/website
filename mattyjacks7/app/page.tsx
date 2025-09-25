@@ -18,10 +18,6 @@ export default function Home() {
           // Keep from zooming out too much
           minScale={0.6}
           maxScale={1}
-          // Sunbeams overlay
-          showBeams
-          beamsOpacity={0.32}
-          beamsSpeedSec={28}
           verticalMultiplier={2.5}
         />
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center px-4 py-24 md:py-32">

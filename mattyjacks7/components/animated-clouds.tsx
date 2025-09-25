@@ -13,9 +13,6 @@ type AnimatedCloudsProps = {
   maxScale?: number; // max zoom scale
   tileSizePx?: number; // base tile width in px for perfect tiling
   horizontalPixelsPerSecond?: number; // controls horizontal drift speed
-  showBeams?: boolean; // overlay animated sunbeams
-  beamsOpacity?: number; // 0..1 opacity of beams
-  beamsSpeedSec?: number; // seconds per beam pan loop
   horizontalSmoothingMs?: number; // low-pass time constant for bgX smoothing
   verticalMultiplier?: number; // multiply vertical speed for stronger drop
 };
@@ -30,9 +27,6 @@ export default function AnimatedClouds({
   maxScale = 1.1,
   tileSizePx = 1024,
   horizontalPixelsPerSecond = 30,
-  showBeams = true,
-  beamsOpacity = 0.3,
-  beamsSpeedSec = 20,
   horizontalSmoothingMs = 120,
   verticalMultiplier = 1,
 }: AnimatedCloudsProps) {
@@ -211,98 +205,7 @@ export default function AnimatedClouds({
         }}
       />
 
-      {showBeams && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-10"
-          style={{ opacity: beamsOpacity, mixBlendMode: ("screen" as React.CSSProperties['mixBlendMode']) }}
-        >
-          {(() => {
-            const animState1: React.CSSProperties = { animationPlayState: active ? 'running' : 'paused' };
-            const animState2: React.CSSProperties = { animationPlayState: active ? 'running' : 'paused' };
-            const animState3: React.CSSProperties = { animationPlayState: active ? 'running' : 'paused' };
-            return (
-              <>
-                <div className="absolute inset-0 beams-layer beams-1" style={animState1} />
-                <div className="absolute inset-0 beams-layer beams-2" style={animState2} />
-                <div className="absolute inset-0 beams-layer beams-3" style={animState3} />
-              </>
-            );
-          })()}
-          {/* Directional sun vignette (warm) from top-left */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(1200px 600px at 5% 0%, rgba(255, 245, 170, 0.25), rgba(255, 245, 170, 0.0) 60%)",
-              mixBlendMode: ("screen" as React.CSSProperties['mixBlendMode']),
-            }}
-          />
-          {/* Soft edge vignette to subtly frame and aid contrast */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(120% 120% at 50% 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.12) 100%)",
-              mixBlendMode: ("multiply" as React.CSSProperties['mixBlendMode']),
-            }}
-          />
-          <style jsx>{`
-            .beams-layer { will-change: transform, background-position; }
-            .beams-1 {
-              background: repeating-linear-gradient(
-                75deg,
-                rgba(255, 245, 170, 0.45) 0%,
-                rgba(255, 245, 170, 0.0) 12%,
-                rgba(255, 245, 170, 0.45) 24%
-              );
-              animation: beams-pan-1 ${beamsSpeedSec}s linear infinite, beams-rot-1 ${beamsSpeedSec * 4}s ease-in-out infinite alternate;
-            }
-            .beams-2 {
-              background: repeating-linear-gradient(
-                62deg,
-                rgba(255, 235, 140, 0.35) 0%,
-                rgba(255, 235, 140, 0.0) 14%,
-                rgba(255, 235, 140, 0.35) 28%
-              );
-              animation: beams-pan-2 ${beamsSpeedSec * 1.3}s linear infinite, beams-rot-2 ${beamsSpeedSec * 5}s ease-in-out infinite alternate;
-            }
-            .beams-3 {
-              background: repeating-linear-gradient(
-                88deg,
-                rgba(255, 225, 120, 0.28) 0%,
-                rgba(255, 225, 120, 0.0) 18%,
-                rgba(255, 225, 120, 0.28) 36%
-              );
-              animation: beams-pan-3 ${beamsSpeedSec * 1.8}s linear infinite, beams-rot-3 ${beamsSpeedSec * 6}s ease-in-out infinite alternate;
-            }
-            @keyframes beams-pan-1 {
-              from { background-position: 0 0; }
-              to { background-position: 700px -900px; }
-            }
-            @keyframes beams-rot-1 {
-              from { transform: rotate(0deg) scale(1.15); }
-              to { transform: rotate(8deg) scale(1.25); }
-            }
-            @keyframes beams-pan-2 {
-              from { background-position: -200px 0; }
-              to { background-position: 600px -700px; }
-            }
-            @keyframes beams-rot-2 {
-              from { transform: rotate(-2deg) scale(1.2); }
-              to { transform: rotate(6deg) scale(1.27); }
-            }
-            @keyframes beams-pan-3 {
-              from { background-position: 200px 0; }
-              to { background-position: -600px -800px; }
-            }
-            @keyframes beams-rot-3 {
-              from { transform: rotate(3deg) scale(1.22); }
-              to { transform: rotate(-5deg) scale(1.28); }
-            }
-          `}</style>
-        </div>
-      )}
+      
 
       {/* Vertical motion is driven by rAF updating backgroundPositionY for seamless looping. */}
     </div>
