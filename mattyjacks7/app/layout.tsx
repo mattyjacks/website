@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
+import Image from "next/image";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -13,6 +14,16 @@ export const metadata: Metadata = {
   title: "MattyJacks – We'll make you money and/or DIE TRYING!!!",
   description:
     "Outsourcing, Software, Consulting, Websites. Custom AI, elite freelancers, idea-to-income execution, and web design that converts.",
+  openGraph: {
+    images: [
+      {
+        url: "/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png",
+        width: 1200,
+        height: 630,
+        alt: "MattyJacks",
+      },
+    ],
+  },
 };
 
 const geistSans = Geist({
@@ -48,8 +59,15 @@ export default function RootLayout({
             {/* Header / Navigation */}
             <header className="w-full sticky top-0 z-30 border-b border-zinc-200/70 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-950/60 backdrop-blur">
               <div className="max-w-6xl mx-auto h-16 px-4 flex items-center justify-between">
-                <Link href="/" className="text-xl font-black tracking-tight">
-                  MattyJacks
+                <Link href="/" className="flex items-center gap-2" aria-label="MattyJacks Home">
+                  <Image
+                    src="/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png"
+                    alt="MattyJacks logo"
+                    width={120}
+                    height={32}
+                    className="h-8 w-auto"
+                    priority
+                  />
                 </Link>
                 <nav className="flex items-center gap-6 text-sm">
                   <Link href="/resumes" className="hidden sm:inline-block hover:text-emerald-600 dark:hover:text-emerald-400">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata = {
   title: "Contact – MattyJacks",
@@ -82,6 +83,22 @@ export default function ContactPage() {
         </div>
 
         <aside className="space-y-6">
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 text-center">
+            <div className="mx-auto h-28 w-28 overflow-hidden rounded-full ring-1 ring-zinc-200 dark:ring-zinc-800">
+              <Image
+                src="/images/MattyJacks-profile-pic-2025-jpg-1.jpg"
+                alt="Matt (MattyJacks) profile picture"
+                width={256}
+                height={256}
+                className="h-28 w-28 object-cover"
+                priority
+              />
+            </div>
+            <div className="mt-3">
+              <h3 className="font-semibold">Matt (MattyJacks)</h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-300">Builder • Operator • Recruiter</p>
+            </div>
+          </div>
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
             <h3 className="font-semibold">Why work with us?</h3>
             <ul className="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300 list-disc pl-5">
