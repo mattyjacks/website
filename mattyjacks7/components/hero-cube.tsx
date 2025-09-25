@@ -1,8 +1,18 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { cn } from "../lib/utils";
+
+// Face brightness baseline used for dynamic lighting; module-level constant for stable identity
+const BASE_BRIGHTNESS = {
+  front: 1.0,
+  back: 0.85,
+  right: 0.95,
+  left: 1.04,
+  top: 1.06,
+  bottom: 0.9,
+} as const;
 
 type HeroCubeProps = {
   textureSrc?: string;
@@ -95,31 +105,21 @@ export default function HeroCube({
   const topRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  // Base brightness per face (subtle bias) multiplied by dynamic factor
-  const baseBrightness = {
-    front: 1.0,
-    back: 0.85,
-    right: 0.95,
-    left: 1.04,
-    top: 1.06,
-    bottom: 0.9,
-  } as const;
-
   // Apply per-face brightness given current rx, ry
-  const applyLighting = (rxDeg: number, ryDeg: number) => {
+  const applyLighting = useCallback((rxDeg: number, ryDeg: number) => {
     const toRad = (d: number) => (d * Math.PI) / 180;
     const rx = toRad(rxDeg);
     const ry = toRad(ryDeg);
     // Rotate a vector by Rx then Ry
     const rot = (v: [number, number, number]) => {
-      let [x, y, z] = v;
+      const [x, y, z] = v;
       // Rx
-      let y1 = y * Math.cos(rx) - z * Math.sin(rx);
-      let z1 = y * Math.sin(rx) + z * Math.cos(rx);
-      let x1 = x;
+      const y1 = y * Math.cos(rx) - z * Math.sin(rx);
+      const z1 = y * Math.sin(rx) + z * Math.cos(rx);
+      const x1 = x;
       // Ry
-      let x2 = x1 * Math.cos(ry) + z1 * Math.sin(ry);
-      let z2 = -x1 * Math.sin(ry) + z1 * Math.cos(ry);
+      const x2 = x1 * Math.cos(ry) + z1 * Math.sin(ry);
+      const z2 = -x1 * Math.sin(ry) + z1 * Math.cos(ry);
       return [x2, y1, z2] as [number, number, number];
     };
     // Light direction from top-left-front
@@ -153,13 +153,13 @@ export default function HeroCube({
       const brightness = clamp(base * f, 0.6, 1.35);
       el.style.filter = `brightness(${brightness}) contrast(1.05)`;
     };
-    setFace(frontRef.current, baseBrightness.front, normals.front);
-    setFace(backRef.current, baseBrightness.back, normals.back);
-    setFace(rightRef.current, baseBrightness.right, normals.right);
-    setFace(leftRef.current, baseBrightness.left, normals.left);
-    setFace(topRef.current, baseBrightness.top, normals.top);
-    setFace(bottomRef.current, baseBrightness.bottom, normals.bottom);
-  };
+    setFace(frontRef.current, BASE_BRIGHTNESS.front, normals.front);
+    setFace(backRef.current, BASE_BRIGHTNESS.back, normals.back);
+    setFace(rightRef.current, BASE_BRIGHTNESS.right, normals.right);
+    setFace(leftRef.current, BASE_BRIGHTNESS.left, normals.left);
+    setFace(topRef.current, BASE_BRIGHTNESS.top, normals.top);
+    setFace(bottomRef.current, BASE_BRIGHTNESS.bottom, normals.bottom);
+  }, []);
 
   // Track container size
   useEffect(() => {
@@ -409,7 +409,7 @@ export default function HeroCube({
 
     const rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  }, [active, idleSpeedDegPerSec]);
+  }, [active, idleSpeedDegPerSec, applyLighting]);
 
   const half = size / 2;
 

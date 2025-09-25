@@ -40,6 +40,9 @@ export default function MoneyCube({
   const emitterRunningRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
   const [active, setActive] = useState(true);
+  // Read 'active' safely inside rAF without forcing effect dependencies
+  const activeRef = useRef(active);
+  useEffect(() => { activeRef.current = active; }, [active]);
 
   // Hover target state (deg), smoothed each frame
   const hoverRef = useRef({ x: 0, y: 0 });
@@ -51,10 +54,6 @@ export default function MoneyCube({
 
   // Drag/spin inertia state
   const dragStateRef = useRef({ dragging: false, lastX: 0, lastY: 0, lastT: 0 });
-  const spinAngleRef = useRef({ x: 0, y: 0 }); // radians accumulators
-  const spinVelRef = useRef({ x: 0, y: 0 });   // radians/sec
-  const transPosRef = useRef({ x: 0, y: 0 });  // world units
-  const transVelRef = useRef({ x: 0, y: 0 });  // world units/sec
 
   // Create or reuse a global particles root attached to <body>
   useEffect(() => {
@@ -102,18 +101,31 @@ export default function MoneyCube({
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-    // Color management (compat across three versions)
-    try {
-      (renderer as any).outputColorSpace = (THREE as any).SRGBColorSpace;
-    } catch {
-      (renderer as any).outputEncoding = (THREE as any).sRGBEncoding;
+    // Color management (compat across three versions) without using 'any'
+    type RendererCompat = {
+      outputColorSpace?: THREE.ColorSpace;
+      outputEncoding?: number;
+      toneMappingExposure?: number;
+    };
+    type ThreeCompat = {
+      SRGBColorSpace?: THREE.ColorSpace;
+      sRGBEncoding?: number;
+    };
+    const rCompat = renderer as unknown as RendererCompat;
+    const threeCompat = THREE as unknown as ThreeCompat;
+    if (typeof rCompat.outputColorSpace !== "undefined" && typeof threeCompat.SRGBColorSpace !== "undefined") {
+      rCompat.outputColorSpace = threeCompat.SRGBColorSpace;
+    } else if (typeof rCompat.outputEncoding !== "undefined" && typeof threeCompat.sRGBEncoding !== "undefined") {
+      rCompat.outputEncoding = threeCompat.sRGBEncoding;
     }
     // Disable shadows (no floor shadow desired, and saves perf)
     renderer.shadowMap.enabled = false;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setClearColor(0x000000, 0); // transparent background
-    // Slight exposure bump to brighten overall
-    try { (renderer as any).toneMappingExposure = 1.1; } catch {}
+    // Slight exposure bump to brighten overall (if supported)
+    if (typeof (rCompat.toneMappingExposure) !== "undefined") {
+      rCompat.toneMappingExposure = 1.1;
+    }
 
     // Pixel ratio capping for mobile perf
     const desiredPR = Math.min(window.devicePixelRatio || 1, 1.75);
@@ -198,11 +210,15 @@ export default function MoneyCube({
     const tex = texLoader.load(
       textureSrc,
       () => {
-        // Color space (compat)
-        try {
-          (tex as any).colorSpace = (THREE as any).SRGBColorSpace;
-        } catch {
-          (tex as any).encoding = (THREE as any).sRGBEncoding;
+        // Color space (compat) without using 'any'
+        type TextureCompat = { colorSpace?: THREE.ColorSpace; encoding?: number };
+        type ThreeCompatTex = { SRGBColorSpace?: THREE.ColorSpace; sRGBEncoding?: number };
+        const tCompat = tex as unknown as TextureCompat;
+        const threeTex = THREE as unknown as ThreeCompatTex;
+        if (typeof tCompat.colorSpace !== "undefined" && typeof threeTex.SRGBColorSpace !== "undefined") {
+          tCompat.colorSpace = threeTex.SRGBColorSpace;
+        } else if (typeof tCompat.encoding !== "undefined" && typeof threeTex.sRGBEncoding !== "undefined") {
+          tCompat.encoding = threeTex.sRGBEncoding;
         }
         tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 4);
         tex.wrapS = THREE.RepeatWrapping;
@@ -396,8 +412,8 @@ export default function MoneyCube({
       hoveringRef.current = false;
     };
     // UX: better dragging feel
-    try { (host.style as any).cursor = "grab"; } catch {}
-    try { (host.style as any).touchAction = "none"; } catch {}
+    try { host.style.cursor = "grab"; } catch {}
+    try { (host.style as CSSStyleDeclaration).touchAction = "none"; } catch {}
 
     host.addEventListener("pointermove", onPointerMove);
     host.addEventListener("pointerleave", onPointerLeave);
@@ -488,17 +504,17 @@ export default function MoneyCube({
       ds.lastX = e.clientX;
       ds.lastY = e.clientY;
       ds.lastT = performance.now();
-      try { (host as any).setPointerCapture?.(e.pointerId); } catch {}
-      try { (host.style as any).cursor = "grabbing"; } catch {}
+      try { host.setPointerCapture?.(e.pointerId); } catch {}
+      try { host.style.cursor = "grabbing"; } catch {}
       startEmitter();
     };
     const onUpOrCancel = (e: PointerEvent) => {
       pressingRef.current = false;
       dragStateRef.current.dragging = false;
-      try { (host as any).releasePointerCapture?.(e.pointerId); } catch {}
+      try { host.releasePointerCapture?.(e.pointerId); } catch {}
       // If still hovering, continue spawning
       if (!hoveringRef.current) stopEmitter();
-      try { (host.style as any).cursor = "grab"; } catch {}
+      try { host.style.cursor = "grab"; } catch {}
     };
     const onEnter = (e: PointerEvent) => {
       pointerPosRef.current = { x: e.clientX, y: e.clientY };
@@ -511,7 +527,7 @@ export default function MoneyCube({
       dragStateRef.current.dragging = false;
       hoveringRef.current = false;
       stopEmitter();
-      try { (host.style as any).cursor = "grab"; } catch {}
+      try { host.style.cursor = "grab"; } catch {}
     };
 
     host.addEventListener("pointerdown", onDown);
@@ -724,7 +740,7 @@ export default function MoneyCube({
         }
       }
 
-      if (active) renderer.render(scene, camera);
+      if (activeRef.current) renderer.render(scene, camera);
       raf = requestAnimationFrame(animate);
     };
 
@@ -749,33 +765,39 @@ export default function MoneyCube({
       // Remove any remaining particle elements
       particles.forEach((p) => p.el.remove());
 
+      // Helpers
+      const disposeMaterial = (mat: THREE.Material | THREE.Material[] | undefined) => {
+        if (!mat) return;
+        if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
+        else mat.dispose();
+      };
       // Dispose Three.js resources
       try {
-        cubeRef.current?.geometry.dispose();
-        if (Array.isArray((cubeRef.current as any)?.material)) {
-          (cubeRef.current as any).material.forEach((m: THREE.Material) => m.dispose());
-        } else {
-          (cubeRef.current as any)?.material?.dispose?.();
+        if (cubeRef.current) {
+          (cubeRef.current.geometry as THREE.BufferGeometry).dispose();
+          disposeMaterial(cubeRef.current.material as THREE.Material | THREE.Material[]);
+          cubeRef.current = null;
         }
-        (cubeRef.current as any) = null;
       } catch {}
       try {
         if (edgeMeshRef.current) {
           edgeMeshRef.current.geometry.dispose();
-          (edgeMeshRef.current.material as any)?.dispose?.();
+          (edgeMeshRef.current.material as THREE.Material).dispose();
           edgeMeshRef.current = null;
         }
       } catch {}
       try {
-        floorRef.current?.geometry.dispose();
-        (floorRef.current as any)?.material?.dispose?.();
-        (floorRef.current as any) = null;
+        if (floorRef.current) {
+          floorRef.current.geometry.dispose();
+          (floorRef.current.material as THREE.Material).dispose();
+          floorRef.current = null;
+        }
       } catch {}
       try {
         if (groupRef.current) {
           scene.remove(groupRef.current);
           groupRef.current.clear();
-          (groupRef.current as any) = null;
+          groupRef.current = null;
         }
       } catch {}
       try {
