@@ -183,20 +183,20 @@ export default function HeroCube({
       }
     };
 
-    const onDown = (e?: PointerEvent) => { if (e) lastTypeRef.current = e.pointerType; start(); };
-    const onUp = (e?: PointerEvent) => {
+    const onDown: (e: PointerEvent) => void = (e) => { lastTypeRef.current = e.pointerType; start(); };
+    const onUp: (e: PointerEvent) => void = (e) => {
       // Only stop for non-mouse pointers on pointerup; mouse should continue while hovering
-      const t = e?.pointerType || lastTypeRef.current;
+      const t = e.pointerType || lastTypeRef.current;
       if (t && t !== 'mouse') stop();
     };
-    const onEnter = () => start();
-    const onLeave = () => stop();
+    const onEnter: (e: PointerEvent) => void = () => start();
+    const onLeave: (e: PointerEvent) => void = () => stop();
 
-    host.addEventListener("pointerdown", onDown as any);
+    host.addEventListener("pointerdown", onDown);
     host.addEventListener("pointerenter", onEnter);
     host.addEventListener("pointerleave", onLeave);
-    host.addEventListener("pointerup", onUp as any);
-    host.addEventListener("pointercancel", onUp as any);
+    host.addEventListener("pointerup", onUp);
+    host.addEventListener("pointercancel", onUp);
 
     // Integrate with main rAF loop by local updater
     let raf: number;
@@ -231,11 +231,11 @@ export default function HeroCube({
     raf = requestAnimationFrame(tick);
 
     return () => {
-      host.removeEventListener("pointerdown", onDown as any);
+      host.removeEventListener("pointerdown", onDown);
       host.removeEventListener("pointerenter", onEnter);
       host.removeEventListener("pointerleave", onLeave);
-      host.removeEventListener("pointerup", onUp as any);
-      host.removeEventListener("pointercancel", onUp as any);
+      host.removeEventListener("pointerup", onUp);
+      host.removeEventListener("pointercancel", onUp);
       if (raf) cancelAnimationFrame(raf);
       stop();
       // Cleanup remaining particles

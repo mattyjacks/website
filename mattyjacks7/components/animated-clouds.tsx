@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 
 type AnimatedCloudsProps = {
   imageSrc: string;
+  darkImageSrc?: string; // optional image for dark mode
   opacity?: number; // 0..1
   verticalSpeedSec?: number; // time to scroll background vertically once
   horizontalRangePx?: number; // max left/right drift from center
@@ -20,19 +22,21 @@ type AnimatedCloudsProps = {
 
 export default function AnimatedClouds({
   imageSrc,
+  darkImageSrc,
   opacity = 0.25,
   verticalSpeedSec = 60,
-  horizontalRangePx = 240,
+  horizontalRangePx = 800,
   minScale = 0.9,
   maxScale = 1.1,
   tileSizePx = 1024,
   horizontalPixelsPerSecond = 30,
-  showBeams = false,
-  beamsOpacity = 0.15,
+  showBeams = true,
+  beamsOpacity = 0.3,
   beamsSpeedSec = 20,
   horizontalSmoothingMs = 120,
   verticalMultiplier = 1,
 }: AnimatedCloudsProps) {
+  const { resolvedTheme } = useTheme();
   const outerRef = useRef<HTMLDivElement | null>(null);
   // Deterministic initial values to prevent hydration mismatch
   const [bgX, setBgX] = useState(0);
@@ -50,6 +54,10 @@ export default function AnimatedClouds({
   const vxRef = useRef(0); // current horizontal px/sec
   const vxTargetRef = useRef(0); // target horizontal px/sec
   const [active, setActive] = useState(true);
+
+  // Choose image based on theme, falling back to light image
+  const currentImageSrc =
+    resolvedTheme === "dark" && darkImageSrc ? darkImageSrc : imageSrc;
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -186,7 +194,7 @@ export default function AnimatedClouds({
           bottom: "-10vh",
           left: "-10vw",
           right: "-10vw",
-          backgroundImage: `url(${imageSrc})`,
+          backgroundImage: `url(${currentImageSrc})`,
           backgroundRepeat: "repeat",
           // Drift horizontally via backgroundPositionX
           backgroundPositionX: `${effectiveBgX}px`,
@@ -206,7 +214,7 @@ export default function AnimatedClouds({
       {showBeams && (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10"
+          className="pointer-events-none absolute inset-0 z-10"
           style={{ opacity: beamsOpacity, mixBlendMode: ("screen" as React.CSSProperties['mixBlendMode']) }}
         >
           {(() => {

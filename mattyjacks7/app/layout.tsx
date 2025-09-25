@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import Image from "next/image";
+import ThemeToggle from "../components/theme-toggle";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -49,7 +50,12 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col">
             {/* Top Bar */}
             <div className="w-full bg-zinc-900 text-zinc-100 text-xs sm:text-sm">
-              <div className="max-w-6xl mx-auto px-4 py-2 text-center">
+              <div className="relative max-w-6xl mx-auto px-4 py-2 flex items-center justify-center">
+                {/* Left: Theme Toggle */}
+                <div className="absolute left-4">
+                  <ThemeToggle />
+                </div>
+                {/* Center: Phone number */}
                 <a href="tel:+16039999420" className="hover:text-emerald-400">
                   603 999 9420
                 </a>

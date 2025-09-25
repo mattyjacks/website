@@ -9,6 +9,7 @@ export default function Home() {
       <section className="relative min-h-screen">
         <AnimatedClouds
           imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
+          darkImageSrc="/images/seamless-space.jpg"
           opacity={0.35}
           verticalSpeedSec={18}
           horizontalRangePx={3000}
