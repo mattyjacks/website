@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 import { cn } from "../lib/utils";
 
 type HeroCubeProps = {
@@ -30,6 +31,7 @@ export default function HeroCube({
   idleSpeedDegPerSec = 16,
   maxTiltDeg = 22,
 }: HeroCubeProps) {
+  const { resolvedTheme } = useTheme();
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const cubeRef = useRef<HTMLDivElement | null>(null);
   const particlesRootRef = useRef<HTMLDivElement | null>(null);
@@ -38,10 +40,126 @@ export default function HeroCube({
   const [size, setSize] = useState<number>(300);
   const [active, setActive] = useState(true);
 
+  // Theme-aware edge/glow colors (avoid flash on first paint)
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return document.documentElement.classList.contains("dark");
+  });
+  useEffect(() => {
+    setIsDark(resolvedTheme === "dark");
+  }, [resolvedTheme]);
+
+  const edgeBorder = isDark ? "4px solid rgba(255,255,255,0.95)" : "4px solid rgba(0,0,0,0.95)";
+  // Layered, tighter halos: small blur with small spread; avoids long-distance glow
+  const edgeShadow = isDark
+    ? [
+        "0 0 3px 0 rgba(255,255,255,0.88)",
+        "0 0 6px 1px rgba(255,255,255,0.5)",
+        "0 0 10px 2px rgba(255,255,255,0.22)",
+        "0 0 0 1px rgba(255,255,255,0.95)"
+      ].join(", ")
+    : [
+        "0 0 3px 0 rgba(0,0,0,0.88)",
+        "0 0 6px 1px rgba(0,0,0,0.5)",
+        "0 0 10px 2px rgba(0,0,0,0.22)",
+        "0 0 0 1px rgba(0,0,0,0.95)"
+      ].join(", ");
+
+  const cornerColor = isDark ? "rgba(255,255,255,1)" : "rgba(0,0,0,1)";
+  const dotSize = 16; // px diameter of corner spheres
+  const dotOffset = Math.round(dotSize * 0.55); // how much to pull outside the corner
+  const dotEdge = isDark ? "rgba(230,230,230,0.95)" : "rgba(0,0,0,0.95)";
+  const dotShadowOuter = isDark ? "0 1px 2px rgba(255,255,255,0.35), 0 0 4px rgba(255,255,255,0.25)" : "0 1px 2px rgba(0,0,0,0.35), 0 0 4px rgba(0,0,0,0.25)";
+  const dotShadowInner = isDark ? "inset 0 2px 4px rgba(0,0,0,0.25)" : "inset 0 2px 4px rgba(255,255,255,0.15)";
+  const dotHighlight = isDark ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.65)";
+  const dotShade = isDark ? "rgba(190,190,190,1)" : "rgba(0,0,0,1)";
+  const cornerDotStyle: React.CSSProperties = {
+    position: "absolute",
+    width: dotSize,
+    height: dotSize,
+    borderRadius: "50%",
+    background: `radial-gradient(circle at 28% 28%, ${dotHighlight} 0%, ${cornerColor} 40%, ${dotShade} 100%)`,
+    border: `1px solid ${dotEdge}`,
+    boxShadow: `${dotShadowOuter}, ${dotShadowInner}`,
+  };
+
   // Animation state
   const angleRef = useRef(0);
   const hoverRef = useRef({ x: 0, y: 0 });
   const targetRef = useRef({ x: 0, y: 0 });
+  // Face refs for dynamic lighting
+  const frontRef = useRef<HTMLDivElement | null>(null);
+  const backRef = useRef<HTMLDivElement | null>(null);
+  const rightRef = useRef<HTMLDivElement | null>(null);
+  const leftRef = useRef<HTMLDivElement | null>(null);
+  const topRef = useRef<HTMLDivElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  // Base brightness per face (subtle bias) multiplied by dynamic factor
+  const baseBrightness = {
+    front: 1.0,
+    back: 0.85,
+    right: 0.95,
+    left: 1.04,
+    top: 1.06,
+    bottom: 0.9,
+  } as const;
+
+  // Apply per-face brightness given current rx, ry
+  const applyLighting = (rxDeg: number, ryDeg: number) => {
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const rx = toRad(rxDeg);
+    const ry = toRad(ryDeg);
+    // Rotate a vector by Rx then Ry
+    const rot = (v: [number, number, number]) => {
+      let [x, y, z] = v;
+      // Rx
+      let y1 = y * Math.cos(rx) - z * Math.sin(rx);
+      let z1 = y * Math.sin(rx) + z * Math.cos(rx);
+      let x1 = x;
+      // Ry
+      let x2 = x1 * Math.cos(ry) + z1 * Math.sin(ry);
+      let z2 = -x1 * Math.sin(ry) + z1 * Math.cos(ry);
+      return [x2, y1, z2] as [number, number, number];
+    };
+    // Light direction from top-left-front
+    const L = normalize([-0.6, 0.8, 0.45]);
+    function normalize(v: [number, number, number]) {
+      const m = Math.hypot(v[0], v[1], v[2]) || 1;
+      return [v[0] / m, v[1] / m, v[2] / m] as [number, number, number];
+    }
+    const dot = (a: [number, number, number], b: [number, number, number]) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+    const clamp = (n: number, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, n));
+
+    // Local face normals
+    const normals: Record<string, [number, number, number]> = {
+      front: [0, 0, 1],
+      back: [0, 0, -1],
+      right: [1, 0, 0],
+      left: [-1, 0, 0],
+      top: [0, 1, 0],
+      bottom: [0, -1, 0],
+    };
+    // Compute brightness factor from 0.7..1.25 based on orientation
+    const factorFromNormal = (n: [number, number, number]) => {
+      const N = rot(n);
+      const d = dot(normalize(N), L);
+      const t = (d + 1) / 2; // 0..1
+      return 0.75 + 0.55 * t; // 0.75..1.3
+    };
+    const setFace = (el: HTMLDivElement | null, base: number, n: [number, number, number]) => {
+      if (!el) return;
+      const f = factorFromNormal(n);
+      const brightness = clamp(base * f, 0.6, 1.35);
+      el.style.filter = `brightness(${brightness}) contrast(1.05)`;
+    };
+    setFace(frontRef.current, baseBrightness.front, normals.front);
+    setFace(backRef.current, baseBrightness.back, normals.back);
+    setFace(rightRef.current, baseBrightness.right, normals.right);
+    setFace(leftRef.current, baseBrightness.left, normals.left);
+    setFace(topRef.current, baseBrightness.top, normals.top);
+    setFace(bottomRef.current, baseBrightness.bottom, normals.bottom);
+  };
 
   // Track container size
   useEffect(() => {
@@ -50,7 +168,12 @@ export default function HeroCube({
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        setSize(Math.min(width, height, 400) * 0.8); // 80% of previous size
+        // Base sizing as before
+        let next = Math.min(width, height, 400) * 0.8;
+        // Cap to 80% of viewport width for mobile/small screens
+        const vwCap = typeof window !== 'undefined' ? window.innerWidth * 0.8 : Infinity;
+        next = Math.min(next, vwCap);
+        setSize(next);
       }
     });
     ro.observe(el);
@@ -277,6 +400,8 @@ export default function HeroCube({
         const ry = baseRY + angleRef.current + hoverRef.current.y;
         cubeRef.current.style.transform = 
           `translate3d(-50%, -50%, 0) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        // Update per-face lighting using final rotation angles
+        applyLighting(rx, ry);
       }
 
       requestAnimationFrame(animate);
@@ -315,99 +440,142 @@ export default function HeroCube({
         >
           {/* Front */}
           <div
-            className="absolute inset-0 rounded-lg overflow-hidden"
+            ref={frontRef}
+            className="absolute inset-0 overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.28) 0%, rgba(0,0,0,0.18) 80%), url(${textureSrc})`,
               backgroundBlendMode: "overlay",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              border: "4px solid rgba(255,255,255,0.95)",
-              boxShadow: "0 0 18px 6px rgba(255,255,255,0.85), 0 0 40px 14px rgba(255,255,255,0.35)",
+              border: edgeBorder,
+              boxShadow: edgeShadow,
               filter: "brightness(1.0) contrast(1.02)",
+              transition: "filter 120ms linear",
               backfaceVisibility: "hidden",
               transform: `translateZ(${half}px)`,
             }}
-          />
+          >
+            {/* Corner dots (spherical nodes) */}
+            <span style={{ ...cornerDotStyle, top: -dotOffset, left: -dotOffset }} />
+            <span style={{ ...cornerDotStyle, top: -dotOffset, right: -dotOffset }} />
+            <span style={{ ...cornerDotStyle, bottom: -dotOffset, left: -dotOffset }} />
+            <span style={{ ...cornerDotStyle, bottom: -dotOffset, right: -dotOffset }} />
+          </div>
           
           {/* Back */}
           <div
-            className="absolute inset-0 rounded-lg overflow-hidden"
+            ref={backRef}
+            className="absolute inset-0 overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.25) 80%), url(${textureSrc})`,
               backgroundBlendMode: "overlay",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              border: "4px solid rgba(255,255,255,0.95)",
-              boxShadow: "0 0 18px 6px rgba(255,255,255,0.85), 0 0 40px 14px rgba(255,255,255,0.35)",
+              border: edgeBorder,
+              boxShadow: edgeShadow,
               filter: "brightness(0.8)",
+              transition: "filter 120ms linear",
               backfaceVisibility: "hidden",
               transform: `rotateY(180deg) translateZ(${half}px)`,
             }}
-          />
+          >
+            <span style={{ position: "absolute", top: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", top: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+          </div>
           
           {/* Right */}
           <div
-            className="absolute inset-0 rounded-lg overflow-hidden"
+            ref={rightRef}
+            className="absolute inset-0 overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.18) 0%, rgba(0,0,0,0.22) 80%), url(${textureSrc})`,
               backgroundBlendMode: "overlay",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              border: "4px solid rgba(255,255,255,0.95)",
-              boxShadow: "0 0 18px 6px rgba(255,255,255,0.85), 0 0 40px 14px rgba(255,255,255,0.35)",
+              border: edgeBorder,
+              boxShadow: edgeShadow,
               filter: "brightness(0.92)",
+              transition: "filter 120ms linear",
               backfaceVisibility: "hidden",
               transform: `rotateY(90deg) translateZ(${half}px)`,
             }}
-          />
+          >
+            <span style={{ position: "absolute", top: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", top: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+          </div>
           
           {/* Left */}
           <div
-            className="absolute inset-0 rounded-lg overflow-hidden"
+            ref={leftRef}
+            className="absolute inset-0 overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.32) 0%, rgba(0,0,0,0.16) 80%), url(${textureSrc})`,
               backgroundBlendMode: "overlay",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              border: "4px solid rgba(255,255,255,0.95)",
-              boxShadow: "0 0 18px 6px rgba(255,255,255,0.85), 0 0 40px 14px rgba(255,255,255,0.35)",
+              border: edgeBorder,
+              boxShadow: edgeShadow,
               filter: "brightness(1.06)",
+              transition: "filter 120ms linear",
               backfaceVisibility: "hidden",
               transform: `rotateY(-90deg) translateZ(${half}px)`,
             }}
-          />
+          >
+            <span style={{ position: "absolute", top: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", top: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+          </div>
           
           {/* Top */}
           <div
-            className="absolute inset-0 rounded-lg overflow-hidden"
+            ref={topRef}
+            className="absolute inset-0 overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.38) 0%, rgba(0,0,0,0.12) 80%), url(${textureSrc})`,
               backgroundBlendMode: "overlay",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              border: "4px solid rgba(255,255,255,0.95)",
-              boxShadow: "0 0 18px 6px rgba(255,255,255,0.85), 0 0 40px 14px rgba(255,255,255,0.35)",
+              border: edgeBorder,
+              boxShadow: edgeShadow,
               filter: "brightness(1.1) contrast(1.05)",
+              transition: "filter 120ms linear",
               backfaceVisibility: "hidden",
               transform: `rotateX(90deg) translateZ(${half}px)`,
             }}
-          />
+          >
+            <span style={{ position: "absolute", top: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", top: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+          </div>
           
           {/* Bottom */}
           <div
-            className="absolute inset-0 rounded-lg overflow-hidden"
+            ref={bottomRef}
+            className="absolute inset-0 overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0.28) 80%), url(${textureSrc})`,
               backgroundBlendMode: "overlay",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              border: "4px solid rgba(255,255,255,0.95)",
-              boxShadow: "0 0 18px 6px rgba(255,255,255,0.85), 0 0 40px 14px rgba(255,255,255,0.35)",
+              border: edgeBorder,
+              boxShadow: edgeShadow,
               filter: "brightness(0.88)",
+              transition: "filter 120ms linear",
               backfaceVisibility: "hidden",
               transform: `rotateX(-90deg) translateZ(${half}px)`,
             }}
-          />
+          >
+            <span style={{ position: "absolute", top: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", top: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, left: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+            <span style={{ position: "absolute", bottom: -dotOffset, right: -dotOffset, width: dotSize, height: dotSize, background: cornerColor, borderRadius: "50%" }} />
+          </div>
         </div>
       </div>
     </div>

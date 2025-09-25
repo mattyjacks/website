@@ -1,25 +1,28 @@
 import Link from "next/link";
+import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
-import HeroCube from "../components/hero-cube";
+import { ClientThemeProvider } from "../components/client-theme-mount";
 
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <section className="relative min-h-screen">
-        <AnimatedClouds
-          imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
-          darkImageSrc="/images/seamless-space.jpg"
-          opacity={0.35}
-          verticalSpeedSec={18}
-          horizontalRangePx={3000}
-          // Slower, exploratory horizontal drift
-          horizontalPixelsPerSecond={8}
-          // Keep from zooming out too much
-          minScale={0.6}
-          maxScale={1}
-          verticalMultiplier={2.5}
-        />
+        <ClientThemeProvider>
+          <AnimatedClouds
+            imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
+            darkImageSrc="/images/seamless-space-jpg-_upscayl_3x_upscayl-standard-4x.jpg"
+            opacity={0.35}
+            verticalSpeedSec={18}
+            horizontalRangePx={3000}
+            // Slower, exploratory horizontal drift
+            horizontalPixelsPerSecond={8}
+            // Keep from zooming out too much
+            minScale={0.6}
+            maxScale={1}
+            verticalMultiplier={2.5}
+          />
+        </ClientThemeProvider>
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center px-4 py-24 md:py-32">
           <div className="relative">
             {/* Contrast helper behind text for readability over beams */}
@@ -40,7 +43,9 @@ export default function Home() {
               <a href="tel:+16039999420" className="inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 px-5 py-3 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-900">Call Us</a>
             </div>
           </div>
-          <HeroCube className="rounded-2xl" />
+          <ClientThemeProvider>
+            <MoneyCube className="rounded-2xl" />
+          </ClientThemeProvider>
         </div>
       </section>
 

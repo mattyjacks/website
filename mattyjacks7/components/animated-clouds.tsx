@@ -49,9 +49,18 @@ export default function AnimatedClouds({
   const vxTargetRef = useRef(0); // target horizontal px/sec
   const [active, setActive] = useState(true);
 
-  // Choose image based on theme, falling back to light image
-  const currentImageSrc =
-    resolvedTheme === "dark" && darkImageSrc ? darkImageSrc : imageSrc;
+  // Choose image based on theme. Initialize synchronously to avoid flash on reload.
+  const [currentImageSrc, setCurrentImageSrc] = useState<string>(() => {
+    if (typeof window === "undefined") return imageSrc;
+    const isDark = document.documentElement.classList.contains("dark");
+    return isDark && darkImageSrc ? darkImageSrc : imageSrc;
+  });
+
+  // Update on theme changes after mount
+  useEffect(() => {
+    const isDark = resolvedTheme === "dark";
+    setCurrentImageSrc(isDark && darkImageSrc ? darkImageSrc : imageSrc);
+  }, [resolvedTheme, darkImageSrc, imageSrc]);
 
   // Keep ref in sync with state
   useEffect(() => {
