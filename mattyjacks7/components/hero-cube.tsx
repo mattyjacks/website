@@ -34,6 +34,7 @@ export default function HeroCube({
   const cubeRef = useRef<HTMLDivElement | null>(null);
   const particlesRootRef = useRef<HTMLDivElement | null>(null);
   const pressingRef = useRef(false);
+  const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
   const [size, setSize] = useState<number>(300);
   const [active, setActive] = useState(true);
 
@@ -107,11 +108,14 @@ export default function HeroCube({
       const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
       targetRef.current.x = -y * maxTiltDeg;
       targetRef.current.y = x * maxTiltDeg;
+      // Track absolute pointer position (viewport coords) for particle spawns
+      pointerPosRef.current = { x: e.clientX, y: e.clientY };
     };
 
     const onPointerLeave = () => {
       targetRef.current.x = 0;
       targetRef.current.y = 0;
+      pointerPosRef.current = null;
     };
 
     el.addEventListener("pointermove", onPointerMove);
@@ -133,9 +137,14 @@ export default function HeroCube({
       const root = particlesRootRef.current;
       if (!cube || !root) return;
       const rect = cube.getBoundingClientRect();
-      // Random point across the projected cube area (approx via bounding rect)
-      const cx = rect.left + Math.random() * rect.width;
-      const cy = rect.top + Math.random() * rect.height;
+      // Use last known pointer position or fallback to cube center
+      const fallbackX = rect.left + rect.width / 2;
+      const fallbackY = rect.top + rect.height / 2;
+      const baseX = pointerPosRef.current?.x ?? fallbackX;
+      const baseY = pointerPosRef.current?.y ?? fallbackY;
+      // Small jitter for visual variety (within ~12px)
+      const cx = baseX + (Math.random() * 2 - 1) * 12;
+      const cy = baseY + (Math.random() * 2 - 1) * 12;
       const kind: Particle["kind"] = Math.random() < 0.5 ? "bill" : "fly";
       const el = document.createElement("span");
       el.textContent = kind === "bill" ? "💵" : "💸";
@@ -183,13 +192,13 @@ export default function HeroCube({
       }
     };
 
-    const onDown: (e: PointerEvent) => void = (e) => { lastTypeRef.current = e.pointerType; start(); };
+    const onDown: (e: PointerEvent) => void = (e) => { lastTypeRef.current = e.pointerType; pointerPosRef.current = { x: e.clientX, y: e.clientY }; start(); };
     const onUp: (e: PointerEvent) => void = (e) => {
       // Only stop for non-mouse pointers on pointerup; mouse should continue while hovering
       const t = e.pointerType || lastTypeRef.current;
       if (t && t !== 'mouse') stop();
     };
-    const onEnter: (e: PointerEvent) => void = () => start();
+    const onEnter: (e: PointerEvent) => void = (e) => { pointerPosRef.current = { x: e.clientX, y: e.clientY }; start(); };
     const onLeave: (e: PointerEvent) => void = () => stop();
 
     host.addEventListener("pointerdown", onDown);
