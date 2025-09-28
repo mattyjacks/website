@@ -1,15 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ExternalLink, X } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
 
-// Define the type for lead sheets
+// Define the types for our data
 interface LeadSheet {
   id: string;
   name: string;
   description: string;
   embedUrl: string;
+  rowCount?: number;
+}
+
+interface SummaryStats {
+  totalSheets: number;
+  totalRows: number;
+  lastUpdated: string;
 }
 
 // Premium Lead Databases - Your shortcut to quality prospects
@@ -70,6 +77,11 @@ const leadSheets: LeadSheet[] = [
   }
 ];
 
+// Format number with commas
+const formatNumber = (num: number): string => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 // Modal component for displaying Google Sheet
 function SheetModal({ sheet, onClose }: { sheet: LeadSheet | null; onClose: () => void }) {
   if (!sheet) return null;
@@ -82,36 +94,183 @@ function SheetModal({ sheet, onClose }: { sheet: LeadSheet | null; onClose: () =
 
         {/* Modal panel */}
         <div className="inline-block h-[90vh] w-full max-w-6xl transform overflow-hidden rounded-lg bg-white dark:bg-zinc-800 text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
-          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-700 px-4 py-3 sm:px-6">
-            <h3 className="text-lg font-medium text-zinc-900 dark:text-white">{sheet.name}</h3>
-            <button
-              type="button"
-              className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-500 dark:hover:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              onClick={onClose}
-            >
-              <X className="h-6 w-6" aria-hidden="true" />
-              <span className="sr-only">Close</span>
-            </button>
+          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-700 px-6 py-4">
+            <div>
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">{sheet.name}</h3>
+              {sheet.rowCount && (
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  {formatNumber(sheet.rowCount)} {sheet.rowCount === 1 ? 'lead' : 'leads'}
+                </p>
+              )}
+            </div>
+            <div className="flex space-x-3">
+              <a
+                href={sheet.embedUrl.replace('/pubhtml?', '/pub?')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-white dark:bg-zinc-700 text-emerald-600 dark:text-emerald-400 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
+              >
+                <ExternalLink className="h-4 w-4 mr-1.5" />
+                Open
+              </a>
+              <button
+                type="button"
+                className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-500 dark:hover:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                onClick={onClose}
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+                <span className="sr-only">Close</span>
+              </button>
+            </div>
           </div>
-          <div className="h-[calc(90vh-60px)] w-full">
+          <div className="h-[calc(90vh-73px)] w-full bg-white dark:bg-zinc-900">
             <iframe
               src={sheet.embedUrl}
               className="h-full w-full border-0"
               frameBorder="0"
               allowFullScreen
               title={`Google Sheet: ${sheet.name}`}
-            ></iframe>
+              loading="lazy"
+            />
           </div>
         </div>
       </div>
     </div>
   );
 }
-export default function LeadsPage() {
-  const [selectedSheet, setSelectedSheet] = useState<LeadSheet | null>(null);
+// Lead Card Component
+function LeadCard({ sheet, onClick }: { sheet: LeadSheet; onClick: () => void }) {
   return (
-    <main className="min-h-[calc(100vh-16rem)]">
-      <div className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex flex-col overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+      <div className="flex-1 p-6 flex flex-col">
+        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2 line-clamp-2">
+          {sheet.name}
+        </h3>
+        <p className="text-zinc-600 dark:text-zinc-300 text-sm mb-4 flex-1 line-clamp-3">
+          {sheet.description}
+        </p>
+        {sheet.rowCount !== undefined && (
+          <div className="mt-2">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200">
+              {formatNumber(sheet.rowCount)} {sheet.rowCount === 1 ? 'lead' : 'leads'}
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="bg-zinc-50 dark:bg-zinc-700/30 px-6 py-3 border-t border-zinc-200 dark:border-zinc-700">
+        <button
+          onClick={onClick}
+          className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+        >
+          <ExternalLink className="h-4 w-4 mr-2" />
+          View Details
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Summary Stats Component
+function SummaryStats({ stats }: { stats: SummaryStats }) {
+  return (
+    <div className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800 rounded-xl p-6 mb-8 border border-emerald-100 dark:border-emerald-900/30">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="text-center">
+          <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Total Leads</dt>
+          <dd className="mt-1 text-3xl font-semibold text-emerald-600 dark:text-emerald-400">
+            {formatNumber(stats.totalRows)}
+          </dd>
+        </div>
+        <div className="text-center">
+          <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Lead Lists</dt>
+          <dd className="mt-1 text-3xl font-semibold text-blue-600 dark:text-blue-400">
+            {stats.totalSheets}
+          </dd>
+        </div>
+        <div className="text-center">
+          <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Last Updated</dt>
+          <dd className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            {new Date(stats.lastUpdated).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </dd>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function LeadsPage() {
+  // Store the initial sheets data in state
+  const [initialSheets] = useState<LeadSheet[]>(leadSheets);
+  const [selectedSheet, setSelectedSheet] = useState<LeadSheet | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sheetsWithStats, setSheetsWithStats] = useState<LeadSheet[]>([]);
+  const [summaryStats, setSummaryStats] = useState<SummaryStats>({
+    totalSheets: leadSheets.length,
+    totalRows: 0,
+    lastUpdated: new Date().toISOString(),
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/sheet-stats');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch sheet statistics');
+        }
+        
+        const data = await response.json();
+        
+        // Update sheets with row counts using the initial sheets data
+        const updatedSheets = initialSheets.map(sheet => {
+          const stat = data.stats.find((s: { id: string; rowCount: number }) => s.id === sheet.id);
+          return stat ? { ...sheet, rowCount: stat.rowCount } : sheet;
+        });
+        
+        setSheetsWithStats(updatedSheets);
+        setSummaryStats(data.summary);
+      } catch (err) {
+        console.error('Error fetching sheet stats:', err);
+        setError('Failed to load lead statistics. Please try again later.');
+        // Fallback to initial data if API fails
+        setSheetsWithStats(initialSheets);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [initialSheets]); // Include initialSheets in dependencies since it's used in the effect
+
+  if (isLoading) {
+    return (
+      <main className="min-h-[calc(100vh-16rem)]">
+        <div className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+          <div className="text-center py-12">
+            <div className="animate-pulse flex flex-col items-center">
+              <div className="h-8 bg-zinc-200 dark:bg-zinc-700 rounded w-1/3 mb-4"></div>
+              <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2 mb-8"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="h-48 bg-zinc-100 dark:bg-zinc-800 rounded-lg animate-pulse"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-[calc(100vh-16rem)] bg-zinc-50 dark:bg-zinc-900 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-4">Free Lead Databases</h1>
           <p className="text-lg text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto">
@@ -119,76 +278,52 @@ export default function LeadsPage() {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-zinc-800 shadow rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
-              <thead className="bg-zinc-50 dark:bg-zinc-700">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                    File Name
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-300 uppercase tracking-wider">
-                    Description
-                  </th>
-                  <th scope="col" className="relative px-6 py-3">
-                    <span className="sr-only">Download</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-zinc-800 divide-y divide-zinc-200 dark:divide-zinc-700">
-                {leadSheets.map((sheet) => (
-                  <tr key={sheet.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-zinc-900 dark:text-white">
-                            <button
-                              onClick={() => setSelectedSheet(sheet)}
-                              className="hover:text-emerald-600 dark:hover:text-emerald-400 text-left"
-                            >
-                              {sheet.name}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm text-zinc-600 dark:text-zinc-300 line-clamp-2">
-                        {sheet.description}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => setSelectedSheet(sheet)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Summary Stats */}
+        <SummaryStats stats={summaryStats} />
+
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 mb-8 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+              </div>
+            </div>
           </div>
-          
-          <div className="bg-zinc-50 dark:bg-zinc-800 px-6 py-4 border-t border-zinc-200 dark:border-zinc-700">
-            <p className="text-sm text-zinc-600 dark:text-zinc-300 text-center">
-              More lead lists coming soon! Check back regularly for updates.
-            </p>
-          </div>
+        )}
+
+        {/* Lead Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {sheetsWithStats.map((sheet) => (
+            <LeadCard 
+              key={sheet.id} 
+              sheet={sheet} 
+              onClick={() => setSelectedSheet(sheet)} 
+            />
+          ))}
         </div>
 
-        <div className="mt-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-6 border border-emerald-100 dark:border-emerald-900/50">
-          <h3 className="text-lg font-medium text-emerald-800 dark:text-emerald-200 mb-2">Need custom lead generation?</h3>
-          <p className="text-emerald-700 dark:text-emerald-300 mb-4">
-            If you need a specific type of lead list or more detailed information, our team can create a custom lead generation solution for your business.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-          >
-            Contact Us for Custom Leads
-          </Link>
+        {/* CTA Section */}
+        <div className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800 rounded-xl p-8 mb-12 border border-emerald-100 dark:border-emerald-900/30">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">Need Custom Lead Generation?</h2>
+            <p className="text-zinc-600 dark:text-zinc-300 mb-6">
+              If you need a specific type of lead list or more detailed information, our team can create a custom lead generation solution tailored to your business needs.
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+            >
+              Get Custom Leads
+              <svg className="ml-2 -mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
       
