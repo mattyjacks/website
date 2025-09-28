@@ -176,7 +176,7 @@ function LeadCard({ sheet, onClick }: { sheet: LeadSheet; onClick: () => void })
 function SummaryStats({ stats }: { stats: SummaryStats }) {
   return (
     <div className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800 rounded-xl p-6 mb-8 border border-emerald-100 dark:border-emerald-900/30">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="text-center">
           <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Total Leads</dt>
           <dd className="mt-1 text-3xl font-semibold text-emerald-600 dark:text-emerald-400">
@@ -187,16 +187,6 @@ function SummaryStats({ stats }: { stats: SummaryStats }) {
           <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Lead Lists</dt>
           <dd className="mt-1 text-3xl font-semibold text-blue-600 dark:text-blue-400">
             {stats.totalSheets}
-          </dd>
-        </div>
-        <div className="text-center">
-          <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Last Updated</dt>
-          <dd className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {new Date(stats.lastUpdated).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
           </dd>
         </div>
       </div>
