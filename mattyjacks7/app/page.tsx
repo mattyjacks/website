@@ -36,7 +36,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 mb-6">
               <div className="h-px w-8 bg-gradient-to-r from-emerald-600 to-emerald-400"></div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
-              <div className="h-px w-8 bg-gradient-to-r from-emerald-400 to-transparent"></div>
+              <div className="h-px w-8 bg-gradient-to-l from-emerald-600 to-emerald-400"></div>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[0.9] tracking-tight text-center lg:text-left">
               <span className="block bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">We make you</span>
