@@ -4,12 +4,28 @@ import React from "react";
 import { useTheme } from "next-themes";
 
 export default function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
+  
   React.useEffect(() => setMounted(true), []);
 
-  const isDark = (mounted ? resolvedTheme : theme) === "dark";
+  // Don't render until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <button
+        type="button"
+        className="inline-flex items-center gap-2 rounded-md border border-zinc-700/40 bg-zinc-900/70 px-2.5 py-1.5 text-zinc-100 hover:bg-zinc-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-300/30 dark:bg-zinc-100/10 dark:hover:bg-zinc-100/20"
+        disabled
+      >
+        {/* Placeholder content to maintain layout */}
+        <div className="h-4 w-4 opacity-50" />
+        <span className="h-4 w-px bg-zinc-600/50 dark:bg-zinc-300/40" aria-hidden />
+        <div className="h-4 w-4 opacity-60" />
+      </button>
+    );
+  }
 
+  const isDark = resolvedTheme === "dark";
   const toggle = () => setTheme(isDark ? "light" : "dark");
 
   return (
@@ -18,7 +34,6 @@ export default function ThemeToggle() {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       onClick={toggle}
       className="inline-flex items-center gap-2 rounded-md border border-zinc-700/40 bg-zinc-900/70 px-2.5 py-1.5 text-zinc-100 hover:bg-zinc-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-300/30 dark:bg-zinc-100/10 dark:hover:bg-zinc-100/20"
-    
     >
       {/* Sun icon */}
       <svg

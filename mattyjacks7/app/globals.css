@@ -66,3 +66,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom xs breakpoint for extra small screens */
+@media (min-width: 475px) {
+  .xs\:text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+  .xs\:inline {
+    display: inline;
+  }
+}
