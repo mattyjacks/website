@@ -23,17 +23,10 @@ interface SummaryStats {
 const leadSheets: LeadSheet[] = [
   {
     id: '1',
-    name: 'USA Leads from Anvith',
+    name: 'USA Leads',
     description: 'A curated list of Instagram marketing prospects with usernames, bios, and follower metrics—ideal for social campaigns.',
     embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTCtIW1D3w-YOcG6DudGLel5F1KxOJ-P20fKVEESC2PmhTK0ph1uYlaAaIUPyQIaA/pubhtml?widget=true&headers=false',
     rowCount: 11970, // Update with actual count
-  },
-  {
-    id: '2',
-    name: 'Mike Orange County Trade Compliance Leads',
-    description: 'Companies in Orange County specializing in trade compliance, complete with websites and key contact details.',
-    embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQo8a86GJuaHBNt6twgyyYS67r-rQK7ThY2bxRYxBBI9vT1sf2c_nepfffUqWJdiA/pubhtml?widget=true&headers=false',
-    rowCount: 85, // Update with actual count
   },
   {
     id: '3',
@@ -51,7 +44,7 @@ const leadSheets: LeadSheet[] = [
   },
   {
     id: '5',
-    name: 'Cruise & Travel Companies – Claudine & Andrea',
+    name: 'Cruise & Travel Companies',
     description: 'Travel-oriented companies and agencies with potential trip or booking plans, including websites and notes.',
     embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHh-4gDTsdIJsv3E1-NA7zRezECm_DFjlDpkkalgQ9rSujkf1UAEdHcJPT-7q0-g/pubhtml?widget=true&headers=false',
     rowCount: 131, // Update with actual count
@@ -172,7 +165,7 @@ function LeadCard({ sheet, onClick }: { sheet: LeadSheet; onClick: () => void })
           className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
         >
           <ExternalLink className="h-4 w-4 mr-2" />
-          View Details
+          View {formatNumber(sheet.rowCount || 0)} Leads
         </button>
       </div>
     </div>
@@ -183,7 +176,7 @@ function LeadCard({ sheet, onClick }: { sheet: LeadSheet; onClick: () => void })
 function SummaryStats({ stats }: { stats: SummaryStats }) {
   return (
     <div className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800 rounded-xl p-6 mb-8 border border-emerald-100 dark:border-emerald-900/30">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="text-center">
           <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Total Leads</dt>
           <dd className="mt-1 text-3xl font-semibold text-emerald-600 dark:text-emerald-400">
@@ -194,16 +187,6 @@ function SummaryStats({ stats }: { stats: SummaryStats }) {
           <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Lead Lists</dt>
           <dd className="mt-1 text-3xl font-semibold text-blue-600 dark:text-blue-400">
             {stats.totalSheets}
-          </dd>
-        </div>
-        <div className="text-center">
-          <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Last Updated</dt>
-          <dd className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {new Date(stats.lastUpdated).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
           </dd>
         </div>
       </div>
