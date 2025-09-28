@@ -139,8 +139,8 @@ export default function MoneyCube({
       canvas.style.left = "50%";
       canvas.style.top = "50%";
       canvas.style.transform = "translate(-50%, -50%)";
-      // Keep cube below the money emojis and menu, but above background
-      canvas.style.zIndex = "5";
+      // Keep cube below action buttons and menu, but above background
+      canvas.style.zIndex = "1";
       canvas.style.display = "block";
       canvas.style.pointerEvents = "auto";
     } catch {}
@@ -821,7 +821,7 @@ export default function MoneyCube({
         "relative aspect-square w-full overflow-visible mx-auto rounded-2xl",
         className,
       )}
-      style={{ zIndex: 10 }}
+      style={{ zIndex: 1 }}
       aria-label="Interactive money cube with soft shadows"
     />
   );
