@@ -14,12 +14,12 @@ export default function ThemeToggle() {
     return (
       <button
         type="button"
-        className="inline-flex items-center gap-2 rounded-md border border-zinc-700/40 bg-zinc-900/70 px-2.5 py-1.5 text-zinc-100 hover:bg-zinc-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-300/30 dark:bg-zinc-100/10 dark:hover:bg-zinc-100/20"
+        className="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-zinc-900 hover:bg-zinc-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-300/30 dark:bg-zinc-100/10 dark:text-zinc-100 dark:hover:bg-zinc-100/20"
         disabled
       >
         {/* Placeholder content to maintain layout */}
         <div className="h-4 w-4 opacity-50" />
-        <span className="h-4 w-px bg-zinc-600/50 dark:bg-zinc-300/40" aria-hidden />
+        <span className="h-4 w-px bg-zinc-300 dark:bg-zinc-300/40" aria-hidden />
         <div className="h-4 w-4 opacity-60" />
       </button>
     );
@@ -33,7 +33,7 @@ export default function ThemeToggle() {
       type="button"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       onClick={toggle}
-      className="inline-flex items-center gap-2 rounded-md border border-zinc-700/40 bg-zinc-900/70 px-2.5 py-1.5 text-zinc-100 hover:bg-zinc-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-300/30 dark:bg-zinc-100/10 dark:hover:bg-zinc-100/20"
+      className="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-zinc-900 hover:bg-zinc-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-300/30 dark:bg-zinc-100/10 dark:text-zinc-100 dark:hover:bg-zinc-100/20"
     >
       {/* Sun icon */}
       <svg
@@ -50,7 +50,7 @@ export default function ThemeToggle() {
         <path d="M12 2v2m0 16v2M4 12H2m20 0h-2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5" />
       </svg>
       {/* Toggle Separator */}
-      <span className="h-4 w-px bg-zinc-600/50 dark:bg-zinc-300/40" aria-hidden />
+      <span className="h-4 w-px bg-zinc-300 dark:bg-zinc-300/40" aria-hidden />
       {/* Moon icon */}
       <svg
         className={`h-4 w-4 ${isDark ? "opacity-100" : "opacity-60"}`}
