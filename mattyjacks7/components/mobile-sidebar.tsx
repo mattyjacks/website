@@ -18,13 +18,17 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
   useEffect(() => {
     if (isOpen) {
+      // Prevent scrolling on the main content but allow sidebar content to scroll if needed
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     }
 
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -52,6 +56,10 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         )}
         style={{
           background: "rgba(0, 0, 0, 0.1)",
+          width: "100vw",
+          height: "100vh",
+          left: 0,
+          top: 0,
         }}
         onClick={handleBackdropClick}
       />
@@ -59,7 +67,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50 transition-transform duration-300 ease-in-out",
+          "fixed top-0 right-0 h-screen w-80 max-w-[85vw] z-50 transition-transform duration-300 ease-in-out",
           "bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md",
           "border-l border-zinc-200/70 dark:border-zinc-800/60",
           "shadow-xl",
@@ -67,9 +75,11 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         )}
         style={{
           width: "min(20rem, 85vw)", // 320px or 85% of viewport width
+          right: 0,
+          top: 0,
         }}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full max-h-screen">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-zinc-200/70 dark:border-zinc-800/60">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -97,7 +107,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 px-6 py-8">
+          <nav className="flex-1 px-6 py-8 overflow-hidden">
             <ul className="space-y-6">
               <li>
                 <Link
@@ -123,7 +133,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           </nav>
 
           {/* Footer */}
-          <div className="p-6 border-t border-zinc-200/70 dark:border-zinc-800/60">
+          <div className="flex-shrink-0 p-6 border-t border-zinc-200/70 dark:border-zinc-800/60">
             <div className="text-sm text-zinc-600 dark:text-zinc-400">
               <p className="font-medium">Contact Us</p>
               <a
