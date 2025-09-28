@@ -12,7 +12,7 @@ export default function Home() {
           <AnimatedClouds
             imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
             darkImageSrc="/images/seamless-space-jpg-_upscayl_3x_upscayl-standard-4x.jpg"
-            opacity={0.15}
+            opacity={0.6}
             verticalSpeedSec={18}
             horizontalRangePx={3000}
             // Slower, exploratory horizontal drift
