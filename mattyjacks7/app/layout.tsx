@@ -79,6 +79,9 @@ export default function RootLayout({
                   <Link href="/resumes" className="hidden sm:inline-block hover:text-emerald-600 dark:hover:text-emerald-400">
                     Resume Sites
                   </Link>
+                  <Link href="/leads" className="hidden sm:inline-block hover:text-emerald-600 dark:hover:text-emerald-400">
+                    Leads
+                  </Link>
                   <Link
                     href="/contact"
                     className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-emerald-500"
@@ -104,6 +107,7 @@ export default function RootLayout({
                   <ul className="mt-2 space-y-2">
                     <li><Link href="/" className="hover:underline">Home</Link></li>
                     <li><Link href="/resumes" className="hover:underline">Resume Sites</Link></li>
+                    <li><Link href="/leads" className="hover:underline">Leads</Link></li>
                     <li><Link href="/contact" className="hover:underline">Contact</Link></li>
                     <li><Link href="/whatsapp" className="hover:underline">WhatsApp</Link></li>
                   </ul>
