@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import MobileSidebar from "./mobile-sidebar";
 import HamburgerMenu from "./hamburger-menu";
+import ThemeToggle from "./theme-toggle";
 
 export default function Navigation() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,41 +23,86 @@ export default function Navigation() {
     <>
       <header className="w-full sticky top-0 z-30 border-b border-zinc-200/70 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-950/60 backdrop-blur">
         <div className="max-w-6xl mx-auto h-16 px-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2" aria-label="MattyJacks Home">
-            <Image
-              src="/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png"
-              alt="MattyJacks logo"
-              width={120}
-              height={32}
-              className="h-8 w-auto"
-              priority
-            />
-          </Link>
+          {/* Logo */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
+            <Link href="/" className="flex items-center gap-2" aria-label="MattyJacks Home">
+              <Image
+                src="/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png"
+                alt="MattyJacks logo"
+                width={120}
+                height={32}
+                className="h-8 w-auto"
+                priority
+              />
+            </Link>
+          </motion.div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden sm:flex items-center gap-6 text-sm">
-            <Link href="/resumes" className="hover:text-emerald-600 dark:hover:text-emerald-400">
-              Resume Sites
-            </Link>
-            <Link href="/leads" className="hover:text-emerald-600 dark:hover:text-emerald-400">
-              Leads
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-emerald-500"
+          <nav className="hidden lg:flex items-center gap-8 text-sm">
+            <div className="flex items-center gap-6">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <Link href="/resumes" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                  Resume Sites
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <Link href="/leads" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                  Leads
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Theme Toggle in Center */}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              Contact
-            </Link>
+              <ThemeToggle />
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <Link
+                href="/contact"
+                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-emerald-500 transition-colors"
+              >
+                Contact
+              </Link>
+            </motion.div>
           </nav>
 
           {/* Mobile Navigation */}
-          <div className="sm:hidden flex items-center gap-2">
-            <Link
-              href="/contact"
-              className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-emerald-500 text-sm"
+          <div className="lg:hidden flex items-center gap-2">
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              Contact
-            </Link>
+              <ThemeToggle />
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <Link
+                href="/contact"
+                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-emerald-500 text-sm transition-colors"
+              >
+                Contact
+              </Link>
+            </motion.div>
             <HamburgerMenu
               isOpen={isSidebarOpen}
               onClick={handleSidebarToggle}
