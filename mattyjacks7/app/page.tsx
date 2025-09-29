@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
@@ -5,10 +8,157 @@ import { ClientThemeProvider } from "../components/client-theme-mount";
 import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store } from "lucide-react";
 
 export default function Home() {
+  const heroRef = useRef<HTMLElement>(null);
+
+  // Global emoji particle system for the hero section
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const heroSection = heroRef.current;
+    if (!heroSection) return;
+
+    // Create or reuse global particles root
+    let root = document.getElementById("money-particles-root") as HTMLDivElement | null;
+    if (!root) {
+      root = document.createElement("div");
+      root.id = "money-particles-root";
+      Object.assign(root.style, {
+        position: "fixed",
+        left: "0",
+        top: "0",
+        right: "0",
+        bottom: "0",
+        pointerEvents: "none",
+        zIndex: "50",
+        overflow: "hidden",
+      } as CSSStyleDeclaration);
+      document.body.appendChild(root);
+    }
+
+    const particles: Array<{
+      el: HTMLSpanElement;
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      g: number;
+      r: number;
+      vr: number;
+      bornAt: number;
+      minTtlMs: number;
+      kind: "bill" | "fly";
+    }> = [];
+
+    let isHovering = false;
+    let emitterId: number | null = null;
+    let lastMousePos = { x: 0, y: 0 };
+
+    const spawn = () => {
+      if (!root) return;
+      const cx = lastMousePos.x + (Math.random() * 2 - 1) * 20;
+      const cy = lastMousePos.y + (Math.random() * 2 - 1) * 20;
+      const kind: "bill" | "fly" = Math.random() < 0.6 ? "bill" : "fly";
+      const el = document.createElement("span");
+      el.textContent = kind === "bill" ? "💵" : "💸";
+      el.style.position = "fixed";
+      el.style.left = "0";
+      el.style.top = "0";
+      el.style.fontSize = `${24 + Math.round(Math.random() * 10)}px`;
+      el.style.willChange = "transform, opacity";
+      el.style.pointerEvents = "none";
+      el.style.zIndex = "60";
+      root.appendChild(el);
+      const vx = (Math.random() * 2 - 1) * 100;
+      const vy = kind === "bill" ? -(100 + Math.random() * 120) : (110 + Math.random() * 120);
+      const g = kind === "bill" ? (260 + Math.random() * 160) : -(280 + Math.random() * 180);
+      const now = performance.now();
+      const minTtlMs = 550 + Math.random() * 550;
+      const p = { el, x: cx, y: cy, vx, vy, g, r: Math.random() * 360, vr: (Math.random() * 2 - 1) * 120, bornAt: now, minTtlMs, kind };
+      particles.push(p);
+    };
+
+    const startEmitter = () => {
+      if (emitterId) return; // already running
+      const loop = () => {
+        if (!isHovering) return;
+        spawn();
+        const perSec = 2 + Math.random() * 3; // 2–5/sec
+        const delay = 1000 / perSec;
+        emitterId = window.setTimeout(loop, delay);
+      };
+      loop();
+    };
+
+    const stopEmitter = () => {
+      if (emitterId) {
+        window.clearTimeout(emitterId);
+        emitterId = null;
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      lastMousePos = { x: e.clientX, y: e.clientY };
+    };
+
+    const handleMouseEnter = (e: MouseEvent) => {
+      isHovering = true;
+      lastMousePos = { x: e.clientX, y: e.clientY };
+      startEmitter();
+    };
+
+    const handleMouseLeave = () => {
+      isHovering = false;
+      stopEmitter();
+    };
+
+    // Animation loop for particles
+    let animationFrame: number;
+    const animateParticles = () => {
+      const now = performance.now();
+      const dt = 0.016; // ~60fps
+      const H = window.innerHeight;
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.vy += p.g * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.r += p.vr * dt;
+        p.el.style.transform = `translate3d(${Math.round(p.x)}px, ${Math.round(p.y)}px, 0) rotate(${p.r}deg)`;
+
+        if (p.kind === "bill") {
+          if (p.y > H + 100 && (now - p.bornAt) >= p.minTtlMs) {
+            p.el.remove();
+            particles.splice(i, 1);
+          }
+        } else {
+          if (p.y < -60 && (now - p.bornAt) >= p.minTtlMs) {
+            p.el.remove();
+            particles.splice(i, 1);
+          }
+        }
+      }
+      animationFrame = requestAnimationFrame(animateParticles);
+    };
+    animationFrame = requestAnimationFrame(animateParticles);
+
+    heroSection.addEventListener("mousemove", handleMouseMove);
+    heroSection.addEventListener("mouseenter", handleMouseEnter);
+    heroSection.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      heroSection.removeEventListener("mousemove", handleMouseMove);
+      heroSection.removeEventListener("mouseenter", handleMouseEnter);
+      heroSection.removeEventListener("mouseleave", handleMouseLeave);
+      stopEmitter();
+      cancelAnimationFrame(animationFrame);
+      particles.forEach((p) => p.el.remove());
+    };
+  }, []);
   return (
     <main className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section className="relative min-h-screen">
+      <section ref={heroRef} className="relative min-h-screen">
         <ClientThemeProvider>
           <AnimatedClouds
             imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
@@ -73,7 +223,7 @@ export default function Home() {
             </div>
           </div>
           <ClientThemeProvider>
-            <MoneyCube className="rounded-2xl" />
+            <MoneyCube className="rounded-2xl" disableParticles={true} />
           </ClientThemeProvider>
         </div>
       </section>
