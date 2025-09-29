@@ -2,7 +2,7 @@ import Link from "next/link";
 import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
 import { ClientThemeProvider } from "../components/client-theme-mount";
-import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy } from "lucide-react";
+import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store } from "lucide-react";
 
 export default function Home() {
   return (
@@ -239,16 +239,36 @@ export default function Home() {
       {/* Industries */}
       <section className="px-4 py-16 bg-zinc-50 dark:bg-zinc-900/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold">Who we help</h2>
-          <ul className="mt-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-zinc-700 dark:text-zinc-300 list-disc pl-5">
-            <li>Software &amp; SaaS</li>
-            <li>E-commerce &amp; DTC</li>
-            <li>Agencies &amp; Studios</li>
-            <li>Local Services</li>
-            <li>Professional Services</li>
-            <li>Education &amp; Info Products</li>
-            <li>Marketplaces</li>
-            <li>Media &amp; Community</li>
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Who We <span className="font-bold text-red-600 dark:text-red-500">Help</span></p>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Industries we serve</h2>
+          </div>
+          <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 list-none">
+            {[
+              { name: "Software & SaaS", icon: Code2 },
+              { name: "E-commerce & DTC", icon: ShoppingCart },
+              { name: "Agencies & Studios", icon: Palette },
+              { name: "Local Services", icon: MapPin },
+              { name: "Professional Services", icon: Briefcase },
+              { name: "Education & Info Products", icon: GraduationCap },
+              { name: "Marketplaces", icon: Store },
+              { name: "Media & Community", icon: Users },
+            ].map((industry, index) => {
+              const IconComponent = industry.icon;
+              return (
+                <li
+                  key={index}
+                  className="group flex items-center gap-4 p-3 rounded-lg hover:bg-white/50 dark:hover:bg-zinc-800/30 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald-100/60 dark:bg-emerald-900/30 flex items-center justify-center group-hover:bg-emerald-200/80 dark:group-hover:bg-emerald-800/50 group-hover:scale-110 transition-all duration-200">
+                    <IconComponent className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <span className="text-base font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-200">
+                    {industry.name}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>
