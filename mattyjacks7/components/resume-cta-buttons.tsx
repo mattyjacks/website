@@ -11,7 +11,7 @@ export default function ResumeCTAButtons() {
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
-        <Link href="/contact" className="inline-flex items-center rounded-md bg-emerald-600 px-5 py-3 text-white font-semibold hover:bg-emerald-500">
+        <Link href="/contact" className="inline-flex items-center rounded-md bg-emerald-600 px-5 py-3 text-white font-semibold hover:bg-red-600">
           Get Yours
         </Link>
       </motion.div>

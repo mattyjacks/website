@@ -20,7 +20,7 @@ export default function ResumeCard({ title, url, desc }: ResumeCardProps) {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-emerald-500"
+          className="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-red-600"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
