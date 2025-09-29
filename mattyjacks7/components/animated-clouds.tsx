@@ -20,7 +20,7 @@ type AnimatedCloudsProps = {
 export default function AnimatedClouds({
   imageSrc,
   darkImageSrc,
-  opacity = 0.25,
+  opacity = 0.2,
   verticalSpeedSec = 60,
   horizontalRangePx = 800,
   minScale = 0.9,

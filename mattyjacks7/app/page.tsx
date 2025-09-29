@@ -12,7 +12,7 @@ export default function Home() {
           <AnimatedClouds
             imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
             darkImageSrc="/images/seamless-space-jpg-_upscayl_3x_upscayl-standard-4x.jpg"
-            opacity={0.35}
+            opacity={0.6}
             verticalSpeedSec={18}
             horizontalRangePx={3000}
             // Slower, exploratory horizontal drift
@@ -23,24 +23,52 @@ export default function Home() {
             verticalMultiplier={2.5}
           />
         </ClientThemeProvider>
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center px-4 py-24 md:py-32">
-          <div className="relative">
-            {/* Contrast helper behind text for readability over beams */}
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center justify-center pt-20 pb-16 px-6 sm:px-6">
+          <div className="relative z-10 flex flex-col items-center lg:items-start text-center lg:text-left max-w-2xl lg:max-w-none mx-auto lg:mx-0">
+            {/* Enhanced contrast helper with better readability */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10 rounded-2xl"
+              className="pointer-events-none absolute -inset-8 -z-10 rounded-3xl backdrop-blur-sm bg-gradient-to-br from-white/20 via-white/10 to-transparent dark:from-zinc-800/30 dark:via-zinc-900/20 dark:to-transparent"
               style={{
-                background:
-                  "radial-gradient(140% 120% at 10% 20%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 35%, rgba(255,255,255,0.0) 70%)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)"
               }}
             />
-            <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
-            <h1 className="mt-3 text-5xl md:text-6xl font-extrabold leading-tight">We make you money and/or DIE TRYING!</h1>
-            <p className="mt-5 text-zinc-600 dark:text-zinc-300">MattyJacks delivers custom AI solutions, elite freelancers, and idea-to-income execution with unusual speed and care. We operate like a special forces unit for growth: small, senior, and ruthless about outcomes.</p>
-            <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">You bring the goal. We assemble the right talent, spin up the plan, and ship. No bloated teams. No endless decks. Just results.</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/contact" className="inline-flex items-center rounded-md bg-emerald-600 px-5 py-3 text-white font-medium hover:bg-emerald-500">Share Your Vision</Link>
-              <a href="tel:+16039999420" className="inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 px-5 py-3 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-900">Call Us</a>
+            <div className="inline-flex items-center gap-2 mb-6">
+              <div className="h-px w-8 bg-gradient-to-r from-emerald-600 to-emerald-400"></div>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
+              <div className="h-px w-8 bg-gradient-to-l from-emerald-600 to-emerald-400"></div>
+            </div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[0.9] tracking-tight text-center lg:text-left">
+              <span className="block bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">We make you</span>
+              <span className="block bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 bg-clip-text text-transparent font-black">money</span>
+              <span className="block bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">and/or</span>
+              <span className="block bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent font-black">DIE TRYING!</span>
+            </h1>
+            <div className="mt-8 space-y-6 px-2 lg:px-0 text-center lg:text-left">
+              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto lg:mx-0">MattyJacks delivers custom AI solutions, elite freelancers, and idea-to-income execution with unusual speed and care. We operate like a special forces unit for growth: small, senior, and ruthless about outcomes.</p>
+              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto lg:mx-0">You bring the goal. We assemble the right talent, spin up the plan, and ship. No bloated teams. No endless decks. Just results.</p>
+            </div>
+            <div className="relative z-20 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Link
+                href="/contact"
+                className="group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-emerald-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+              >
+                <span className="relative z-10">Share Your Vision</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <svg className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+              <a
+                href="tel:+16039999420"
+                className="group inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
+              >
+                <svg className="mr-2 w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                </svg>
+                Call Us
+                <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors hidden xs:inline">(603) 999-9420</span>
+              </a>
             </div>
           </div>
           <ClientThemeProvider>

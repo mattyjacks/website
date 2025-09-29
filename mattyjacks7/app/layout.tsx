@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
-import Image from "next/image";
-import ThemeToggle from "../components/theme-toggle";
+import Navigation from "../components/navigation";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -48,49 +47,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="min-h-screen flex flex-col">
-            {/* Top Bar */}
-            <div className="w-full bg-zinc-900 text-zinc-100 text-xs sm:text-sm">
-              <div className="relative max-w-6xl mx-auto px-4 py-2 flex items-center justify-center">
-                {/* Left: Theme Toggle */}
-                <div className="absolute left-4">
-                  <ThemeToggle />
-                </div>
-                {/* Center: Phone number */}
-                <a href="tel:+16039999420" className="hover:text-emerald-400">
-                  603 999 9420
-                </a>
-              </div>
-            </div>
-
             {/* Header / Navigation */}
-            <header className="w-full sticky top-0 z-30 border-b border-zinc-200/70 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-950/60 backdrop-blur">
-              <div className="max-w-6xl mx-auto h-16 px-4 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2" aria-label="MattyJacks Home">
-                  <Image
-                    src="/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png"
-                    alt="MattyJacks logo"
-                    width={120}
-                    height={32}
-                    className="h-8 w-auto"
-                    priority
-                  />
-                </Link>
-                <nav className="flex items-center gap-6 text-sm">
-                  <Link href="/resumes" className="hidden sm:inline-block hover:text-emerald-600 dark:hover:text-emerald-400">
-                    Resume Sites
-                  </Link>
-                  <Link href="/leads" className="hidden sm:inline-block hover:text-emerald-600 dark:hover:text-emerald-400">
-                    Leads
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-emerald-500"
-                  >
-                    Contact
-                  </Link>
-                </nav>
-              </div>
-            </header>
+            <Navigation />
 
             {children}
 
