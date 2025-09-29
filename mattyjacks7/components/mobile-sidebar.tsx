@@ -113,9 +113,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <Link
                   href="/resumes"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   Resume Sites
                 </Link>
               </li>
@@ -123,9 +123,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <Link
                   href="/leads"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   Leads
                 </Link>
               </li>
@@ -138,13 +138,13 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <p className="font-medium">Contact Us</p>
               <a
                 href="tel:+16039999420"
-                className="block mt-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                className="block mt-1 hover:text-red-600 dark:hover:text-red-400 transition-colors"
               >
                 (603) 999-9420
               </a>
               <a
                 href="mailto:Matt@MattyJacks.com"
-                className="block mt-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                className="block mt-1 hover:text-red-600 dark:hover:text-red-400 transition-colors"
               >
                 Matt@MattyJacks.com
               </a>

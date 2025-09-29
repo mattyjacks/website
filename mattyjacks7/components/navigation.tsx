@@ -58,7 +58,7 @@ export default function Navigation() {
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Link href="/resumes" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              <Link href="/resumes" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">
                 Resume Sites
               </Link>
             </motion.div>
@@ -66,7 +66,7 @@ export default function Navigation() {
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Link href="/leads" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              <Link href="/leads" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">
                 Leads
               </Link>
             </motion.div>
@@ -77,7 +77,7 @@ export default function Navigation() {
             >
               <Link
                 href="/contact"
-                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-emerald-500 transition-colors"
+                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-red-500 transition-colors"
               >
                 Contact
               </Link>
@@ -99,7 +99,7 @@ export default function Navigation() {
             >
               <Link
                 href="/contact"
-                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-emerald-500 text-sm transition-colors"
+                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-red-500 text-sm transition-colors"
               >
                 Contact
               </Link>

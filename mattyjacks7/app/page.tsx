@@ -202,23 +202,23 @@ export default function Home() {
             <div className="relative z-20 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
-                className="group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-emerald-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+                className="group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-red-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
               >
                 <span className="relative z-10">Share Your Vision</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <svg className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
               <a
                 href="tel:+16039999420"
-                className="group inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
+                className="group inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-red-500 dark:hover:border-red-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
               >
                 <svg className="mr-2 w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
                 Call Us
-                <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors hidden xs:inline">(603) 999-9420</span>
+                <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors hidden xs:inline">(603) 999-9420</span>
               </a>
             </div>
           </div>
@@ -278,15 +278,15 @@ export default function Home() {
               return (
                 <div
                   key={i}
-                  className="group relative rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-300 dark:hover:border-emerald-500 hover:-translate-y-2 transition-all duration-300 ease-out cursor-pointer"
+                  className="group relative rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 hover:-translate-y-2 transition-all duration-300 ease-out cursor-pointer"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-600/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors duration-300">
+                      <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-300">
                         <IconComponent className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
                       </div>
-                      <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">{s.t}</h3>
+                      <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300">{s.t}</h3>
                     </div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{s.d}</p>
                   </div>
@@ -331,14 +331,14 @@ export default function Home() {
 
                     {/* Step Content Card */}
                     <div className="group-hover:scale-105 transition-transform duration-300 h-full">
-                      <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-xl hover:shadow-emerald-500/15 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300 relative overflow-hidden h-full flex flex-col">
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-xl hover:shadow-red-500/15 hover:border-red-400 dark:hover:border-red-500 transition-all duration-300 relative overflow-hidden h-full flex flex-col">
+                        <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                         <div className="relative z-10 flex-1 flex flex-col">
-                          <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4 mx-auto group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors duration-300">
+                          <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4 mx-auto group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-300">
                             <step.icon className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
                           </div>
-                          <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">{step.t}</h3>
+                          <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300">{step.t}</h3>
                           <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed flex-1">{step.d}</p>
                         </div>
                       </div>
@@ -410,10 +410,10 @@ export default function Home() {
                   key={index}
                   className="group flex items-center gap-4 p-3 rounded-lg hover:bg-white/50 dark:hover:bg-zinc-800/30 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
                 >
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald-100/60 dark:bg-emerald-900/30 flex items-center justify-center group-hover:bg-emerald-200/80 dark:group-hover:bg-emerald-800/50 group-hover:scale-110 transition-all duration-200">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald-100/60 dark:bg-emerald-900/30 flex items-center justify-center group-hover:bg-red-200/80 dark:group-hover:bg-red-800/50 group-hover:scale-110 transition-all duration-200">
                     <IconComponent className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <span className="text-base font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-200">
+                  <span className="text-base font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-200">
                     {industry.name}
                   </span>
                 </li>
@@ -446,7 +446,7 @@ export default function Home() {
               <p className="opacity-90 drop-shadow-md text-sm md:text-base md:max-w-md">Share your vision with us, and let&apos;s turn it into reality.</p>
             </div>
             <div className="flex justify-center md:justify-start md:flex-shrink-0">
-              <Link href="/contact" className="inline-flex items-center rounded-md bg-white text-emerald-700 px-6 py-3 font-semibold hover:bg-zinc-100 shadow-lg transition-all duration-200 hover:scale-105">Contact Us</Link>
+              <Link href="/contact" className="inline-flex items-center rounded-md bg-white text-red-700 px-6 py-3 font-semibold hover:bg-zinc-100 shadow-lg transition-all duration-200 hover:scale-105">Contact Us</Link>
             </div>
           </div>
         </div>
