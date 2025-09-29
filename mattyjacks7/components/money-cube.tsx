@@ -15,6 +15,7 @@ type MoneyCubeProps = {
   className?: string;
   idleSpeedDegPerSec?: number;
   maxTiltDeg?: number;
+  disableParticles?: boolean;
 };
 
 export default function MoneyCube({
@@ -22,6 +23,7 @@ export default function MoneyCube({
   className,
   idleSpeedDegPerSec = 16,
   maxTiltDeg = 22,
+  disableParticles = false,
 }: MoneyCubeProps) {
   const { theme: resolvedTheme } = useClientTheme();
 
@@ -57,7 +59,7 @@ export default function MoneyCube({
 
   // Create or reuse a global particles root attached to <body>
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || disableParticles) return;
     let root = document.getElementById("money-particles-root") as HTMLDivElement | null;
     if (!root) {
       root = document.createElement("div");
@@ -74,7 +76,7 @@ export default function MoneyCube({
       } as CSSStyleDeclaration);
       document.body.appendChild(root);
     }
-  }, []);
+  }, [disableParticles]);
 
   // Setup / teardown Three.js scene
   useEffect(() => {
@@ -465,6 +467,7 @@ export default function MoneyCube({
 
     let emitterId: number | null = null;
     const startEmitter = () => {
+      if (disableParticles) return; // particles disabled
       if (emitterRunningRef.current) return; // already running
       if (!(pressingRef.current || hoveringRef.current)) return;
       emitterRunningRef.current = true;
