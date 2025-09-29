@@ -158,22 +158,7 @@ export default function Home() {
           {/* Desktop Workflow */}
           <div className="hidden lg:block">
             <div className="relative">
-              {/* Step Numbers and Connecting Lines */}
-              <div className="relative mb-12">
-                {/* Horizontal connecting line */}
-                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-emerald-500 dark:bg-emerald-400 transform -translate-y-1/2"></div>
-
-                {/* Step Number Circles */}
-                <div className="flex justify-between items-center relative z-10">
-                  {[1, 2, 3, 4].map((number, index) => (
-                    <div key={index} className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center shadow-lg">
-                      {number}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Process Cards */}
+              {/* Process Cards with Numbers */}
               <div className="grid grid-cols-4 gap-8">
                 {[
                   {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
@@ -181,7 +166,19 @@ export default function Home() {
                   {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
                   {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
                 ].map((step, index) => (
-                  <div key={index} className="group text-center">
+                  <div key={index} className="group text-center relative">
+                    {/* Step Number Circle positioned above each card */}
+                    <div className="flex justify-center mb-6">
+                      <div className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center shadow-lg relative z-20">
+                        {index + 1}
+                      </div>
+                    </div>
+
+                    {/* Connecting line from this number to next (except last) */}
+                    {index < 3 && (
+                      <div className="absolute top-6 left-1/2 w-full h-0.5 bg-emerald-500 dark:bg-emerald-400 z-10 transform translate-x-4"></div>
+                    )}
+
                     {/* Step Content Card */}
                     <div className="group-hover:scale-105 transition-transform duration-300 h-full">
                       <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-xl hover:shadow-emerald-500/15 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300 relative overflow-hidden h-full flex flex-col">
@@ -204,36 +201,38 @@ export default function Home() {
 
           {/* Mobile Workflow */}
           <div className="lg:hidden">
-            <div className="relative">
-              {/* Vertical connecting line */}
-              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-emerald-500 dark:bg-emerald-400 z-0"></div>
-
-              <div className="space-y-6 relative z-10">
-                {[
-                  {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
-                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes—in plain English.",icon: Target},
-                  {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
-                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
-                ].map((step, index) => (
-                  <div key={index} className="relative flex items-start gap-4">
-                    {/* Step Number Circle */}
-                    <div className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center flex-shrink-0 shadow-lg z-20">
+            <div className="space-y-6">
+              {[
+                {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
+                {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes—in plain English.",icon: Target},
+                {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
+                {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
+              ].map((step, index) => (
+                <div key={index} className="relative">
+                  {/* Step Number Circle centered above card */}
+                  <div className="flex justify-center mb-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center shadow-lg">
                       {index + 1}
                     </div>
-
-                    {/* Content Card */}
-                    <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-4 bg-white dark:bg-zinc-950 flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                          <step.icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        </div>
-                        <h3 className="font-bold text-base text-zinc-900 dark:text-white">{step.t}</h3>
-                      </div>
-                      <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{step.d}</p>
-                    </div>
                   </div>
-                ))}
-              </div>
+
+                  {/* Vertical connecting line to next card (except last) */}
+                  {index < 3 && (
+                    <div className="absolute top-12 left-1/2 w-0.5 h-6 bg-emerald-500 dark:bg-emerald-400 transform -translate-x-1/2 z-0"></div>
+                  )}
+
+                  {/* Content Card */}
+                  <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-4 bg-white dark:bg-zinc-950">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                        <step.icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <h3 className="font-bold text-base text-zinc-900 dark:text-white">{step.t}</h3>
+                    </div>
+                    <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{step.d}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
