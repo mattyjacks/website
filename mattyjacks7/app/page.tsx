@@ -274,11 +274,31 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="px-4 py-16 bg-emerald-600 text-white">
-        <div className="max-w-6xl mx-auto md:flex md:items-center md:justify-between gap-6">
-          <h2 className="text-2xl md:text-3xl font-bold">Ready to Make Money?</h2>
-          <p className="mt-2 md:mt-0 opacity-90">Share your vision with us, and let&apos;s turn it into reality.</p>
-          <Link href="/contact" className="mt-4 md:mt-0 inline-flex items-center rounded-md bg-white text-emerald-700 px-5 py-3 font-semibold hover:bg-zinc-100">Contact Us</Link>
+      <section
+        className="px-4 py-16 bg-emerald-600 text-white relative"
+        style={{
+          backgroundImage: "url('/images/bg-100-dollar-ai-bills-1.png')",
+          backgroundSize: "400px 400px",
+          backgroundPosition: "center",
+          backgroundRepeat: "repeat"
+        }}
+      >
+        {/* Semi-transparent overlay for better text readability */}
+        <div className="absolute inset-0 bg-emerald-600/60"></div>
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <div className="text-center md:text-left md:flex md:items-center md:justify-center md:gap-8 lg:gap-12">
+            <div className="mb-6 md:mb-0 md:flex-shrink-0">
+              <h2 className="text-2xl md:text-3xl font-bold drop-shadow-lg mb-3 md:mb-2">
+                <span className="text-red-700 font-black" style={{
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.3)'
+                }}>Ready</span> to Make Money?
+              </h2>
+              <p className="opacity-90 drop-shadow-md text-sm md:text-base md:max-w-md">Share your vision with us, and let&apos;s turn it into reality.</p>
+            </div>
+            <div className="flex justify-center md:justify-start md:flex-shrink-0">
+              <Link href="/contact" className="inline-flex items-center rounded-md bg-white text-emerald-700 px-6 py-3 font-semibold hover:bg-zinc-100 shadow-lg transition-all duration-200 hover:scale-105">Contact Us</Link>
+            </div>
+          </div>
         </div>
       </section>
     </main>
