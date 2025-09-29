@@ -201,38 +201,36 @@ export default function Home() {
 
           {/* Mobile Workflow */}
           <div className="lg:hidden">
-            <div className="space-y-6">
-              {[
-                {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
-                {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes—in plain English.",icon: Target},
-                {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
-                {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
-              ].map((step, index) => (
-                <div key={index} className="relative">
-                  {/* Step Number Circle centered above card */}
-                  <div className="flex justify-center mb-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center shadow-lg">
+            <div className="relative">
+              {/* Vertical connecting line on the left */}
+              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-emerald-500 dark:bg-emerald-400 z-0"></div>
+
+              <div className="space-y-6">
+                {[
+                  {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
+                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes—in plain English.",icon: Target},
+                  {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
+                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
+                ].map((step, index) => (
+                  <div key={index} className="relative flex items-center gap-6">
+                    {/* Step Number Circle on the left */}
+                    <div className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center shadow-lg flex-shrink-0 z-10">
                       {index + 1}
                     </div>
-                  </div>
 
-                  {/* Vertical connecting line to next card (except last) */}
-                  {index < 3 && (
-                    <div className="absolute top-12 left-1/2 w-0.5 h-6 bg-emerald-500 dark:bg-emerald-400 transform -translate-x-1/2 z-0"></div>
-                  )}
-
-                  {/* Content Card */}
-                  <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-4 bg-white dark:bg-zinc-950">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                        <step.icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    {/* Content Card */}
+                    <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-4 bg-white dark:bg-zinc-950 flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                          <step.icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <h3 className="font-bold text-base text-zinc-900 dark:text-white">{step.t}</h3>
                       </div>
-                      <h3 className="font-bold text-base text-zinc-900 dark:text-white">{step.t}</h3>
+                      <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{step.d}</p>
                     </div>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{step.d}</p>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
