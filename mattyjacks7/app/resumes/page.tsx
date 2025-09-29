@@ -2,7 +2,7 @@ import ResumeCard from "../../components/resume-card";
 import ResumeCTAButtons from "../../components/resume-cta-buttons";
 
 export const metadata = {
-  title: "Resume Sites – MattyJacks",
+  title: "Resume Sites - MattyJacks",
   description:
     "High-converting resume sites built fast. See featured examples and get yours started.",
 };

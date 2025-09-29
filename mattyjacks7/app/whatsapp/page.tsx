@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "WhatsApp – MattyJacks",
+  title: "WhatsApp - MattyJacks",
   description:
     "Join the MattyJacks public WhatsApp group, read the rules, and follow Matt on X.",
 };
@@ -22,14 +22,14 @@ export default function WhatsAppPage() {
         <p className="mt-3 text-zinc-700 dark:text-zinc-300">
           This should only be shared with <span className="font-semibold">COOL PEOPLE</span>, not just anyone.
           If someone shared this with you, you&apos;re <span className="font-semibold">special</span> to that someone.
-          Live your precious life as long as you can — you&apos;re dear to those around you.
+          Live your precious life as long as you can - you&apos;re dear to those around you.
         </p>
 
         {/* Group CTA */}
         <div className="mt-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
           <div className="flex flex-col gap-3">
             <div className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">
-              MattyJacks.com Public Work — Chat
+              MattyJacks.com Public Work - Chat
             </div>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               This group chat is where Matt personally drops some of the latest work coming down the
