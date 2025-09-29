@@ -2,6 +2,7 @@ import Link from "next/link";
 import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
 import { ClientThemeProvider } from "../components/client-theme-mount";
+import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy } from "lucide-react";
 
 export default function Home() {
   return (
@@ -23,8 +24,8 @@ export default function Home() {
             verticalMultiplier={2.5}
           />
         </ClientThemeProvider>
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center justify-center pt-20 pb-16 px-6 sm:px-6">
-          <div className="relative z-10 flex flex-col items-center lg:items-start text-center lg:text-left max-w-2xl lg:max-w-none mx-auto lg:mx-0">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-12 xl:gap-16 items-center justify-center pt-20 pb-16 px-6 sm:px-6">
+          <div className="relative z-10 flex flex-col items-center lg:items-start text-center lg:text-left mx-auto lg:mx-0">
             {/* Enhanced contrast helper with better readability */}
             <div
               aria-hidden
@@ -79,64 +80,161 @@ export default function Home() {
 
       {/* About: Led by Matt */}
       <section id="about" className="px-4 py-16">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-start">
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Led by Matt</p>
-            <h2 className="mt-2 text-2xl md:text-3xl font-bold">We create unique campaigns that grow your revenue</h2>
-            <p className="mt-4 text-zinc-600 dark:text-zinc-300">Matt is a strategist and builder known for forming strong partnerships with talented freelancers worldwide&mdash;delivering premium results at practical rates. We design for conversions first, then add beauty.</p>
-            <p className="mt-3 text-zinc-600 dark:text-zinc-300">Our network includes engineers, designers, analysts, and operators who have shipped products used by millions. You get senior execution without the agency tax.</p>
-            <Link href="/contact" className="mt-6 inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 px-4 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-900">Learn more</Link>
+        <div className="max-w-6xl mx-auto">
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 xl:p-10 bg-white dark:bg-zinc-950">
+            <div className="space-y-4">
+              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Led by <span className="font-bold text-red-600 dark:text-red-500">MATT</span></p>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">We create unique campaigns that grow your revenue</h2>
+              <div className="grid sm:grid-cols-2 gap-4 text-zinc-600 dark:text-zinc-300">
+                <p>Matt is a strategist and builder known for forming strong partnerships with talented freelancers worldwide&mdash;delivering premium results at practical rates. We design for conversions first, then add beauty.</p>
+                <p>Our network includes engineers, designers, analysts, and operators who have shipped products used by millions. You get senior execution without the agency tax.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Services */}
-      <section id="services" className="px-4 py-16 bg-zinc-50 dark:bg-zinc-900/30">
+      <section id="services" className="px-4 py-16 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between gap-6 mb-8">
-            <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Our Services</p>
-              <h2 className="text-3xl font-bold">What can we do for you?</h2>
-            </div>
-            <Link href="/contact" className="hidden sm:inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-emerald-500">More Services</Link>
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Our Services</p>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">What can we do for you?</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              {t:"Custom AI Solutions",d:"AI copilots, internal tools, and automations mapped to your workflows to reduce cost and increase throughput."},
-              {t:"Elite Freelancers",d:"Handpicked engineers, designers, writers, and operators. Senior talent only. Coordinated for speed and quality."},
-              {t:"Idea-to-Income",d:"From napkin sketch to MVP to first dollars. We prototype fast, test in the wild, and iterate with real feedback."},
-              {t:"Web Design",d:"Beautiful, disciplined, conversion-focused sites. Clear offers, crisp copy, and performance that ranks."},
-            ].map((s,i)=> (
-              <div key={i} className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
-                <h3 className="font-semibold">{s.t}</h3>
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{s.d}</p>
-                <Link href="/contact" className="mt-4 inline-flex text-sm text-emerald-700 dark:text-emerald-300 hover:underline">Learn More</Link>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-sm text-zinc-600 dark:text-zinc-300 max-w-prose">
-            We keep scopes small and cycles short. Most engagements start with a punchy, low-risk sprint to ship something valuable within days, not months.
+              {
+                t:"Custom AI Solutions",
+                d:"AI copilots, internal tools, and automations mapped to your workflows to reduce cost and increase throughput.",
+                icon: Bot
+              },
+              {
+                t:"Elite Freelancers",
+                d:"Handpicked engineers, designers, writers, and operators. Senior talent only. Coordinated for speed and quality.",
+                icon: Users
+              },
+              {
+                t:"Idea-to-Income",
+                d:"From napkin sketch to MVP to first dollars. We prototype fast, test in the wild, and iterate with real feedback.",
+                icon: TrendingUp
+              },
+              {
+                t:"Web Design",
+                d:"Beautiful, disciplined, conversion-focused sites. Clear offers, crisp copy, and performance that ranks.",
+                icon: Palette
+              },
+            ].map((s,i)=> {
+              const IconComponent = s.icon;
+              return (
+                <div
+                  key={i}
+                  className="group relative rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-300 dark:hover:border-emerald-500 hover:-translate-y-2 transition-all duration-300 ease-out cursor-pointer"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-600/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors duration-300">
+                        <IconComponent className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
+                      </div>
+                      <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">{s.t}</h3>
+                    </div>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{s.d}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Process */}
-      <section id="process" className="px-4 py-16">
+      <section id="process" className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6">Our Process</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you."},
-              {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes&mdash;in plain English."},
-              {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required."},
-              {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics&mdash;we track what moves revenue."},
-            ].map((s,i)=> (
-              <div key={i} className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
-                <h3 className="font-semibold">{s.t}</h3>
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{s.d}</p>
-                <Link href="/contact" className="mt-4 inline-flex text-sm text-emerald-700 dark:text-emerald-300 hover:underline">Learn More</Link>
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Our Process</p>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">How we work with you</h2>
+          </div>
+
+          {/* Desktop Workflow */}
+          <div className="hidden lg:block">
+            <div className="relative">
+              {/* Step Numbers and Connecting Lines */}
+              <div className="relative mb-12">
+                {/* Horizontal connecting line */}
+                <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-emerald-500 dark:bg-emerald-400 transform -translate-y-1/2"></div>
+
+                {/* Step Number Circles */}
+                <div className="flex justify-between items-center relative z-10">
+                  {[1, 2, 3, 4].map((number, index) => (
+                    <div key={index} className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center shadow-lg">
+                      {number}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+
+              {/* Process Cards */}
+              <div className="grid grid-cols-4 gap-8">
+                {[
+                  {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
+                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes—in plain English.",icon: Target},
+                  {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
+                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
+                ].map((step, index) => (
+                  <div key={index} className="group text-center">
+                    {/* Step Content Card */}
+                    <div className="group-hover:scale-105 transition-transform duration-300 h-full">
+                      <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-xl hover:shadow-emerald-500/15 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300 relative overflow-hidden h-full flex flex-col">
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                        <div className="relative z-10 flex-1 flex flex-col">
+                          <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4 mx-auto group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors duration-300">
+                            <step.icon className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
+                          </div>
+                          <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">{step.t}</h3>
+                          <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed flex-1">{step.d}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Workflow */}
+          <div className="lg:hidden">
+            <div className="relative">
+              {/* Vertical connecting line */}
+              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-emerald-500 dark:bg-emerald-400 z-0"></div>
+
+              <div className="space-y-6 relative z-10">
+                {[
+                  {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
+                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes—in plain English.",icon: Target},
+                  {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
+                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
+                ].map((step, index) => (
+                  <div key={index} className="relative flex items-start gap-4">
+                    {/* Step Number Circle */}
+                    <div className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center flex-shrink-0 shadow-lg z-20">
+                      {index + 1}
+                    </div>
+
+                    {/* Content Card */}
+                    <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-4 bg-white dark:bg-zinc-950 flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                          <step.icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <h3 className="font-bold text-base text-zinc-900 dark:text-white">{step.t}</h3>
+                      </div>
+                      <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{step.d}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
