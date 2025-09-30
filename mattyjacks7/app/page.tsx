@@ -186,7 +186,7 @@ export default function Home() {
             />
             <div className="inline-flex items-center gap-2 mb-6">
               <div className="h-px w-8 bg-gradient-to-r from-emerald-600 to-emerald-400"></div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
+              <p className="text-base font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
               <div className="h-px w-8 bg-gradient-to-l from-emerald-600 to-emerald-400"></div>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[0.9] tracking-tight text-center">
@@ -196,8 +196,9 @@ export default function Home() {
               <span className="block bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent font-black">DIE TRYING!</span>
             </h1>
             <div className="mt-8 space-y-6 px-2 text-center">
-              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">MattyJacks delivers custom AI solutions, elite freelancers, and idea-to-income execution with unusual speed and care. We operate like a special forces unit for growth: small, senior, and ruthless about outcomes.</p>
-              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto">You bring the goal. We assemble the right talent, spin up the plan, and ship. No bloated teams. No endless decks. Just results.</p>
+              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">MattyJacks provides cheap workers from far away lands. We deploy the latest in AI technologies to make websites and harvest leads. </p>
+              <p className="text-base md:text-md text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">We have sales callers, coders, and so many other talents.</p>
+              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto">You bring the goal, we bring the results. Simple.</p>
             </div>
             <div className="relative z-20 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -233,11 +234,11 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 xl:p-10 bg-white dark:bg-zinc-950">
             <div className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Led by <span className="font-bold text-red-600 dark:text-red-500">MATT</span></p>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">We create unique campaigns that grow your revenue</h2>
+              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Freelancers at the Ready<span className="font-bold text-red-600 dark:text-red-500">MATT</span></p>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">This website will CHANGE YOUR LIFE!!!</h2>
               <div className="grid sm:grid-cols-2 gap-4 text-zinc-600 dark:text-zinc-300">
                 <p>Matt is a strategist and builder known for forming strong partnerships with talented freelancers worldwide-delivering premium results at practical rates. We design for conversions first, then add beauty.</p>
-                <p>Our network includes engineers, designers, analysts, and operators who have shipped products used by millions. You get senior execution without the agency tax.</p>
+                <p>Our network includes engineers, designers, analysts, and operators. You get senior execution without the agency tax.</p>
               </div>
             </div>
           </div>
@@ -420,6 +421,28 @@ export default function Home() {
               );
             })}
           </ul>
+         </div>
+        </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="px-4 py-16">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">What Clients Say</p>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Testimonials</h2>
+          </div>
+          <div className="max-w-lg mx-auto">
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden shadow-md">
+              <video className="w-full h-auto max-h-[300px] md:max-h-[400px] lg:max-h-[500px] xl:max-h-[600px] 2xl:max-h-[700px] object-contain" controls playsInline preload="metadata">
+                <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div className="mt-4 text-center">
+              <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Justin Hughes</p>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">CEO, FirebringerAI</p>
+            </div>
+          </div>
         </div>
       </section>
 
