@@ -18,6 +18,7 @@ export default function Home() {
   const servicesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const processRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const industriesRef = useScrollAnimation<HTMLUListElement>(scaleIn);
+  const videoDemosRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const testimonialsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
@@ -436,6 +437,45 @@ export default function Home() {
           </ul>
          </div>
         </section>
+
+      {/* Video Demos */}
+      <section id="video-demos" className="px-4 py-16 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">See Our <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Video Demos</h2>
+          </div>
+          <div ref={videoDemosRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              "O2U7A3uSEVo",
+              "FzEW5X8PryU",
+              "jTC7vNDd61Q",
+              "nbXak-BQ2SM",
+              "WHWKnAtswNM",
+              "ybG7L7eqc5g",
+            ].map((videoId, index) => (
+              <div
+                key={index}
+                className="group relative rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-black hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 transition-all duration-300"
+              >
+                <div className="aspect-video">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${videoId}`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                    className="w-full h-full"
+                  ></iframe>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Testimonials */}
       <section id="testimonials" className="px-4 py-16">
