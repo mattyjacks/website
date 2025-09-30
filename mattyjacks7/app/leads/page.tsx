@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { X, ExternalLink } from 'lucide-react';
+import { useScrollAnimation } from '@/lib/hooks/useScrollAnimation';
+import { fadeInUp, slideInGrid } from '@/lib/animations/scroll-animations';
 
 // Define the types for our data
 interface LeadSheet {
@@ -196,7 +198,12 @@ function SummaryStats({ stats }: { stats: SummaryStats }) {
 
 export default function LeadsPage() {
   const [selectedSheet, setSelectedSheet] = useState<LeadSheet | null>(null);
-  
+
+  const headerRef = useScrollAnimation(fadeInUp);
+  const statsRef = useScrollAnimation(fadeInUp);
+  const gridRef = useScrollAnimation(slideInGrid);
+  const ctaRef = useScrollAnimation(fadeInUp);
+
   // Calculate summary stats from the hardcoded data
   const summaryStats: SummaryStats = {
     totalSheets: leadSheets.length,
@@ -231,7 +238,7 @@ export default function LeadsPage() {
   return (
     <main className="min-h-[calc(100vh-16rem)] bg-zinc-50 dark:bg-zinc-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+        <div ref={headerRef} className="text-center mb-12">
           <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-4">Free Lead Databases</h1>
           <p className="text-lg text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto">
             Browse our free lead databases to help grow your business. View and analyze the data directly in your browser.
@@ -239,7 +246,9 @@ export default function LeadsPage() {
         </div>
 
         {/* Summary Stats */}
-        <SummaryStats stats={summaryStats} />
+        <div ref={statsRef}>
+          <SummaryStats stats={summaryStats} />
+        </div>
 
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 mb-8 rounded">
@@ -257,7 +266,7 @@ export default function LeadsPage() {
         )}
 
         {/* Lead Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {leadSheets.map((sheet) => (
             <LeadCard 
               key={sheet.id} 
@@ -268,7 +277,7 @@ export default function LeadsPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800 rounded-xl p-8 mb-12 border border-emerald-100 dark:border-emerald-900/30">
+        <div ref={ctaRef} className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800 rounded-xl p-8 mb-12 border border-emerald-100 dark:border-emerald-900/30">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">Need Custom Lead Generation?</h2>
             <p className="text-zinc-600 dark:text-zinc-300 mb-6">

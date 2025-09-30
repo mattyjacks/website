@@ -1,24 +1,29 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-
-export const metadata = {
-  title: "Contact - MattyJacks",
-  description:
-    "Share your vision with MattyJacks. Call, email, or message us on WhatsApp to get started.",
-};
+import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
+import { fadeInUp, slideInGrid } from "@/lib/animations/scroll-animations";
 
 export default function ContactPage() {
+  const headerRef = useScrollAnimation(fadeInUp);
+  const cardsRef = useScrollAnimation(slideInGrid);
+  const teamRef = useScrollAnimation(fadeInUp);
+  const sidebarRef = useScrollAnimation(fadeInUp);
+
   return (
     <main className="min-h-[70vh] px-4 py-14">
       <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
         <div className="md:col-span-2">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Contact</h1>
-          <p className="mt-3 text-zinc-600 dark:text-zinc-300 max-w-prose">
-            Share your vision and we’ll propose a fast, practical path to results. Whether you need a
-            custom AI tool, a high-converting website, or elite freelancers, we’ll help you move quickly.
-          </p>
+          <div ref={headerRef}>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Contact</h1>
+            <p className="mt-3 text-zinc-600 dark:text-zinc-300 max-w-prose">
+              Share your vision and we'll propose a fast, practical path to results. Whether you need a
+              custom AI tool, a high-converting website, or elite freelancers, we'll help you move quickly.
+            </p>
+          </div>
 
-          <div className="mt-8 grid sm:grid-cols-2 gap-6">
+          <div ref={cardsRef} className="mt-8 grid sm:grid-cols-2 gap-6">
             <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
               <h2 className="font-semibold">Email</h2>
               <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Matt@MattyJacks.com</p>
@@ -64,7 +69,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="mt-12 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
+          <div ref={teamRef} className="mt-12 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950">
             <h2 className="text-xl font-bold">Join the Team</h2>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
               We regularly collaborate with talented freelancers around the world.
@@ -82,7 +87,7 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <aside className="space-y-6">
+        <aside ref={sidebarRef} className="space-y-6">
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 text-center">
             <div className="mx-auto h-28 w-28 overflow-hidden rounded-full ring-1 ring-zinc-200 dark:ring-zinc-800">
               <Image
