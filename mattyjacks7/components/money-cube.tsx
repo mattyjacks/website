@@ -36,6 +36,9 @@ export default function MoneyCube({
   const floorRef = useRef<THREE.Mesh | null>(null);
   const groupRef = useRef<THREE.Group | null>(null);
   const edgeMeshRef = useRef<THREE.InstancedMesh | null>(null);
+  // Drag helpers for accurate follow
+  const dragPlaneRef = useRef<THREE.Plane | null>(null);
+  const dragOffsetRef = useRef<THREE.Vector3 | null>(null);
 
   const pressingRef = useRef(false);
   const hoveringRef = useRef(false);
@@ -129,7 +132,6 @@ export default function MoneyCube({
       rCompat.toneMappingExposure = 1.1;
     }
 
-    // Pixel ratio capping for mobile perf
     const desiredPR = Math.min(window.devicePixelRatio || 1, 1.75);
     renderer.setPixelRatio(desiredPR);
 
@@ -145,6 +147,7 @@ export default function MoneyCube({
       canvas.style.zIndex = "1";
       canvas.style.display = "block";
       canvas.style.pointerEvents = "auto";
+      canvas.style.touchAction = "pan-y pinch-zoom";
     } catch {}
     rendererRef.current = renderer;
 
@@ -375,19 +378,21 @@ export default function MoneyCube({
         spinVels[idx].x = (dy * spinFactor) / dt;
         spinVels[idx].y = (dx * spinFactor) / dt;
 
-        // Slight translation for fun
-        transPos[idx].x = THREE.MathUtils.clamp(
-          transPos[idx].x + dx * transFactor,
-          -0.6,
-          0.6
-        );
-        transPos[idx].y = THREE.MathUtils.clamp(
-          transPos[idx].y - dy * transFactor,
-          -0.6,
-          0.6
-        );
-        transVel[idx].x = (dx * transFactor) / dt;
-        transVel[idx].y = (-dy * transFactor) / dt;
+        if (!dragPlaneRef.current) {
+          // Slight translation for fun when not plane-dragging
+          transPos[idx].x = THREE.MathUtils.clamp(
+            transPos[idx].x + dx * transFactor,
+            -0.6,
+            0.6
+          );
+          transPos[idx].y = THREE.MathUtils.clamp(
+            transPos[idx].y - dy * transFactor,
+            -0.6,
+            0.6
+          );
+          transVel[idx].x = (dx * transFactor) / dt;
+          transVel[idx].y = (-dy * transFactor) / dt;
+        }
 
         // Nudge orbital velocity of the selected cube in camera-right/up directions
         const cam = cameraRef.current;
@@ -402,6 +407,25 @@ export default function MoneyCube({
           vel[idx].add(upWorld.multiplyScalar(-dy * velFactor));
         }
 
+        // Drag-plane follow: project pointer to plane and move cube center to follow
+        const plane = dragPlaneRef.current;
+        const offset = dragOffsetRef.current;
+        if (plane && offset) {
+          const canvas = renderer.domElement as HTMLCanvasElement;
+          const rectC = canvas.getBoundingClientRect();
+          pointer.x = ((e.clientX - rectC.left) / rectC.width) * 2 - 1;
+          pointer.y = -((e.clientY - rectC.top) / rectC.height) * 2 + 1;
+          raycaster.setFromCamera(pointer, camera);
+          const hitP = new THREE.Vector3();
+          if (raycaster.ray.intersectPlane(plane, hitP)) {
+            const target = hitP.add(offset.clone());
+            pos[idx].copy(target);
+            // zero out transient translation while dragging for precision
+            transPos[idx].x = 0; transPos[idx].y = 0;
+            transVel[idx].x = 0; transVel[idx].y = 0;
+          }
+        }
+
         ds.lastX = e.clientX;
         ds.lastY = e.clientY;
         ds.lastT = nowT;
@@ -413,12 +437,30 @@ export default function MoneyCube({
       pointerPosRef.current = null;
       hoveringRef.current = false;
     };
+    // Allow page scroll by default; block only if touch starts on a cube
+    const onTouchStart = (e: TouchEvent) => {
+      if (!camera) return;
+      if (e.touches.length === 0) return;
+      const t = e.touches[0];
+      try {
+        const canvas = renderer.domElement as HTMLCanvasElement;
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((t.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((t.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const intersects = raycaster.intersectObjects(cubes.map(c => c.mesh));
+        if (intersects.length > 0) {
+          e.preventDefault(); // touching a cube: prevent scroll
+        }
+      } catch {}
+    };
     // UX: better dragging feel
     try { host.style.cursor = "grab"; } catch {}
-    try { (host.style as CSSStyleDeclaration).touchAction = "none"; } catch {}
+    try { (host.style as CSSStyleDeclaration).touchAction = "auto"; } catch {}
 
     host.addEventListener("pointermove", onPointerMove);
     host.addEventListener("pointerleave", onPointerLeave);
+    host.addEventListener("touchstart", onTouchStart, { passive: false });
 
     // Emoji particle emitter (lightweight)
     const particles: Array<{
@@ -489,32 +531,58 @@ export default function MoneyCube({
     };
 
     const onDown = (e: PointerEvent) => {
-      pressingRef.current = true;
       pointerPosRef.current = { x: e.clientX, y: e.clientY };
-      // Raycast to select cube under pointer
-      const rect = host.getBoundingClientRect();
+      // Raycast using canvas rect for accuracy
+      const canvas = renderer.domElement as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
       pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(pointer, camera);
       const intersects = raycaster.intersectObjects(cubes.map(c => c.mesh));
-      if (intersects.length > 0) {
-        const hit = intersects[0].object as THREE.Mesh;
-        const idx = cubes.findIndex(c => c.mesh === hit);
-        if (idx >= 0) selectedIndexRef.current = idx;
-      }
+
       const ds = dragStateRef.current;
-      ds.dragging = true;
-      ds.lastX = e.clientX;
-      ds.lastY = e.clientY;
-      ds.lastT = performance.now();
-      try { host.setPointerCapture?.(e.pointerId); } catch {}
-      try { host.style.cursor = "grabbing"; } catch {}
-      startEmitter();
+      if (intersects.length > 0) {
+        const first = intersects[0];
+        const hitMesh = first.object as THREE.Mesh;
+        const idx = cubes.findIndex(c => c.mesh === hitMesh);
+        if (idx >= 0) selectedIndexRef.current = idx;
+
+        ds.dragging = true;
+        pressingRef.current = true;
+        ds.lastX = e.clientX;
+        ds.lastY = e.clientY;
+        ds.lastT = performance.now();
+        try { host.setPointerCapture?.(e.pointerId); } catch {}
+        try { host.style.cursor = "grabbing"; } catch {}
+
+        // Setup a drag plane perpendicular to camera through the hit point
+        const camForward = new THREE.Vector3();
+        camera.getWorldDirection(camForward);
+        dragPlaneRef.current = new THREE.Plane().setFromNormalAndCoplanarPoint(camForward, first.point.clone());
+        // Keep the same relative offset from pointer hit to the group center
+        const groupWorld = new THREE.Vector3();
+        cubes[selectedIndexRef.current].group.getWorldPosition(groupWorld);
+        dragOffsetRef.current = groupWorld.sub(first.point.clone());
+
+        // While dragging, disable scroll on the canvas
+        try { canvas.style.touchAction = "none"; } catch {}
+
+        startEmitter();
+      } else {
+        // Not clicking on a cube – do not start dragging
+        pressingRef.current = false;
+      }
     };
     const onUpOrCancel = (e: PointerEvent) => {
       pressingRef.current = false;
       dragStateRef.current.dragging = false;
       try { host.releasePointerCapture?.(e.pointerId); } catch {}
+      dragPlaneRef.current = null;
+      dragOffsetRef.current = null;
+      try {
+        const canvas = renderer.domElement as HTMLCanvasElement;
+        canvas.style.touchAction = "pan-y pinch-zoom";
+      } catch {}
       // If still hovering, continue spawning
       if (!hoveringRef.current) stopEmitter();
       try { host.style.cursor = "grab"; } catch {}
@@ -764,7 +832,7 @@ export default function MoneyCube({
       host.removeEventListener("pointercancel", onUpOrCancel);
       host.removeEventListener("pointerenter", onEnter);
       host.removeEventListener("pointerleave", onLeaveAll);
-
+      host.removeEventListener("touchstart", onTouchStart);
       // Remove any remaining particle elements
       particles.forEach((p) => p.el.remove());
 
@@ -815,7 +883,7 @@ export default function MoneyCube({
       sceneRef.current = null;
       cameraRef.current = null;
     };
-  }, [textureSrc, idleSpeedDegPerSec, maxTiltDeg, resolvedTheme]);
+  }, [textureSrc, idleSpeedDegPerSec, maxTiltDeg, resolvedTheme, disableParticles]);
 
   return (
     <div
