@@ -6,9 +6,20 @@ import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
 import { ClientThemeProvider } from "../components/client-theme-mount";
 import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store } from "lucide-react";
+import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
+import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
+
+  // Scroll animation refs
+  const heroContentRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const aboutRef = useScrollAnimation<HTMLDivElement>(fadeInLeft);
+  const servicesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
+  const processRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const industriesRef = useScrollAnimation<HTMLUListElement>(scaleIn);
+  const testimonialsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
   // Global emoji particle system for the hero section
   useEffect(() => {
@@ -158,7 +169,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen">
+      <section ref={heroRef} className="relative min-h-screen flex items-start pt-32 overflow-x-hidden">
         <ClientThemeProvider>
           <AnimatedClouds
             imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
@@ -174,8 +185,8 @@ export default function Home() {
             verticalMultiplier={2.5}
           />
         </ClientThemeProvider>
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-8 xl:gap-12 items-center justify-center pt-20 pb-16 px-6 sm:px-6">
-          <div className="relative z-10 flex flex-col items-center lg:items-center text-center mx-auto">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-8 xl:gap-12 items-center justify-center px-6 sm:px-6 w-full overflow-visible">
+          <div ref={heroContentRef} className="relative z-30 flex flex-col items-center lg:items-center text-center mx-auto">
             {/* Enhanced contrast helper with better readability */}
             <div
               aria-hidden
@@ -186,7 +197,7 @@ export default function Home() {
             />
             <div className="inline-flex items-center gap-2 mb-6">
               <div className="h-px w-8 bg-gradient-to-r from-emerald-600 to-emerald-400"></div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
+              <p className="text-base font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
               <div className="h-px w-8 bg-gradient-to-l from-emerald-600 to-emerald-400"></div>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[0.9] tracking-tight text-center">
@@ -196,10 +207,11 @@ export default function Home() {
               <span className="block bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent font-black">DIE TRYING!</span>
             </h1>
             <div className="mt-8 space-y-6 px-2 text-center">
-              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">MattyJacks delivers custom AI solutions, elite freelancers, and idea-to-income execution with unusual speed and care. We operate like a special forces unit for growth: small, senior, and ruthless about outcomes.</p>
-              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto">You bring the goal. We assemble the right talent, spin up the plan, and ship. No bloated teams. No endless decks. Just results.</p>
+              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">MattyJacks provides cheap workers from far away lands. We deploy the latest in AI technologies to make websites and harvest leads. </p>
+              <p className="text-base md:text-md text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">We have sales callers, coders, and so many other talents.</p>
+              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto">You bring the goal, we bring the results. Simple.</p>
             </div>
-            <div className="relative z-20 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="relative z-40 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
                 className="group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-red-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
@@ -222,9 +234,11 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <ClientThemeProvider>
-            <MoneyCube className="rounded-2xl" disableParticles={true} />
-          </ClientThemeProvider>
+          <div className="relative w-full overflow-visible z-10 min-h-[400px] md:min-h-[500px]">
+            <ClientThemeProvider>
+              <MoneyCube className="rounded-2xl" disableParticles={true} />
+            </ClientThemeProvider>
+          </div>
         </div>
       </section>
 
@@ -232,12 +246,12 @@ export default function Home() {
       <section id="about" className="px-4 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 xl:p-10 bg-white dark:bg-zinc-950">
-            <div className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Led by <span className="font-bold text-red-600 dark:text-red-500">MATT</span></p>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">We create unique campaigns that grow your revenue</h2>
+            <div ref={aboutRef} className="space-y-4">
+              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Freelancers at the Ready<span className="font-bold text-red-600 dark:text-red-500">MATT</span></p>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">This website will CHANGE YOUR LIFE!!!</h2>
               <div className="grid sm:grid-cols-2 gap-4 text-zinc-600 dark:text-zinc-300">
                 <p>Matt is a strategist and builder known for forming strong partnerships with talented freelancers worldwide-delivering premium results at practical rates. We design for conversions first, then add beauty.</p>
-                <p>Our network includes engineers, designers, analysts, and operators who have shipped products used by millions. You get senior execution without the agency tax.</p>
+                <p>Our network includes engineers, designers, analysts, and operators. You get senior execution without the agency tax.</p>
               </div>
             </div>
           </div>
@@ -251,7 +265,7 @@ export default function Home() {
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Our <span className="font-bold text-red-600 dark:text-red-500">Services</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">What can we do for you?</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div ref={servicesRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 t:"Custom AI Solutions",
@@ -309,7 +323,7 @@ export default function Home() {
           <div className="hidden lg:block">
             <div className="relative">
               {/* Process Cards with Numbers */}
-              <div className="grid grid-cols-4 gap-8">
+              <div ref={processRef} className="grid grid-cols-4 gap-8">
                 {[
                   {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
                   {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes-in plain English.",icon: Target},
@@ -393,7 +407,7 @@ export default function Home() {
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Who We <span className="font-bold text-red-600 dark:text-red-500">Help</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Industries we serve</h2>
           </div>
-          <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 list-none">
+          <ul ref={industriesRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 list-none">
             {[
               { name: "Software & SaaS", icon: Code2 },
               { name: "E-commerce & DTC", icon: ShoppingCart },
@@ -420,6 +434,30 @@ export default function Home() {
               );
             })}
           </ul>
+         </div>
+        </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="px-4 py-16">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">What <span className="font-bold text-red-600 dark:text-red-500">Clients</span> Say</p>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Testimonials</h2>
+          </div>
+          <div ref={testimonialsRef} className="max-w-md mx-auto">
+            <div className="rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-shadow duration-300">
+              <video className="w-full aspect-[9/16] object-cover max-h-[600px]" controls playsInline preload="metadata">
+                <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div className="mt-6 flex items-center justify-center gap-4 p-6 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+              <div className="text-center">
+                <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Justin Hughes</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">CEO, FirebringerAI</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -436,7 +474,7 @@ export default function Home() {
         {/* Semi-transparent overlay for better text readability */}
         <div className="absolute inset-0 bg-emerald-600/60"></div>
         <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="text-center md:text-left md:flex md:items-center md:justify-center md:gap-8 lg:gap-12">
+          <div ref={ctaRef} className="text-center md:text-left md:flex md:items-center md:justify-center md:gap-8 lg:gap-12">
             <div className="mb-6 md:mb-0 md:flex-shrink-0">
               <h2 className="text-2xl md:text-3xl font-bold drop-shadow-lg mb-3 md:mb-2">
                 <span className="text-red-700 font-black" style={{

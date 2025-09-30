@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { X, ExternalLink } from 'lucide-react';
+import { useScrollAnimation } from '@/lib/hooks/useScrollAnimation';
+import { fadeInUp, slideInGrid } from '@/lib/animations/scroll-animations';
 
 // Define the types for our data
 interface LeadSheet {
@@ -110,10 +112,10 @@ function SheetModal({ sheet, onClose }: { sheet: LeadSheet | null; onClose: () =
                 href={sheet.embedUrl.replace('/pubhtml?', '/pub?')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-white dark:bg-zinc-700 text-emerald-600 dark:text-emerald-400 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
+                className="inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-xl bg-emerald-600 text-white shadow-lg hover:bg-red-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
               >
                 <ExternalLink className="h-4 w-4 mr-1.5" />
-                Open
+                <span>Open</span>
               </a>
               <button
                 type="button"
@@ -162,10 +164,10 @@ function LeadCard({ sheet, onClick }: { sheet: LeadSheet; onClick: () => void })
       <div className="bg-zinc-50 dark:bg-zinc-700/30 px-6 py-3 border-t border-zinc-200 dark:border-zinc-700">
         <button
           onClick={onClick}
-          className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+          className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-emerald-600 text-white shadow-lg hover:bg-red-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
         >
           <ExternalLink className="h-4 w-4 mr-2" />
-          View {formatNumber(sheet.rowCount || 0)} Leads
+          <span>View {formatNumber(sheet.rowCount || 0)} Leads</span>
         </button>
       </div>
     </div>
@@ -185,7 +187,7 @@ function SummaryStats({ stats }: { stats: SummaryStats }) {
         </div>
         <div className="text-center">
           <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Lead Lists</dt>
-          <dd className="mt-1 text-3xl font-semibold text-blue-600 dark:text-blue-400">
+          <dd className="mt-1 text-3xl font-semibold text-red-600 dark:text-red-400">
             {stats.totalSheets}
           </dd>
         </div>
@@ -196,7 +198,12 @@ function SummaryStats({ stats }: { stats: SummaryStats }) {
 
 export default function LeadsPage() {
   const [selectedSheet, setSelectedSheet] = useState<LeadSheet | null>(null);
-  
+
+  const headerRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const statsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const gridRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
+  const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+
   // Calculate summary stats from the hardcoded data
   const summaryStats: SummaryStats = {
     totalSheets: leadSheets.length,
@@ -231,15 +238,20 @@ export default function LeadsPage() {
   return (
     <main className="min-h-[calc(100vh-16rem)] bg-zinc-50 dark:bg-zinc-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-4">Free Lead Databases</h1>
-          <p className="text-lg text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto">
+        <div ref={headerRef} className="mb-12">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
+            <span className="text-emerald-600">Free Lead</span>{" "}
+            <span className="text-red-600">Databases</span>
+          </h1>
+          <p className="text-base text-zinc-600 dark:text-zinc-300">
             Browse our free lead databases to help grow your business. View and analyze the data directly in your browser.
           </p>
         </div>
 
         {/* Summary Stats */}
-        <SummaryStats stats={summaryStats} />
+        <div ref={statsRef}>
+          <SummaryStats stats={summaryStats} />
+        </div>
 
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 mb-8 rounded">
@@ -257,7 +269,7 @@ export default function LeadsPage() {
         )}
 
         {/* Lead Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {leadSheets.map((sheet) => (
             <LeadCard 
               key={sheet.id} 
@@ -268,7 +280,7 @@ export default function LeadsPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800 rounded-xl p-8 mb-12 border border-emerald-100 dark:border-emerald-900/30">
+        <div ref={ctaRef} className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800 rounded-xl p-8 mb-12 border border-emerald-100 dark:border-emerald-900/30">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4">Need Custom Lead Generation?</h2>
             <p className="text-zinc-600 dark:text-zinc-300 mb-6">
@@ -276,9 +288,9 @@ export default function LeadsPage() {
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+              className="inline-flex items-center px-6 py-3 text-base font-medium rounded-xl shadow-lg bg-emerald-600 text-white hover:bg-red-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
             >
-              Get Custom Leads
+              <span>Get Custom Leads</span>
               <svg className="ml-2 -mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
