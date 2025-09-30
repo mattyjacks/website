@@ -6,9 +6,20 @@ import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
 import { ClientThemeProvider } from "../components/client-theme-mount";
 import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store } from "lucide-react";
+import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
+import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
+
+  // Scroll animation refs
+  const heroContentRef = useScrollAnimation(fadeInUp);
+  const aboutRef = useScrollAnimation(fadeInLeft);
+  const servicesRef = useScrollAnimation(slideInGrid);
+  const processRef = useScrollAnimation(fadeInUp);
+  const industriesRef = useScrollAnimation(scaleIn);
+  const testimonialsRef = useScrollAnimation(fadeInUp);
+  const ctaRef = useScrollAnimation(fadeInUp);
 
   // Global emoji particle system for the hero section
   useEffect(() => {
@@ -175,7 +186,7 @@ export default function Home() {
           />
         </ClientThemeProvider>
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-8 xl:gap-12 items-center justify-center px-6 sm:px-6 w-full overflow-visible">
-          <div className="relative z-10 flex flex-col items-center lg:items-center text-center mx-auto">
+          <div ref={heroContentRef} className="relative z-10 flex flex-col items-center lg:items-center text-center mx-auto">
             {/* Enhanced contrast helper with better readability */}
             <div
               aria-hidden
@@ -235,7 +246,7 @@ export default function Home() {
       <section id="about" className="px-4 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 xl:p-10 bg-white dark:bg-zinc-950">
-            <div className="space-y-4">
+            <div ref={aboutRef} className="space-y-4">
               <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Freelancers at the Ready<span className="font-bold text-red-600 dark:text-red-500">MATT</span></p>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">This website will CHANGE YOUR LIFE!!!</h2>
               <div className="grid sm:grid-cols-2 gap-4 text-zinc-600 dark:text-zinc-300">
@@ -254,7 +265,7 @@ export default function Home() {
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Our <span className="font-bold text-red-600 dark:text-red-500">Services</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">What can we do for you?</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div ref={servicesRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 t:"Custom AI Solutions",
@@ -312,7 +323,7 @@ export default function Home() {
           <div className="hidden lg:block">
             <div className="relative">
               {/* Process Cards with Numbers */}
-              <div className="grid grid-cols-4 gap-8">
+              <div ref={processRef} className="grid grid-cols-4 gap-8">
                 {[
                   {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
                   {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes-in plain English.",icon: Target},
@@ -396,7 +407,7 @@ export default function Home() {
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Who We <span className="font-bold text-red-600 dark:text-red-500">Help</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Industries we serve</h2>
           </div>
-          <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 list-none">
+          <ul ref={industriesRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 list-none">
             {[
               { name: "Software & SaaS", icon: Code2 },
               { name: "E-commerce & DTC", icon: ShoppingCart },
@@ -433,7 +444,7 @@ export default function Home() {
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">What <span className="font-bold text-red-600 dark:text-red-500">Clients</span> Say</p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Testimonials</h2>
           </div>
-          <div className="max-w-md mx-auto">
+          <div ref={testimonialsRef} className="max-w-md mx-auto">
             <div className="rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-shadow duration-300">
               <video className="w-full aspect-[9/16] object-cover max-h-[600px]" controls playsInline preload="metadata">
                 <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
@@ -463,7 +474,7 @@ export default function Home() {
         {/* Semi-transparent overlay for better text readability */}
         <div className="absolute inset-0 bg-emerald-600/60"></div>
         <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="text-center md:text-left md:flex md:items-center md:justify-center md:gap-8 lg:gap-12">
+          <div ref={ctaRef} className="text-center md:text-left md:flex md:items-center md:justify-center md:gap-8 lg:gap-12">
             <div className="mb-6 md:mb-0 md:flex-shrink-0">
               <h2 className="text-2xl md:text-3xl font-bold drop-shadow-lg mb-3 md:mb-2">
                 <span className="text-red-700 font-black" style={{
