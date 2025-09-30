@@ -428,19 +428,21 @@ export default function Home() {
       <section id="testimonials" className="px-4 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">What Clients Say</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">What <span className="font-bold text-red-600 dark:text-red-500">Clients</span> Say</p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Testimonials</h2>
           </div>
-          <div className="max-w-lg mx-auto">
-            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden shadow-md">
-              <video className="w-full h-auto max-h-[300px] md:max-h-[400px] lg:max-h-[500px] xl:max-h-[600px] 2xl:max-h-[700px] object-contain" controls playsInline preload="metadata">
+          <div className="max-w-md mx-auto">
+            <div className="rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-shadow duration-300">
+              <video className="w-full aspect-[9/16] object-cover max-h-[600px]" controls playsInline preload="metadata">
                 <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
-            <div className="mt-4 text-center">
-              <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Justin Hughes</p>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">CEO, FirebringerAI</p>
+            <div className="mt-6 flex items-center justify-center gap-4 p-6 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+              <div className="text-center">
+                <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Justin Hughes</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">CEO, FirebringerAI</p>
+              </div>
             </div>
           </div>
         </div>
