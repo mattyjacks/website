@@ -158,7 +158,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen">
+      <section ref={heroRef} className="relative min-h-screen flex items-start pt-32">
         <ClientThemeProvider>
           <AnimatedClouds
             imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
@@ -174,7 +174,7 @@ export default function Home() {
             verticalMultiplier={2.5}
           />
         </ClientThemeProvider>
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-8 xl:gap-12 items-center justify-center pt-20 pb-16 px-6 sm:px-6">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-8 xl:gap-12 items-center justify-center px-6 sm:px-6 w-full">
           <div className="relative z-10 flex flex-col items-center lg:items-center text-center mx-auto">
             {/* Enhanced contrast helper with better readability */}
             <div
