@@ -199,10 +199,10 @@ function SummaryStats({ stats }: { stats: SummaryStats }) {
 export default function LeadsPage() {
   const [selectedSheet, setSelectedSheet] = useState<LeadSheet | null>(null);
 
-  const headerRef = useScrollAnimation(fadeInUp);
-  const statsRef = useScrollAnimation(fadeInUp);
-  const gridRef = useScrollAnimation(slideInGrid);
-  const ctaRef = useScrollAnimation(fadeInUp);
+  const headerRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const statsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const gridRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
+  const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
   // Calculate summary stats from the hardcoded data
   const summaryStats: SummaryStats = {

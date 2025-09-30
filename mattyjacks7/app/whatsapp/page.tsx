@@ -12,11 +12,11 @@ const DIRECT_WA_URL =
   "https://api.whatsapp.com/send?phone=15106005735&text=Hi%20Matt%20%F0%9F%91%8B%20I%E2%80%99m%20%3CYour%20Name%3E.%20Here%20are%20my%20skills%20and%20what%20I%20want%20to%20do%3A%20";
 
 export default function WhatsAppPage() {
-  const headerRef = useScrollAnimation(fadeInUp);
-  const groupRef = useScrollAnimation(fadeInUp);
-  const rulesRef = useScrollAnimation(fadeInUp);
-  const connectRef = useScrollAnimation(fadeInUp);
-  const footerRef = useScrollAnimation(fadeInUp);
+  const headerRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const groupRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const rulesRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const connectRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const footerRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
   return (
     <main className="min-h-[70vh] px-4 py-14">

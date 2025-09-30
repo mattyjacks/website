@@ -7,10 +7,10 @@ import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, slideInGrid } from "@/lib/animations/scroll-animations";
 
 export default function ContactPage() {
-  const headerRef = useScrollAnimation(fadeInUp);
-  const cardsRef = useScrollAnimation(slideInGrid);
-  const teamRef = useScrollAnimation(fadeInUp);
-  const sidebarRef = useScrollAnimation(fadeInUp);
+  const headerRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const cardsRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
+  const teamRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const sidebarRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
   return (
     <main className="min-h-[70vh] px-4 py-14">
@@ -23,8 +23,8 @@ export default function ContactPage() {
               </span>
             </h1>
             <p className="mt-4 text-base text-zinc-600 dark:text-zinc-300 max-w-prose leading-relaxed">
-              Share your vision and we'll propose a fast, practical path to results. Whether you need a
-              custom AI tool, a high-converting website, or elite freelancers, we'll help you move quickly.
+              Share your vision and we&apos;ll propose a fast, practical path to results. Whether you need a
+              custom AI tool, a high-converting website, or elite freelancers, we&apos;ll help you move quickly.
             </p>
           </div>
 
@@ -113,7 +113,7 @@ export default function ContactPage() {
             </div>
             <p className="mt-3 text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
               We regularly collaborate with talented freelancers around the world.
-              If you're elite, fair, and chill, we'd love to meet you.
+              If you&apos;re elite, fair, and chill, we&apos;d love to meet you.
             </p>
             <p className="mt-4 text-sm lg:text-base leading-relaxed">
               Apply via

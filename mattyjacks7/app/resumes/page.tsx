@@ -24,9 +24,9 @@ const featured = [
 ];
 
 export default function ResumesPage() {
-  const headerRef = useScrollAnimation(fadeInUp);
-  const gridRef = useScrollAnimation(slideInGrid);
-  const ctaRef = useScrollAnimation(fadeInUp);
+  const headerRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const gridRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
+  const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
   return (
     <main className="min-h-[70vh] px-4 py-14">

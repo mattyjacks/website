@@ -13,13 +13,13 @@ export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
 
   // Scroll animation refs
-  const heroContentRef = useScrollAnimation(fadeInUp);
-  const aboutRef = useScrollAnimation(fadeInLeft);
-  const servicesRef = useScrollAnimation(slideInGrid);
-  const processRef = useScrollAnimation(fadeInUp);
-  const industriesRef = useScrollAnimation(scaleIn);
-  const testimonialsRef = useScrollAnimation(fadeInUp);
-  const ctaRef = useScrollAnimation(fadeInUp);
+  const heroContentRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const aboutRef = useScrollAnimation<HTMLDivElement>(fadeInLeft);
+  const servicesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
+  const processRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const industriesRef = useScrollAnimation<HTMLUListElement>(scaleIn);
+  const testimonialsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
   // Global emoji particle system for the hero section
   useEffect(() => {

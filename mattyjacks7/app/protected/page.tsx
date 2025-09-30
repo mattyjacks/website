@@ -9,12 +9,12 @@ import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp } from "@/lib/animations/scroll-animations";
 
 export default function ProtectedPage() {
-  const [claims, setClaims] = useState<any>(null);
+  const [claims, setClaims] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const infoRef = useScrollAnimation(fadeInUp);
-  const detailsRef = useScrollAnimation(fadeInUp);
-  const stepsRef = useScrollAnimation(fadeInUp);
+  const infoRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const detailsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const stepsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
   useEffect(() => {
     const checkAuth = async () => {
