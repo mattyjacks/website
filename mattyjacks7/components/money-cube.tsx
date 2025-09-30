@@ -601,11 +601,32 @@ export default function MoneyCube({
       try { host.style.cursor = "grab"; } catch {}
     };
 
+    // Touch handlers for mobile emoji particles
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const t = e.touches[0];
+      pointerPosRef.current = { x: t.clientX, y: t.clientY };
+      // Trigger emitter on touch move
+      if (!emitterRunningRef.current) {
+        hoveringRef.current = true;
+        startEmitter();
+      }
+    };
+
+    const onTouchEnd = () => {
+      hoveringRef.current = false;
+      if (!pressingRef.current) {
+        stopEmitter();
+      }
+    };
+
     host.addEventListener("pointerdown", onDown);
     host.addEventListener("pointerup", onUpOrCancel);
     host.addEventListener("pointercancel", onUpOrCancel);
     host.addEventListener("pointerenter", onEnter);
     host.addEventListener("pointerleave", onLeaveAll);
+    host.addEventListener("touchmove", onTouchMove, { passive: true });
+    host.addEventListener("touchend", onTouchEnd, { passive: true });
 
     // Intersection/visibility control to pause rendering when offscreen
     let offTimer: number | null = null;
@@ -833,6 +854,8 @@ export default function MoneyCube({
       host.removeEventListener("pointerenter", onEnter);
       host.removeEventListener("pointerleave", onLeaveAll);
       host.removeEventListener("touchstart", onTouchStart);
+      host.removeEventListener("touchmove", onTouchMove);
+      host.removeEventListener("touchend", onTouchEnd);
       // Remove any remaining particle elements
       particles.forEach((p) => p.el.remove());
 
