@@ -144,7 +144,7 @@ export default function MoneyCube({
       canvas.style.top = "50%";
       canvas.style.transform = "translate(-50%, -50%)";
       // Keep cube below action buttons and menu, but above background
-      canvas.style.zIndex = "1";
+      canvas.style.zIndex = "10";
       canvas.style.display = "block";
       canvas.style.pointerEvents = "auto";
       canvas.style.touchAction = "pan-y pinch-zoom";

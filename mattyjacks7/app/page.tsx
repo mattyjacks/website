@@ -158,7 +158,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-start pt-32">
+      <section ref={heroRef} className="relative min-h-screen flex items-start pt-32 overflow-x-hidden">
         <ClientThemeProvider>
           <AnimatedClouds
             imageSrc="/images/cloud-image_upscayl_2x_upscayl-standard-4x.jpg"
@@ -174,7 +174,7 @@ export default function Home() {
             verticalMultiplier={2.5}
           />
         </ClientThemeProvider>
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-8 xl:gap-12 items-center justify-center px-6 sm:px-6 w-full">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-8 xl:gap-12 items-center justify-center px-6 sm:px-6 w-full overflow-visible">
           <div className="relative z-10 flex flex-col items-center lg:items-center text-center mx-auto">
             {/* Enhanced contrast helper with better readability */}
             <div
@@ -200,7 +200,7 @@ export default function Home() {
               <p className="text-base md:text-md text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">We have sales callers, coders, and so many other talents.</p>
               <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto">You bring the goal, we bring the results. Simple.</p>
             </div>
-            <div className="relative z-20 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="relative z-30 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
                 className="group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-red-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
@@ -223,9 +223,11 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <ClientThemeProvider>
-            <MoneyCube className="rounded-2xl" disableParticles={true} />
-          </ClientThemeProvider>
+          <div className="relative w-full overflow-visible z-20 min-h-[400px] md:min-h-[500px]">
+            <ClientThemeProvider>
+              <MoneyCube className="rounded-2xl" disableParticles={true} />
+            </ClientThemeProvider>
+          </div>
         </div>
       </section>
 
