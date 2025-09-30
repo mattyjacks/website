@@ -236,7 +236,7 @@ export default function Home() {
               <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Led by <span className="font-bold text-red-600 dark:text-red-500">MATT</span></p>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">We create unique campaigns that grow your revenue</h2>
               <div className="grid sm:grid-cols-2 gap-4 text-zinc-600 dark:text-zinc-300">
-                <p>Matt is a strategist and builder known for forming strong partnerships with talented freelancers worldwide&mdash;delivering premium results at practical rates. We design for conversions first, then add beauty.</p>
+                <p>Matt is a strategist and builder known for forming strong partnerships with talented freelancers worldwide-delivering premium results at practical rates. We design for conversions first, then add beauty.</p>
                 <p>Our network includes engineers, designers, analysts, and operators who have shipped products used by millions. You get senior execution without the agency tax.</p>
               </div>
             </div>
@@ -312,9 +312,9 @@ export default function Home() {
               <div className="grid grid-cols-4 gap-8">
                 {[
                   {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
-                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes—in plain English.",icon: Target},
+                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes-in plain English.",icon: Target},
                   {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
-                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
+                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics-we track what moves revenue.",icon: Trophy},
                 ].map((step, index) => (
                   <div key={index} className="group text-center relative">
                     {/* Step Number Circle positioned above each card */}
@@ -358,9 +358,9 @@ export default function Home() {
               <div className="space-y-6">
                 {[
                   {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
-                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes—in plain English.",icon: Target},
+                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes-in plain English.",icon: Target},
                   {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
-                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics—we track what moves revenue.",icon: Trophy},
+                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics-we track what moves revenue.",icon: Trophy},
                 ].map((step, index) => (
                   <div key={index} className="relative flex items-center gap-6">
                     {/* Step Number Circle on the left */}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata = {
-  title: "Contact – MattyJacks",
+  title: "Contact - MattyJacks",
   description:
     "Share your vision with MattyJacks. Call, email, or message us on WhatsApp to get started.",
 };

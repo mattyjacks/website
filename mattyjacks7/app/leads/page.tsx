@@ -24,13 +24,13 @@ const leadSheets: LeadSheet[] = [
   {
     id: '1',
     name: 'USA Leads',
-    description: 'A curated list of Instagram marketing prospects with usernames, bios, and follower metrics—ideal for social campaigns.',
+    description: 'A curated list of Instagram marketing prospects with usernames, bios, and follower metrics-ideal for social campaigns.',
     embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTCtIW1D3w-YOcG6DudGLel5F1KxOJ-P20fKVEESC2PmhTK0ph1uYlaAaIUPyQIaA/pubhtml?widget=true&headers=false',
     rowCount: 11970, // Update with actual count
   },
   {
     id: '3',
-    name: 'Septic & Plumbers USA – Dec 2024',
+    name: 'Septic & Plumbers USA - Dec 2024',
     description: 'Verified septic system and plumbing businesses across the U.S., including phone numbers, addresses, and service info.',
     embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSmU5IpksX3BkPNyGtMgs609jddAPY8znmddtsrFz1nswoJLWXeq4CnRaz_l9IjNg/pubhtml?widget=true&headers=false',
     rowCount: 1195, // Update with actual count
@@ -59,7 +59,7 @@ const leadSheets: LeadSheet[] = [
   {
     id: '7',
     name: 'Instagram Leads 500k Global + 12k USA (2024)',
-    description: 'Massive influencer and brand lists with bios and follower stats—perfect for outreach at scale.',
+    description: 'Massive influencer and brand lists with bios and follower stats-perfect for outreach at scale.',
     embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRuusqefwKC8BFJhOSO7k5U5TopRiWw4ckC8pc2xOU9h9ZIoan57v7c5hwsrY3FvQ/pubhtml?widget=true&headers=false',
     rowCount: 511970, // Update with actual count
   },

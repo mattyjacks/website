@@ -11,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "MattyJacks – We'll make you money and/or DIE TRYING!!!",
+  title: "MattyJacks - We'll make you money and/or DIE TRYING!!!",
   description:
     "Outsourcing, Software, Consulting, Websites. Custom AI, elite freelancers, idea-to-income execution, and web design that converts.",
   openGraph: {
@@ -68,7 +68,7 @@ export default function RootLayout({
                         603 999 9420
                       </a>
                       <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                        Mon–Fri 9:00AM – 5:00PM EST
+                        Mon-Fri 9:00AM - 5:00PM EST
                       </div>
                       <a
                         href="mailto:Matt@MattyJacks.com"
