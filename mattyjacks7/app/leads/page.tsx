@@ -245,6 +245,9 @@ export default function LeadsPage() {
           </h1>
           <p className="text-base text-zinc-600 dark:text-zinc-300">
             Browse our free lead databases to help grow your business. View and analyze the data directly in your browser.
+            <span className="block mt-2 text-sm text-amber-600 dark:text-amber-400">
+              Note: Some spreadsheets may take a moment to load due to their size.
+            </span>
           </p>
         </div>
 
