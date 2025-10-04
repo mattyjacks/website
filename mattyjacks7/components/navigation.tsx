@@ -67,13 +67,12 @@ export default function Navigation() {
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Link href="/leads" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">
-                Leads
+                Free Leads
               </Link>
             </motion.div>
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Link
                 href="/contact"

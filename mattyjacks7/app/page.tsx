@@ -8,6 +8,7 @@ import { ClientThemeProvider } from "../components/client-theme-mount";
 import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store } from "lucide-react";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
+import WorkerFeedbackCarousel from "@/components/worker-feedback";
 
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
@@ -518,6 +519,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Worker Feedback Carousel */}
+      <WorkerFeedbackCarousel />
 
       {/* Final CTA */}
       <section
