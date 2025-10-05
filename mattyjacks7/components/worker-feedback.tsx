@@ -22,40 +22,34 @@ export default function WorkerFeedbackCarousel() {
     },
     {
       id: 2,
-      name: 'Christian A.',
-      role: 'Developer',
-      content: 'Working with Matty is motivating because he is organized and dependable. He simplifies things, communicates well, and makes the work feel effortless.',
-    },
-    {
-      id: 3,
-      name: 'Christian A.',
-      role: 'Developer',
-      content: 'Working with Matty is motivating because he is organized and dependable. He simplifies things, communicates well, and makes the work feel effortless.',
+      name: 'Kenj R.',
+      role: 'Web Developer',
+      content: 'Collaborating with Matty has been a great experience. As freelancers, we have the flexibility to manage our own time and complete tasks efficiently, and he completely respects that. He\'s easy to communicate with, cool, and chill to work with.',
     },
   ];
 
-  // Duplicate feedbacks for infinite scroll effect
-  const duplicatedFeedbacks = [...feedbacks, ...feedbacks];
+  // Triple the feedbacks for seamless infinite scroll effect
+  const duplicatedFeedbacks = [...feedbacks, ...feedbacks, ...feedbacks];
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
-    if (!scrollContainer || isPaused) return;
+    if (!scrollContainer) return;
 
-    let scrollPosition = 0;
     const scrollSpeed = 0.5; // pixels per frame
     let animationFrameId: number;
 
     const scroll = () => {
       if (!isPaused && scrollContainer) {
-        scrollPosition += scrollSpeed;
-        
-        // Reset scroll position when we've scrolled through one set of items
-        const maxScroll = scrollContainer.scrollWidth / 2;
-        if (scrollPosition >= maxScroll) {
-          scrollPosition = 0;
+        const currentScroll = scrollContainer.scrollLeft;
+        // Reset after scrolling through one complete set (1/3 of total since we tripled)
+        const singleSetWidth = scrollContainer.scrollWidth / 3;
+
+        // Seamlessly reset when we've scrolled through one set
+        if (currentScroll >= singleSetWidth) {
+          scrollContainer.scrollLeft = currentScroll - singleSetWidth;
+        } else {
+          scrollContainer.scrollLeft = currentScroll + scrollSpeed;
         }
-        
-        scrollContainer.scrollLeft = scrollPosition;
       }
       animationFrameId = requestAnimationFrame(scroll);
     };
@@ -81,20 +75,26 @@ export default function WorkerFeedbackCarousel() {
           </h2>
         </div>
 
-        <div 
-          className="relative overflow-hidden"
+        <div
+          className="relative overflow-hidden -mx-4 px-4"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
+          {/* Left gradient fade overlay */}
+          <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-32 md:w-48 lg:w-64 z-10 pointer-events-none bg-gradient-to-r from-background to-transparent" />
+
+          {/* Right gradient fade overlay */}
+          <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-32 md:w-48 lg:w-64 z-10 pointer-events-none bg-gradient-to-l from-background to-transparent" />
+
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-hidden"
+            className="flex gap-4 sm:gap-6 overflow-x-hidden"
             style={{ scrollBehavior: 'auto' }}
           >
             {duplicatedFeedbacks.map((feedback, index) => (
               <div
                 key={`${feedback.id}-${index}`}
-                className="flex-shrink-0 w-[calc(100%-2rem)] sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1rem)] group"
+                className="flex-shrink-0 w-[85vw] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] group"
               >
                 <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 h-full hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 transition-all duration-300">
                   <div className="flex items-center gap-3 mb-4">
