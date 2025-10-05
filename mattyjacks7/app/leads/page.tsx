@@ -46,7 +46,7 @@ const leadSheets: LeadSheet[] = [
   },
   {
     id: '5',
-    name: 'Cruise & Travel Companies',
+    name: 'Leads for Cruise & Travel Companies',
     description: 'Travel-oriented companies and agencies with potential trip or booking plans, including websites and notes.',
     embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHh-4gDTsdIJsv3E1-NA7zRezECm_DFjlDpkkalgQ9rSujkf1UAEdHcJPT-7q0-g/pubhtml?widget=true&headers=false',
     rowCount: 131, // Update with actual count
