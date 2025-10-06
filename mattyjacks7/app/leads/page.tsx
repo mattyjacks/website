@@ -78,7 +78,14 @@ const leadSheets: LeadSheet[] = [
     description: 'Contacts for cannabis-industry payment processors, including coverage areas and accepted payment methods.',
     embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6EOp1Gf4fesmnmZNL6jz-eN2WUu_97Ws0lPVpHMYoTcAfbrL-erC_ohPi_UF0Fg/pubhtml?widget=true&headers=false',
     rowCount: 60, // Update with actual count
-  }
+  },
+  {
+    id: '10',
+    name: 'Leads of HVAC Contractors in Massachusetts USA',
+    description: 'Comprehensive list of 1,757 HVAC contractors across Massachusetts, including contact details and service areas. Ideal for B2B outreach, equipment suppliers, and service providers looking to connect with heating and cooling professionals in the region.',
+    embedUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThPLvLZ73cBAG8Syx7rtKfZuCUA2lHK4E2TAjaL26jz4k8OjhxcQ9Ct2J2mp4x3A/pubhtml?widget=true&headers=false',
+    rowCount: 1757, // Update with actual count
+  },
 ];
 
 // Format number with commas
