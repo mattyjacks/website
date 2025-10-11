@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { FileText, Clock, ExternalLink, ChevronDown, ChevronUp, Info, ZoomIn, ZoomOut, X } from "lucide-react";
+import { FileText, Clock, ExternalLink, ChevronDown, ChevronUp, Info, ZoomIn, ZoomOut, X, DollarSign, MessageSquare, HelpCircle } from "lucide-react";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp } from "@/lib/animations/scroll-animations";
 
@@ -10,10 +10,14 @@ export default function ManualPage() {
   const [showListView, setShowListView] = useState(true);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   
   const headerRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const irsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const togglRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const invoiceRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const commRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const faqRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const noteRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
 
   return (
@@ -49,30 +53,11 @@ export default function ManualPage() {
             </p>
 
             <div className="space-y-4">
-              {/* Adobe Sign Link */}
+              {/* IRS Official Form - NOW STEP 1 */}
               <div className="group rounded-lg border border-zinc-200 dark:border-zinc-700 p-4 bg-zinc-50 dark:bg-zinc-900/50 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all duration-300">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">Step 1: Sign PDF Online</h3>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Use Adobe&apos;s free online tool to sign your form</p>
-                  </div>
-                  <a
-                    href="https://www.adobe.com/acrobat/online/sign-pdf.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-shrink-0 inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-red-500 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Open Adobe
-                  </a>
-                </div>
-              </div>
-
-              {/* IRS Official Form */}
-              <div className="group rounded-lg border border-zinc-200 dark:border-zinc-700 p-4 bg-zinc-50 dark:bg-zinc-900/50 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all duration-300">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">Step 2: Reference Official Form</h3>
+                    <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">Step 1: Reference Official Form</h3>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">Download the official IRS W-8BEN form for reference</p>
                   </div>
                   <a
@@ -83,6 +68,25 @@ export default function ManualPage() {
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
                     IRS Form
+                  </a>
+                </div>
+              </div>
+
+              {/* Adobe Sign Link - NOW STEP 2 */}
+              <div className="group rounded-lg border border-zinc-200 dark:border-zinc-700 p-4 bg-zinc-50 dark:bg-zinc-900/50 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all duration-300">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">Step 2: Sign PDF Online</h3>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Use Adobe&apos;s free online tool to sign your form</p>
+                  </div>
+                  <a
+                    href="https://www.adobe.com/acrobat/online/sign-pdf.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-red-500 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Open Adobe
                   </a>
                 </div>
               </div>
@@ -228,6 +232,281 @@ export default function ManualPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Invoices Section */}
+        <div ref={invoiceRef} className="mb-10">
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 bg-white dark:bg-zinc-950">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400">
+                <DollarSign className="w-6 h-6" />
+              </div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Invoices</h2>
+            </div>
+
+            {/* Important Note about LTC */}
+            <div className="mb-6 rounded-lg border border-yellow-200 dark:border-yellow-800/50 p-4 bg-yellow-50 dark:bg-yellow-950/20">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-yellow-800 dark:text-yellow-200">
+                  <p className="font-semibold text-yellow-900 dark:text-yellow-100 mb-1">Note:</p>
+                  <p className="mb-1">We have ceased issuing invoices for transactions that are not related to LTC. Invoices are necessary for LTC transactions.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Purpose */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Purpose</h3>
+                <p className="text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  All invoices are created and sent using{" "}
+                  <a 
+                    href="https://invoice.mattyjacks.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
+                  >
+                    invoice.mattyjacks.com
+                  </a>
+                  . This process ensures timely and accurate payment tracking.
+                </p>
+              </div>
+
+              {/* Using the Platform */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Using the Platform</h3>
+                <div className="space-y-3 text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  <p>
+                    Visit{" "}
+                    <a 
+                      href="https://invoice.mattyjacks.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
+                    >
+                      invoice.mattyjacks.com
+                    </a>
+                    . Fill in all required invoice details, including the work done, total hours, and amount due.
+                  </p>
+                  <p>
+                    You must also provide your full legal name when submitting your invoice. This is required for payment records and government compliance, especially for U.S.-based contractors.
+                  </p>
+                  <p>
+                    If your total earnings from Matty Jacks are projected to exceed $600 USD in a calendar year, you&apos;ll be required to fill out a tax-related form (e.g., Form W-9) for U.S. tax reporting purposes. The admin team will reach out when this is needed.
+                  </p>
+                </div>
+              </div>
+
+              {/* Generating the Invoice Email */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Generating the Invoice Email</h3>
+                <div className="space-y-3 text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  <p>Once your invoice is submitted, the platform will generate:</p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>Email Subject Line – click &quot;Copy Email Subject&quot;</li>
+                    <li>Email Content – click &quot;Copy Email Content&quot;</li>
+                  </ul>
+                  <p className="font-semibold text-zinc-900 dark:text-white">
+                    These must be used exactly as generated. Do not change the format, subject, or message body.
+                  </p>
+                </div>
+              </div>
+
+              {/* Sending the Invoice */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Sending the Invoice</h3>
+                <div className="space-y-3 text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  <p>
+                    Send the invoice email to the address shown under &quot;Email Being Invoiced&quot; (usually: mattyjacks11@gmail.com).
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>Paste the copied subject into the email subject line.</li>
+                    <li>Paste the copied content into the email body. Send using your official work email only.</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* For Crypto Payments */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">For Crypto Payments</h3>
+                <div className="space-y-3 text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  <p>If you choose to receive payment in crypto:</p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>Double-check your wallet address before submitting.</li>
+                    <li>Once sent, crypto payments cannot be reversed.</li>
+                    <li>Make sure your preferred coin/token is supported by the client.</li>
+                  </ul>
+                  <p className="font-semibold text-red-600 dark:text-red-400">
+                    Any incorrect wallet address will result in permanent loss of funds. You&apos;re responsible for ensuring the address is accurate.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Communications Section */}
+        <div ref={commRef} className="mb-10">
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 bg-white dark:bg-zinc-950">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400">
+                <MessageSquare className="w-6 h-6" />
+              </div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Communication</h2>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Purpose */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Purpose</h3>
+                <p className="text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  We use Discord as our main communication platform. It&apos;s where task updates, team coordination, and announcements happen in real time.
+                </p>
+              </div>
+
+              {/* Getting Started */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Getting Started</h3>
+                <p className="text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  You&apos;ll be invited to our official Discord server after onboarding. This server includes channels organized by tasks, roles, and teams. Make sure you&apos;ve accepted the invite and joined the server before your first working day.
+                </p>
+              </div>
+
+              {/* Communication Guidelines */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Communication Guidelines</h3>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  <li>If you have questions, post them in the correct server channel (e.g., #content-team, #admin-tasks, etc.)</li>
+                  <li>For urgent concerns or unclear assignments, ping @MattyJacks or your assigned manager directly in the thread or channel where the task was posted.</li>
+                  <li>Keep conversations task-focused and professional within work channels.</li>
+                  <li>Use threads for updates or follow-ups on specific tasks to keep things organized.</li>
+                </ul>
+              </div>
+
+              {/* Reminders */}
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Reminders</h3>
+                <ul className="space-y-2 text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span>
+                    <span>Always check Discord before and during your shift</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span>
+                    <span>Update your status if you&apos;re stepping away or done for the day</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span>
+                    <span>Tag the right people when clarification is needed</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span>
+                    <span>Stay in your assigned channels and respect role boundaries</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span>
+                    <span>Refer to pinned messages or announcements for ongoing instructions</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div ref={faqRef} className="mb-10">
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 bg-white dark:bg-zinc-950">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400">
+                <HelpCircle className="w-6 h-6" />
+              </div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">FAQs</h2>
+            </div>
+            
+            <div className="space-y-3">
+              {[
+                {
+                  question: "What if I forget to log time?",
+                  answer: "Try to log your hours as soon as you remember. If you're unsure about the exact duration, give your best estimate and leave a short note in the description."
+                },
+                {
+                  question: "How often should I track time?",
+                  answer: "Daily. The best practice is to log time right after finishing a task to keep everything accurate and fresh."
+                },
+                {
+                  question: "When do I need to send my invoice?",
+                  answer: "Invoices should be submitted twice a month—on the 15th and the 30th—using invoice.mattyjacks.com."
+                },
+                {
+                  question: "How long does it take to receive payment?",
+                  answer: "Payments are processed within 3 to 5 business days after invoice submission."
+                },
+                {
+                  question: "Do I have to work fixed hours?",
+                  answer: "No. We care more about output than hours worked. You can work on your own schedule as long as deadlines are met and time is tracked properly."
+                },
+                {
+                  question: "Where do I go if I need help or access to something?",
+                  answer: "Send a message on Discord or tag your lead directly if it's urgent."
+                },
+                {
+                  question: "What happens if I miss a deadline?",
+                  answer: "Let your lead know as soon as possible. We understand delays happen, but transparency is expected."
+                },
+                {
+                  question: "What tools am I expected to use?",
+                  answer: "You'll use Toggl for time tracking, our invoice tool for billing, Discord for communication, and Notion for project references if needed."
+                },
+                {
+                  question: "Do I need to submit personal information to get paid?",
+                  answer: "Yes. We require your full name, email, country, and phone number for compliance purposes. If you invoice through a registered business, this may not be necessary."
+                },
+                {
+                  question: "Can I get paid in crypto?",
+                  answer: "Yes. Just make sure your compliance details are complete and you're set up properly with our payment process."
+                }
+              ].map((faq, index) => (
+                <div 
+                  key={index}
+                  className={`rounded-lg border overflow-hidden transition-all duration-300 ${
+                    openFaqIndex === index 
+                      ? 'border-emerald-500 dark:border-emerald-400 bg-emerald-50 dark:bg-emerald-950/20' 
+                      : 'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50'
+                  }`}
+                >
+                  <button
+                    onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                    className={`w-full flex items-center justify-between p-4 text-left transition-all duration-300 ${
+                      openFaqIndex === index
+                        ? 'bg-emerald-50 dark:bg-emerald-950/20'
+                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
+                    }`}
+                  >
+                    <span className={`font-semibold pr-4 transition-colors duration-300 ${
+                      openFaqIndex === index 
+                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        : 'text-zinc-900 dark:text-white'
+                    }`}>
+                      {faq.question}
+                    </span>
+                    {openFaqIndex === index ? (
+                      <ChevronUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
+                    )}
+                  </button>
+                  {openFaqIndex === index && (
+                    <div className="px-4 pb-4 pt-0 bg-white dark:bg-zinc-950">
+                      <p className="text-sm lg:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
