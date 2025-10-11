@@ -2,10 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
 import { ClientThemeProvider } from "../components/client-theme-mount";
-import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store } from "lucide-react";
+import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store, ExternalLink } from "lucide-react";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 import WorkerFeedbackCarousel from "@/components/worker-feedback";
@@ -19,6 +20,7 @@ export default function Home() {
   const servicesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const processRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const industriesRef = useScrollAnimation<HTMLUListElement>(scaleIn);
+  const tristateRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const videoDemosRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const testimonialsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
@@ -457,11 +459,68 @@ export default function Home() {
          </div>
         </section>
 
+      {/* TristateHoney Lead Generation */}
+      <section className="px-4 py-16 border-t border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-emerald-50/30 via-white to-emerald-50/30 dark:from-emerald-950/10 dark:via-zinc-900/10 dark:to-emerald-950/10">
+        <div className="max-w-4xl mx-auto">
+          {/* See Our Work Header */}
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">See Our <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
+          </div>
+
+          <div ref={tristateRef} className="text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
+                TristateHoney.com — Still Bringing in Leads
+              </span>
+            </h2>
+            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+              TristateHoney.com is still getting real inquiries! One recent message came from a company looking to order bulk honey for a new product they’re developing.
+            </p>
+
+            {/* Recent Inquiry Label */}
+            <div className="mb-4">
+              <span className="inline-block text-sm font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-4 py-2 rounded-full">
+                Recent Inquiry:
+              </span>
+            </div>
+
+            {/* Screenshot */}
+            <div className="group relative max-w-3xl mx-auto mb-6">
+              <div className="rounded-2xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] bg-white dark:bg-zinc-900">
+                <Image
+                  src="/images/tristatehoney-lead.jpg"
+                  alt="TristateHoney lead inquiry screenshot"
+                  width={1200}
+                  height={800}
+                  className="w-full h-auto"
+                  priority
+                />
+              </div>
+            </div>
+
+            {/* Visit Link */}
+            <div className="flex items-center justify-center gap-2 text-base md:text-lg">
+              <span className="text-2xl">💡</span>
+              <span className="text-zinc-700 dark:text-zinc-300">Visit</span>
+              <a
+                href="https://tristatehoney.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
+              >
+                TristateHoney.com
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <span className="text-zinc-700 dark:text-zinc-300">to see it live!</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Video Demos */}
       <section id="video-demos" className="px-4 py-16 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">See Our <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Video Demos</h2>
           </div>
           <div ref={videoDemosRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
