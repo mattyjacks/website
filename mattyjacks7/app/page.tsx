@@ -484,17 +484,33 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Screenshot */}
-            <div className="group relative max-w-3xl mx-auto mb-6">
-              <div className="rounded-2xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] bg-white dark:bg-zinc-900">
-                <Image
-                  src="/images/tristatehoney-lead.jpg"
-                  alt="TristateHoney lead inquiry screenshot"
-                  width={1200}
-                  height={800}
-                  className="w-full h-auto"
-                  priority
-                />
+            {/* Screenshots - Lead and Website */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-6">
+              {/* Lead Screenshot */}
+              <div className="group relative">
+                <div className="rounded-2xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] bg-white dark:bg-zinc-900">
+                  <Image
+                    src="/images/tristatehoney-lead.jpg"
+                    alt="TristateHoney lead inquiry screenshot"
+                    width={600}
+                    height={400}
+                    className="w-full h-auto"
+                    priority
+                  />
+                </div>
+              </div>
+              {/* Website Screenshot */}
+              <div className="group relative">
+                <div className="rounded-2xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] bg-white dark:bg-zinc-900">
+                  <Image
+                    src="/images/tristatehoney-website-screenshot.jpg"
+                    alt="TristateHoney website screenshot"
+                    width={600}
+                    height={400}
+                    className="w-full h-auto"
+                    priority
+                  />
+                </div>
               </div>
             </div>
 
