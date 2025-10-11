@@ -64,18 +64,13 @@ export default function Navigation() {
             </motion.div>
             <motion.div
               whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Link href="/leads" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">
+              <Link
+                href="/leads"
+                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white font-medium hover:bg-red-500 transition-colors"
+              >
                 Free Leads
-              </Link>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <Link href="/manual" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">
-                Manual
               </Link>
             </motion.div>
             <motion.div

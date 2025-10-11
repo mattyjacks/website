@@ -127,17 +127,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   Leads
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/manual"
-                  onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
-                >
-                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  Manual
-                </Link>
-              </li>
-            </ul>
+</ul>
           </nav>
 
           <div className="flex-shrink-0 p-6 border-t border-zinc-200/70 dark:border-zinc-800/60">
