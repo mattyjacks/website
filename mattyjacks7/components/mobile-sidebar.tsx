@@ -80,7 +80,6 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         }}
       >
         <div className="flex flex-col h-full max-h-screen">
-          {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-zinc-200/70 dark:border-zinc-800/60">
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
               Menu
@@ -106,7 +105,6 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             </button>
           </div>
 
-          {/* Navigation Links */}
           <nav className="flex-1 px-6 py-8 overflow-hidden">
             <ul className="space-y-6">
               <li>
@@ -129,10 +127,19 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   Leads
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/manual"
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
+                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  Manual
+                </Link>
+              </li>
             </ul>
           </nav>
 
-          {/* Footer */}
           <div className="flex-shrink-0 p-6 border-t border-zinc-200/70 dark:border-zinc-800/60">
             <div className="text-sm text-zinc-600 dark:text-zinc-400">
               <p className="font-medium">Contact Us</p>
