@@ -130,6 +130,15 @@ export default function RootLayout({
                             WhatsApp
                           </Link>
                         </li>
+                        <li>
+                          <Link
+                            href="/privacy"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            aria-label="Go to Privacy Policy page"
+                          >
+                            Privacy Policy
+                          </Link>
+                        </li>
                       </ul>
                     </nav>
                   </div>
