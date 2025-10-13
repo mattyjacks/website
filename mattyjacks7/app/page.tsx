@@ -10,6 +10,7 @@ import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Co
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 import WorkerFeedbackCarousel from "@/components/worker-feedback";
+import CookieBanner from "@/components/cookie-banner";
 
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
@@ -657,6 +658,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Cookie Consent Banner */}
+      <CookieBanner />
     </main>
   );
 }
