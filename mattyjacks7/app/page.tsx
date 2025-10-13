@@ -543,7 +543,7 @@ export default function Home() {
               </span>
             </h2>
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-              We helped our client go viral on TikTok on a new account. His third video got 2,300+ likes with 0 marketing. Results obtained purely through manipulating the TikTok algorithm. Grew account to 3,000 followers in 30 days.
+              We helped our client Eric Escobedo go viral on TikTok on a new account. His third video got 2,300+ likes with 0 marketing. Results obtained purely through manipulating the TikTok algorithm. Grew account to 3,000 followers in 30 days.
             </p>
 
             {/* TikTok Video Link */}
