@@ -109,6 +109,16 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             <ul className="space-y-6">
               <li>
                 <Link
+                  href="/services"
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
+                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  Services
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/resumes"
                   onClick={handleLinkClick}
                   className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
@@ -127,7 +137,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   Leads
                 </Link>
               </li>
-</ul>
+            </ul>
           </nav>
 
           <div className="flex-shrink-0 p-6 border-t border-zinc-200/70 dark:border-zinc-800/60">
