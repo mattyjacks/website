@@ -533,6 +533,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* TikTok Viral Case Study */}
+      <section className="px-4 py-16 border-t border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-red-50/30 via-white to-red-50/30 dark:from-red-950/10 dark:via-zinc-900/10 dark:to-red-950/10">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
+                TikTok Algorithm Mastery
+              </span>
+            </h2>
+            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+              We helped our client Eric Escobedo go viral on TikTok on a new account. His third video got 2,300+ likes with 0 marketing. Results obtained purely through manipulating the TikTok algorithm. Grew account to 3,000 followers in 30 days.
+            </p>
+
+            {/* TikTok Video Link */}
+            <div className="flex items-center justify-center gap-2 text-base md:text-lg">
+              <span className="text-2xl">🎯</span>
+              <span className="text-zinc-700 dark:text-zinc-300">Watch the viral video on</span>
+              <a
+                href="https://www.tiktok.com/@eric_escobedo/video/7520191936905383169"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-red-600 dark:text-red-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors underline decoration-red-500 hover:decoration-emerald-500"
+              >
+                TikTok
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Video Demos */}
       <section id="video-demos" className="px-4 py-16 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
