@@ -221,18 +221,12 @@ export default function Home() {
               }}
             />
             <div className="mb-6">
-              <p className="text-xl md:text-2xl font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Software, Consulting, Websites</p>
+              <p className="text-xl md:text-2xl font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Websites, Sales, Consulting, Software</p>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[0.9] tracking-tight text-center">
-              <span className="block bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">We make you</span>
-              <span className="block bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 bg-clip-text text-transparent font-black">MONEY</span>
-              <span className="block bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">and/or</span>
-              <span className="block bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent font-black">DIE TRYING!</span>
-            </h1>
             <div className="mt-8 space-y-6 px-2 text-center">
-              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">MattyJacks provides cheap workers from far away lands. We deploy the latest in AI technologies to make websites and harvest leads. </p>
-              <p className="text-base md:text-md text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">We have sales callers, coders, and so many other talents.</p>
-              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto">You bring the goal, we bring the results. Simple.</p>
+              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">MattyJacks deploys cost-effective workers from far away lands.</p>
+              <p className="text-base md:text-md text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">We have sales callers, web developers, marketers, virtual assistants, and many other talents.</p>
+              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto">You bring the vision, we bring the results. Simple.</p>
             </div>
             <div className="relative z-40 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -270,11 +264,38 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 xl:p-10 bg-white dark:bg-zinc-950">
             <div ref={aboutRef} className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Freelancers at the Ready<span className="font-bold text-red-600 dark:text-red-500">MATT</span></p>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">This website will CHANGE YOUR LIFE!!!</h2>
-              <div className="grid sm:grid-cols-2 gap-4 text-zinc-600 dark:text-zinc-300">
-                <p>Matt is a strategist and builder known for forming strong partnerships with talented freelancers worldwide-delivering premium results at practical rates. We design for conversions first, then add beauty.</p>
-                <p>Our network includes engineers, designers, analysts, and operators. You get senior execution without the agency tax.</p>
+              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Global Talent <span className="font-bold text-red-600 dark:text-red-500">Meets</span> Technology</p>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">Scale smarter, faster, and more efficiently with cost-effective global talent and shiny new technology.</h2>
+              <div className="space-y-6">
+                <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">We specialize in building high-performing remote teams that handle:</p>
+                <ul className="grid sm:grid-cols-2 gap-3 text-zinc-600 dark:text-zinc-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
+                    <span>Software development & website creation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
+                    <span>Cold calling and sales outreach</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
+                    <span>Lead generation with custom AI tools</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
+                    <span>Graphic design & visual branding</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
+                    <span>Copywriting and marketing communication</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
+                    <span>Virtual assistance and BPO tasks</span>
+                  </li>
+                </ul>
+                <p className="text-zinc-700 dark:text-zinc-200 font-semibold text-lg">We don&apos;t just outsource: we help you unlock the full power of humanity.</p>
+                <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">Grow your business with good and affordable services from skilled professionals across the world, saving time, reducing costs, and improving efficiency.</p>
               </div>
             </div>
           </div>
@@ -544,7 +565,7 @@ export default function Home() {
               </span>
             </h2>
             <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-              We helped our client Eric Escobedo go viral on TikTok on a new account. His third video got 2,300+ likes with 0 marketing. Results obtained purely through manipulating the TikTok algorithm. Grew account to 3,000 followers in 30 days.
+              We helped our client Eric Escobedo go viral on TikTok on a new account. His third video got 2,300+ likes with 0 marketing. Results obtained purely through manipulating the TikTok algorithm. Grew account to 3,000+ followers in 30 days.
             </p>
 
             {/* TikTok Video Link */}

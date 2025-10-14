@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "MattyJacks - We'll make you money and/or DIE TRYING!!!",
   description:
-    "Outsourcing, Software, Consulting, Websites. Custom AI, elite freelancers, idea-to-income execution, and web design that converts.",
+    "Outsourcing, Websites, Sales, Consulting, Software, Custom AI, elite freelancers, idea-to-income execution, and web design that converts.",
   openGraph: {
     images: [
       {
@@ -176,7 +176,7 @@ export default function RootLayout({
                         © 2025 MattyJacks. All rights reserved.
                       </div>
                       <div className="text-zinc-500 dark:text-zinc-500 text-sm">
-                        Building success, one project at a time.
+                        We&apos;ll make you money and/or DIE TRYING!!!
                       </div>
                     </div>
                   </div>
