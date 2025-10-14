@@ -176,7 +176,7 @@ export default function RootLayout({
                         © 2025 MattyJacks. All rights reserved.
                       </div>
                       <div className="text-zinc-500 dark:text-zinc-500 text-sm">
-                        We'll make you money and/or DIE TRYING!!!
+                        We&apos;ll make you money and/or DIE TRYING!!!
                       </div>
                     </div>
                   </div>
