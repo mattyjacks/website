@@ -97,6 +97,10 @@ export default function WhatsAppPage() {
             </li>
             <li className="flex items-start gap-2">
               <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <span>You must be at least 18 years old to join this group.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <span>No buying or selling any kind of account, especially Upwork.</span>
             </li>
           </ul>
