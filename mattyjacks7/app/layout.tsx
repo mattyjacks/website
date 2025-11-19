@@ -84,7 +84,7 @@ export default function RootLayout({
                         603 999 9420
                       </a>
                       <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                        Mon-Fri 9:00AM - 5:00PM EST
+                        Call 24/7/365 Any Time
                       </div>
                       <a
                         href="mailto:Matt@MattyJacks.com"
