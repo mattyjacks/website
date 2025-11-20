@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import Script from "next/script";
 import Navigation from "../components/navigation";
+import SmoothScroll from "../components/smooth-scroll";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -62,6 +63,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <SmoothScroll>
           <div className="min-h-screen flex flex-col">
             {/* Header / Navigation */}
             <Navigation />
@@ -183,6 +185,7 @@ export default function RootLayout({
                 </div>
               </div>
             </footer>          </div>
+          </SmoothScroll>
         </ThemeProvider>
       </body>
     </html>
