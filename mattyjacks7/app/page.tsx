@@ -11,6 +11,7 @@ import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 import WorkerFeedbackCarousel from "@/components/worker-feedback";
 import CookieBanner from "@/components/cookie-banner";
+import ScaledIframe from "@/components/scaled-iframe";
 
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
@@ -548,6 +549,48 @@ export default function Home() {
               >
                 TristateHoney.com
                 <ExternalLink className="w-4 h-4" />
+              </a>
+              <span className="text-zinc-700 dark:text-zinc-300">to see it live!</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Opority Portfolio Item */}
+      <section className="px-4 py-16 border-t border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-emerald-50/30 via-white to-emerald-50/30 dark:from-emerald-950/10 dark:via-zinc-900/10 dark:to-emerald-950/10">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
+                Opority — Design for Designers
+              </span>
+            </h2>
+            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Opority is a web design firm that hired us to design their website because they liked our work better. We created a beautiful, polished UI that matches their high standards.
+            </p>
+
+            {/* Website Live Preview */}
+            <div className="group relative max-w-4xl mx-auto mb-6 h-[400px] md:h-[500px]">
+              <div className="rounded-2xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 bg-white dark:bg-zinc-900 h-full">
+                <ScaledIframe
+                  src="https://www.opority.com/"
+                  title="Opority Website Preview"
+                  targetWidth={1280}
+                />
+              </div>
+            </div>
+
+            {/* Visit Link */}
+            <div className="flex items-center justify-center gap-2 text-base md:text-lg">
+              <span className="text-2xl">✨</span>
+              <span className="text-zinc-700 dark:text-zinc-300">Visit</span>
+              <a
+                href="https://www.opority.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
+              >
+                Opority.com
               </a>
               <span className="text-zinc-700 dark:text-zinc-300">to see it live!</span>
             </div>

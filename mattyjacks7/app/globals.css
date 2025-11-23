@@ -160,3 +160,40 @@
     overflow-x: hidden;
   }
 }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8; /* zinc-300 */
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa; /* zinc-400 */
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46; /* zinc-700 */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #52525b; /* zinc-600 */
+}
+
+/* Emerald accent on hover for main scrollbar to match theme */
+body::-webkit-scrollbar-thumb:hover {
+  background: #10b981; /* emerald-500 */
+}
+
+.dark body::-webkit-scrollbar-thumb:hover {
+  background: #059669; /* emerald-600 */
+}
