@@ -9,8 +9,8 @@ type Params = {
   slug: string;
 };
 
-export default async function PostPage({ params }: { params: Params }) {
-  const { year, slug } = params;
+export default async function PostPage({ params }: { params: Promise<Params> }) {
+  const { year, slug } = await params;
 
   const post = await fetchPostMarkdown(year, slug);
   if (!post) return notFound();
