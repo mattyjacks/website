@@ -123,6 +123,15 @@ export default function RootLayout({
                         </li>
                         <li>
                           <Link
+                            href="/merchants"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            aria-label="Go to Merchant Services page"
+                          >
+                            Merchant Services
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
                             href="/resumes"
                             className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
                             aria-label="Go to Resume Sites page"

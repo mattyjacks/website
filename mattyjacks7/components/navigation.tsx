@@ -49,6 +49,11 @@ export default function Navigation() {
               </Link>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }}>
+              <Link href="/merchants" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                Merchant Services
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }}>
               <Link href="/resumes" className="hover:text-red-600 dark:hover:text-red-400 transition-colors whitespace-nowrap">
                 Resume Sites
               </Link>
