@@ -90,7 +90,7 @@ export default function MerchantsPage() {
           <div ref={heroContentRef} className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-semibold mb-6 animate-bounce">
               <Zap className="w-4 h-4" />
-              <span>Same Day Approvals Available</span>
+              <span>3 Day Approvals</span>
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
@@ -123,7 +123,7 @@ export default function MerchantsPage() {
             <p className="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
               <span className="inline-flex items-center gap-1">
                 <Lock className="w-4 h-4" />
-                No obligation rates as low as 1%
+                Secured through our giant partner company
               </span>
             </p>
           </div>
@@ -157,7 +157,7 @@ export default function MerchantsPage() {
               {
                 icon: DollarSign,
                 title: "Transparent Pricing",
-                description: "No hidden fees, no long-term contracts. Competitive rates starting at 1%."
+                description: "No hidden fees, no long-term contracts. Highly competitive rates."
               },
               {
                 icon: Headphones,
@@ -446,7 +446,7 @@ export default function MerchantsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <DollarSign className="w-5 h-5" />
-                <span>Rates from 1%</span>
+                <span>Competitive Rates</span>
               </div>
               <div className="flex items-center gap-2">
                 <Headphones className="w-5 h-5" />

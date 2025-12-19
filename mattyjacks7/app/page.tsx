@@ -6,7 +6,7 @@ import Image from "next/image";
 import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
 import { ClientThemeProvider } from "../components/client-theme-mount";
-import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store, ExternalLink } from "lucide-react";
+import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store, ExternalLink, CreditCard, Shield, DollarSign, ArrowRight } from "lucide-react";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 import WorkerFeedbackCarousel from "@/components/worker-feedback";
@@ -22,6 +22,7 @@ export default function Home() {
   const servicesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const processRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const industriesRef = useScrollAnimation<HTMLUListElement>(scaleIn);
+  const merchantServicesRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const tristateRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const videoDemosRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const testimonialsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
@@ -352,6 +353,87 @@ export default function Home() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Merchant Services Section */}
+      <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-700 dark:from-emerald-900 dark:via-emerald-800 dark:to-emerald-950 py-20">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
+          <div ref={merchantServicesRef} className="text-center space-y-8">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-bold uppercase tracking-wider mb-4">
+              <CreditCard className="w-5 h-5" />
+              <span>Payment Processing Solutions</span>
+            </div>
+
+            {/* Main Heading */}
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+              Accept Payments.
+              <br />
+              <span className="text-emerald-100">Grow Your Business.</span>
+            </h2>
+
+            {/* Subheading */}
+            <p className="text-xl md:text-2xl text-emerald-50 max-w-3xl mx-auto leading-relaxed mb-12">
+              We provide merchant account solutions for both high-risk and low-risk businesses across the USA & Canada. Get approved fast with transparent pricing and expert support.
+            </p>
+
+            {/* Feature Grid */}
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">3 Day Approvals</h3>
+                <p className="text-emerald-100">Fast processing for both low and high-risk accounts</p>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+                  <Shield className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">High-Risk Specialists</h3>
+                <p className="text-emerald-100">20+ bank relationships to handle any business</p>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+                  <DollarSign className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Competitive Rates</h3>
+                <p className="text-emerald-100">Transparent pricing with no hidden fees</p>
+              </div>
+            </div>
+
+            {/* CTA Button */}
+            <div className="flex justify-center">
+              <Link
+                href="/merchants"
+                className="group inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-emerald-600 bg-white rounded-2xl shadow-2xl hover:shadow-white/50 transition-all duration-300 hover:scale-110"
+              >
+                <span>Explore Merchant Services</span>
+                <ArrowRight className="ml-3 w-6 h-6 transition-transform group-hover:translate-x-2" />
+              </Link>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="mt-12 pt-8 border-t border-white/20">
+              <p className="text-emerald-100 text-sm mb-4">Trusted by businesses in 20+ industries</p>
+              <div className="flex flex-wrap justify-center gap-8 text-white/80 text-sm">
+                <span>✓ Secured Processing</span>
+                <span>✓ 24/7 Support</span>
+                <span>✓ Multiple Payment Options</span>
+                <span>✓ Chargeback Protection</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -9,6 +9,7 @@ import ThemeToggle from "./theme-toggle";
 
 export default function Navigation() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);
 
@@ -53,19 +54,37 @@ export default function Navigation() {
                 Merchant Services
               </Link>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <Link href="/resumes" className="hover:text-red-600 dark:hover:text-red-400 transition-colors whitespace-nowrap">
-                Resume Sites
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/leads"
-                className="rounded-md bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-red-500 transition-colors whitespace-nowrap"
+            <div 
+              className="relative"
+              onMouseEnter={() => setIsMoreDropdownOpen(true)}
+              onMouseLeave={() => setIsMoreDropdownOpen(false)}
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                className="hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-1"
               >
-                Free Leads
-              </Link>
-            </motion.div>
+                More
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </motion.button>
+              {isMoreDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-2 z-50">
+                  <Link
+                    href="/leads"
+                    className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  >
+                    Free Leads
+                  </Link>
+                  <Link
+                    href="/resumes"
+                    className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  >
+                    Resume Sites
+                  </Link>
+                </div>
+              )}
+            </div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/contact"
