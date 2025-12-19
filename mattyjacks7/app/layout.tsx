@@ -59,7 +59,7 @@ export default function RootLayout({
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
@@ -119,6 +119,15 @@ export default function RootLayout({
                             aria-label="Go to Services page"
                           >
                             Services
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/merchants"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            aria-label="Go to Merchant Services page"
+                          >
+                            Merchant Services
                           </Link>
                         </li>
                         <li>
