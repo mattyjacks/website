@@ -258,6 +258,33 @@ export default function LeadsPage() {
           </p>
         </div>
 
+        {/* DNC Compliance Warning */}
+        <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-600 p-6 mb-8 rounded-lg shadow-md">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-6 w-6 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">
+                Important Legal Disclaimer
+              </h3>
+              <div className="text-sm text-red-700 dark:text-red-200 space-y-2">
+                <p className="font-semibold">
+                  These leads have NOT been scrubbed for Federal Do-Not-Call (DNC) Registry compliance.
+                </p>
+                <p>
+                  Use of these leads is entirely at your own risk. You are solely responsible for ensuring compliance with all applicable federal, state, and local telemarketing laws, including the Telephone Consumer Protection Act (TCPA) and the Federal Trade Commission&apos;s Telemarketing Sales Rule (TSR).
+                </p>
+                <p>
+                  We strongly recommend scrubbing all leads against the National Do Not Call Registry before initiating any telemarketing contact.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Summary Stats */}
         <div ref={statsRef}>
           <SummaryStats stats={summaryStats} />
