@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { 
   CreditCard, 
@@ -28,13 +28,16 @@ import {
   DollarSign,
   Lock,
   Headphones,
-  ArrowRight
+  ArrowRight,
+  ChevronDown
 } from "lucide-react";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 
 export default function MerchantsPage() {
   const heroRef = useRef<HTMLElement>(null);
+  
+  const [isMoreBusinessesOpen, setIsMoreBusinessesOpen] = useState(false);
   
   const heroContentRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const benefitsRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
@@ -52,7 +55,6 @@ export default function MerchantsPage() {
     { name: "Debt Collection", icon: FileText },
     { name: "E-Cigarette & Vape", icon: Sparkles },
     { name: "Fantasy Sports", icon: Trophy },
-    { name: "Firearms", icon: Shield },
     { name: "Online Gaming", icon: Gamepad2 },
     { name: "Nutraceuticals", icon: Pill },
     { name: "Pawn Shops", icon: Store },
@@ -63,15 +65,65 @@ export default function MerchantsPage() {
     { name: "Health & Beauty", icon: Sparkles },
     { name: "Business Opportunities", icon: TrendingUp },
     { name: "Continuity Billing", icon: Clock },
+    { name: "Business Consulting", icon: Users },
   ];
 
   const lowRiskIndustries = [
     { name: "E-commerce & Retail", icon: ShoppingCart },
     { name: "Professional Services", icon: Briefcase },
-    { name: "Business Consulting", icon: Users },
     { name: "Software & SaaS", icon: Zap },
     { name: "Education & Training", icon: FileText },
     { name: "Local Services", icon: Store },
+    { name: "Firearms", icon: Shield },
+  ];
+
+  const additionalBusinesses = [
+    "Auto Repair Shops",
+    "Bookstores",
+    "Car Rental Services",
+    "Car Wash",
+    "Charities",
+    "Clothing Stores",
+    "Coach",
+    "Coffee Shops",
+    "Consultants",
+    "Convenience Stores",
+    "Daycare Centers",
+    "Dentists",
+    "Dry Cleaners",
+    "Electronics Stores",
+    "Furniture Stores",
+    "Gas Stations",
+    "Grocery Stores",
+    "Gyms & Fitness Centers",
+    "Hair Salons & Barbershops",
+    "Home Cleaning Services",
+    "Hotels",
+    "HVAC Company",
+    "Lawn Care Services",
+    "Medical Clinics",
+    "Notary",
+    "Online Retailers",
+    "Other Retailers",
+    "Other Services",
+    "Painter",
+    "Personal Chef / Meal Planner",
+    "Personal Trainer",
+    "Pet Groomer",
+    "Pet Stores",
+    "Pharmacies",
+    "Photographer",
+    "Plumber",
+    "Restaurants",
+    "Schools & Colleges",
+    "Security Services",
+    "Spas",
+    "Subscription Boxes",
+    "Tailor",
+    "Tax Services",
+    "Tutoring Services",
+    "Vape Stores",
+    "Veterinary Clinics",
   ];
 
   return (
@@ -291,6 +343,43 @@ export default function MerchantsPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* More Businesses We Support Section */}
+      <section className="px-4 py-12 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-6">
+            <button
+              onClick={() => setIsMoreBusinessesOpen(!isMoreBusinessesOpen)}
+              className="group inline-flex items-center gap-3 px-6 py-4 text-lg font-semibold text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-700 rounded-xl shadow-md hover:shadow-lg hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-300"
+            >
+              <span>More Businesses We Support</span>
+              <ChevronDown 
+                className={`w-5 h-5 text-zinc-600 dark:text-zinc-400 transition-transform duration-300 ${
+                  isMoreBusinessesOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          <div
+            className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto overflow-hidden transition-all duration-500 ${
+              isMoreBusinessesOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            {additionalBusinesses.map((business, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 p-3 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 hover:shadow-md transition-all duration-200"
+              >
+                <CheckCircle2 className="w-4 h-4 text-zinc-500 dark:text-zinc-400 flex-shrink-0" />
+                <span className="text-sm text-zinc-900 dark:text-zinc-100">
+                  {business}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
