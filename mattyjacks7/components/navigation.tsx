@@ -54,7 +54,7 @@ export default function Navigation() {
                 Merchant Services
               </Link>
             </motion.div>
-            <div 
+            <div
               className="relative"
               onMouseEnter={() => setIsMoreDropdownOpen(true)}
               onMouseLeave={() => setIsMoreDropdownOpen(false)}
@@ -81,6 +81,12 @@ export default function Navigation() {
                     className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   >
                     Resume Sites
+                  </Link>
+                  <Link
+                    href="/internship"
+                    className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors font-semibold text-emerald-600 dark:text-emerald-400"
+                  >
+                    Internship
                   </Link>
                 </div>
               )}

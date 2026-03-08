@@ -252,6 +252,26 @@ export default function Home() {
                 <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors hidden xs:inline">(603) 999-9420</span>
               </a>
             </div>
+
+            {/* Internship Banner */}
+            <div className="relative z-40 mt-10 w-full max-w-lg mx-auto">
+              <Link href="/internship" className="block w-full group">
+                <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-500/30 bg-gradient-to-r from-zinc-900 via-emerald-950 to-zinc-900 p-4 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/20 hover:border-emerald-400/50">
+                  <div className="absolute inset-0 bg-[url('/images/seamless-space-jpg-_upscayl_3x_upscayl-standard-4x.jpg')] opacity-20 group-hover:opacity-30 transition-opacity bg-cover mix-blend-screen"></div>
+                  <div className="absolute top-0 right-0 p-2 text-2xl animate-bounce">🍉</div>
+                  <div className="relative z-10 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 animate-pulse">
+                      <Bot className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="text-white font-bold text-lg mb-0.5 group-hover:text-emerald-400 transition-colors">Vibe Coding Internship</h3>
+                      <p className="text-emerald-100/70 text-sm m-0">Learn AI tools. Build a portfolio. Make $4/hr.</p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
           </div>
           <div className="relative w-full overflow-visible z-10 min-h-[400px] md:min-h-[500px]">
             <ClientThemeProvider>
@@ -314,26 +334,26 @@ export default function Home() {
           <div ref={servicesRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                t:"Custom AI Solutions",
-                d:"AI copilots, internal tools, and automations mapped to your workflows to reduce cost and increase throughput.",
+                t: "Custom AI Solutions",
+                d: "AI copilots, internal tools, and automations mapped to your workflows to reduce cost and increase throughput.",
                 icon: Bot
               },
               {
-                t:"Elite Freelancers",
-                d:"Handpicked engineers, designers, writers, and operators. Senior talent only. Coordinated for speed and quality.",
+                t: "Elite Freelancers",
+                d: "Handpicked engineers, designers, writers, and operators. Senior talent only. Coordinated for speed and quality.",
                 icon: Users
               },
               {
-                t:"Idea-to-Income",
-                d:"From napkin sketch to MVP to first dollars. We prototype fast, test in the wild, and iterate with real feedback.",
+                t: "Idea-to-Income",
+                d: "From napkin sketch to MVP to first dollars. We prototype fast, test in the wild, and iterate with real feedback.",
                 icon: TrendingUp
               },
               {
-                t:"Web Design",
-                d:"Beautiful, disciplined, conversion-focused sites. Clear offers, crisp copy, and performance that ranks.",
+                t: "Web Design",
+                d: "Beautiful, disciplined, conversion-focused sites. Clear offers, crisp copy, and performance that ranks.",
                 icon: Palette
               },
-            ].map((s,i)=> {
+            ].map((s, i) => {
               const IconComponent = s.icon;
               return (
                 <div
@@ -452,10 +472,10 @@ export default function Home() {
               {/* Process Cards with Numbers */}
               <div ref={processRef} className="grid grid-cols-4 gap-8">
                 {[
-                  {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
-                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes-in plain English.",icon: Target},
-                  {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
-                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics-we track what moves revenue.",icon: Trophy},
+                  { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle },
+                  { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes-in plain English.", icon: Target },
+                  { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap },
+                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics-we track what moves revenue.", icon: Trophy },
                 ].map((step, index) => (
                   <div key={index} className="group text-center relative">
                     {/* Step Number Circle positioned above each card */}
@@ -498,10 +518,10 @@ export default function Home() {
 
               <div className="space-y-6">
                 {[
-                  {t:"Share Your Vision",d:"A short call to unpack goals, constraints, and what success looks like for you.",icon: MessageCircle},
-                  {t:"Strategic Assessment",d:"We propose a focused plan with scope, timeline, and expected outcomes-in plain English.",icon: Target},
-                  {t:"Build and Execute",d:"We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.",icon: Zap},
-                  {t:"Deliver Results",d:"Launch, instrument, iterate. We are allergic to vanity metrics-we track what moves revenue.",icon: Trophy},
+                  { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle },
+                  { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes-in plain English.", icon: Target },
+                  { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap },
+                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics-we track what moves revenue.", icon: Trophy },
                 ].map((step, index) => (
                   <div key={index} className="relative flex items-center gap-6">
                     {/* Step Number Circle on the left */}
@@ -561,8 +581,8 @@ export default function Home() {
               );
             })}
           </ul>
-         </div>
-        </section>
+        </div>
+      </section>
 
       {/* TristateHoney Lead Generation */}
       <section className="px-4 py-16 border-t border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-emerald-50/30 via-white to-emerald-50/30 dark:from-emerald-950/10 dark:via-zinc-900/10 dark:to-emerald-950/10">

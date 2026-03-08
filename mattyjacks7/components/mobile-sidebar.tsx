@@ -139,12 +139,12 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               </li>
               <li>
                 <Link
-                  href="/leads"
+                  href="/internship"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
                 >
                   <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  Leads
+                  Internships
                 </Link>
               </li>
             </ul>
