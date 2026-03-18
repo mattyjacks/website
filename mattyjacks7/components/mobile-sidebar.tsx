@@ -4,6 +4,20 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "../lib/utils";
 
+type MobileControlPlanePayload = {
+  user: {
+    canControlEcosystem: boolean;
+    accessMode: string;
+  };
+  admin: {
+    url: string;
+  };
+};
+
+type MobileAppsPayload = {
+  apps?: { id: string }[];
+};
+
 interface MobileSidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -11,6 +25,8 @@ interface MobileSidebarProps {
 
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const [mounted, setMounted] = useState(false);
+  const [controlPlane, setControlPlane] = useState<MobileControlPlanePayload | null>(null);
+  const [ecosystemAppCount, setEcosystemAppCount] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -31,6 +47,53 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
       document.documentElement.style.overflow = "";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadControlPlane = async () => {
+      try {
+        const response = await fetch("/api/givegigs/control-plane?app=mattyjacks", {
+          method: "GET",
+          cache: "no-store",
+        });
+
+        if (!response.ok) return;
+        const payload = (await response.json()) as MobileControlPlanePayload;
+
+        if (!cancelled) {
+          setControlPlane(payload);
+        }
+      } catch {
+        if (!cancelled) {
+          setControlPlane(null);
+        }
+      } finally {
+        try {
+          const appsResponse = await fetch("/api/givegigs/apps", {
+            method: "GET",
+            cache: "no-store",
+          });
+
+          if (!appsResponse.ok) return;
+          const appsPayload = (await appsResponse.json()) as MobileAppsPayload;
+          if (!cancelled) {
+            setEcosystemAppCount(Array.isArray(appsPayload.apps) ? appsPayload.apps.length : 0);
+          }
+        } catch {
+          if (!cancelled) {
+            setEcosystemAppCount(0);
+          }
+        }
+      }
+    };
+
+    void loadControlPlane();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleLinkClick = () => {
     onClose();
@@ -147,11 +210,63 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   Internships
                 </Link>
               </li>
+              <li>
+                <a
+                  href="https://givegigs.com"
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
+                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  GiveGigs
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://venturecapitalarts.com"
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
+                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  VentureCapitalArts
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://cryptartist.com"
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
+                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  CryptArtist
+                </a>
+              </li>
             </ul>
           </nav>
 
           <div className="flex-shrink-0 p-6 border-t border-zinc-200/70 dark:border-zinc-800/60">
             <div className="text-sm text-zinc-600 dark:text-zinc-400">
+              <div className="mb-4 rounded-lg border border-zinc-200 dark:border-zinc-800 p-3">
+                <p className="font-medium text-zinc-900 dark:text-zinc-100">GiveGigs Control Plane</p>
+                <p className="mt-1 text-xs">
+                  Mode: {controlPlane?.user.accessMode ?? "syncing"}
+                </p>
+                <p className="text-xs">
+                  Admin: {controlPlane?.user.canControlEcosystem ? "granted" : "not granted"}
+                </p>
+                <p className="text-xs">
+                  Apps: {ecosystemAppCount > 0 ? ecosystemAppCount : "syncing"}
+                </p>
+                {controlPlane?.admin?.url ? (
+                  <a
+                    href={controlPlane.admin.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-block mt-2 text-xs text-red-600 dark:text-red-400 hover:underline"
+                  >
+                    Open GiveGigs Admin
+                  </a>
+                ) : null}
+              </div>
               <p className="font-medium">Contact Us</p>
               <a
                 href="tel:+16039999420"
