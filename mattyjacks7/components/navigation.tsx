@@ -62,6 +62,7 @@ export default function Navigation() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 className="hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-1"
+                onMouseDown={(e) => e.preventDefault()}
               >
                 More
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

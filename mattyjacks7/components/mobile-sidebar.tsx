@@ -105,7 +105,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             </button>
           </div>
 
-          <nav className="flex-1 px-6 py-8 overflow-hidden">
+          <nav className="flex-1 px-6 py-8 overflow-y-auto">
             <ul className="space-y-6">
               <li>
                 <Link
