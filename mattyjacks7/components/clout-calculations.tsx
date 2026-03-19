@@ -69,6 +69,10 @@ export default function CloutCalculations() {
     total: 0,
   };
 
+  const cloutPercentage = siteStats.total > 0
+    ? ((currentPageStats.total / siteStats.total) * 100).toFixed(1)
+    : "0.0";
+
   if (loading) {
     return (
       <div className="mt-8 px-4 py-6 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
@@ -84,6 +88,10 @@ export default function CloutCalculations() {
       <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 mb-4">
         Clout Calculations (Popularity)
       </h3>
+
+      <div className="mb-4 px-3 py-2 rounded-md bg-emerald-100/60 dark:bg-emerald-900/30 border border-emerald-200/60 dark:border-emerald-800/40 text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+        This page has <span className="text-emerald-600 dark:text-emerald-300 font-bold">{cloutPercentage}%</span> of total clout.
+      </div>
 
       <div className="space-y-3 text-xs text-zinc-600 dark:text-zinc-400 mb-4">
         <div>

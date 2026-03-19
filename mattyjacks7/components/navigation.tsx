@@ -82,12 +82,8 @@ export default function Navigation() {
       <header className="sticky top-0 z-30 w-full border-b border-zinc-200/70 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-950/80 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center relative">
           {/* LEFT: Logo */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            className="flex-shrink-0"
-          >
-            <Link href="/" className="flex items-center" aria-label="Home">
+          <div className="flex-shrink-0 logo-3d">
+            <Link href="/" className="flex items-center logo-3d-inner" aria-label="Home">
               <Image
                 src="/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png"
                 alt="MattyJacks logo"
@@ -97,7 +93,7 @@ export default function Navigation() {
                 priority
               />
             </Link>
-          </motion.div>
+          </div>
 
           {/* TRUE CENTER: Theme Toggle (desktop only) */}
           <div className="hidden lg:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -173,7 +169,7 @@ export default function Navigation() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/contact"
-                className="rounded-md bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-red-500 transition-colors whitespace-nowrap"
+                className="shiny-hover-button rounded-md bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-red-500 transition-colors whitespace-nowrap"
               >
                 Contact
               </Link>
@@ -198,7 +194,7 @@ export default function Navigation() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/contact"
-                className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-500 transition-colors"
+                className="shiny-hover-button rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-500 transition-colors"
               >
                 Contact
               </Link>
