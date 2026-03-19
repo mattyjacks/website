@@ -1,0 +1,33 @@
+/* TEAM */
+
+Founder & CEO: Matt (MattyJacks)
+Contact: Matt [at] MattyJacks.com
+Phone: (603) 999-9420
+Twitter: @MattyJacksX
+GitHub: mattyjacks
+Location: New Hampshire, USA
+
+/* THANKS */
+
+To all our freelancers, workers, and clients worldwide.
+To the open-source community.
+To everyone who believes in doing and/or dying trying.
+
+/* SITE */
+
+Standards: HTML5, CSS3, JavaScript ES2024
+Framework: Next.js 15 (App Router)
+Language: TypeScript
+Styling: Tailwind CSS
+UI Components: shadcn/ui, Lucide Icons
+Hosting: Vercel
+Database: Supabase (PostgreSQL)
+Analytics: Google Analytics 4
+Font: Geist Sans
+Last Updated: 2025
+
+/* PORTFOLIO */
+
+GiveGigs: https://givegigs.com
+CryptArtist Studio: https://cryptartiststudio.com
+VentureCapitalArts: https://venturecapitalarts.com

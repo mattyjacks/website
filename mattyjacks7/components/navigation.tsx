@@ -107,7 +107,7 @@ export default function Navigation() {
           </div>
 
           {/* RIGHT: Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8 text-sm ml-auto">
+          <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-8 text-sm ml-auto">
             <div className="hidden xl:flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs">
               <Network className="w-3.5 h-3.5 text-red-500" />
               <span className="text-zinc-700 dark:text-zinc-300">

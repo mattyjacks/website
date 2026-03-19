@@ -1,0 +1,66 @@
+# MattyJacks.com
+
+> MattyJacks is a holding company and full-service agency that builds websites, deploys cold calling teams, ships custom AI tools, and connects you with elite freelancers worldwide. Based in New Hampshire, USA. Serving clients globally. Founded by Matt (MattyJacks).
+
+## About
+
+MattyJacks is a technology holding company and agency founded by Matt. The company builds, acquires, and operates technology businesses. The core agency offers outsourcing, website development, cold calling operations, custom AI solutions, copywriting, graphic design, lead generation, and merchant services.
+
+The company motto is "Do and/or DIE TRYING!!!"
+
+## Contact
+
+- Phone: (603) 999-9420 (available 24/7/365)
+- Email: Matt@MattyJacks.com
+- WhatsApp: https://api.whatsapp.com/send?phone=15106005735
+- Website: https://mattyjacks.com
+- Twitter/X: https://x.com/MattyJacksX
+- GitHub: https://github.com/mattyjacks
+
+## Services
+
+- **Website Development**: Modern, mobile-first, SEO-optimized websites designed to convert visitors into customers. Our most popular service.
+- **Cold Calling Operations**: Managed cold calling teams for B2B lead generation. We research your market, build lead lists, craft scripts, deploy callers, and optimize results.
+- **Custom AI Solutions**: AI copilots, internal tools, and workflow automations mapped to your specific business processes.
+- **Elite Freelancers**: Handpicked engineers, designers, writers, and operators at all talent levels for maximum cost effectiveness.
+- **Merchant Services**: High-risk and low-risk payment processing. 20+ proven bank relationships. Fast approvals for USA and Canada businesses.
+- **Copywriting & Marketing**: Website copy, email campaigns, ad copy, and brand storytelling.
+- **Graphic Design**: Logo design, brand identity, social media graphics, marketing materials, and more.
+- **Lead Generation**: Free and custom lead databases for business prospecting.
+- **Resume Websites**: Professional resume sites that convert.
+- **TikTok & Social Media Growth**: Algorithm mastery and organic growth strategies.
+
+## Portfolio Companies
+
+- **GiveGigs** (givegigs.com): A freelance marketplace connecting clients with talented freelancers worldwide. Features AI-powered task matching and an AI agent ecosystem.
+- **CryptArtist Studio** (cryptartiststudio.com): An open-source creative software suite with 11 programs including Media Mogul, VibeCodeWorker, DemoRecorder, and more.
+- **VentureCapitalArts** (venturecapitalarts.com): An arts-focused venture capital and creative consultancy.
+
+## Key Facts
+
+- Available 24/7/365
+- No long-term contracts required
+- Money-back guarantee
+- All talent levels for cost effectiveness
+- Based in New Hampshire, USA
+- Global freelancer network
+- Free lead databases with 500,000+ leads available
+- Free consultations
+
+## Pages
+
+- Home: https://mattyjacks.com
+- Services: https://mattyjacks.com/services
+- Contact: https://mattyjacks.com/contact
+- Merchant Services: https://mattyjacks.com/merchants
+- Resume Sites: https://mattyjacks.com/resumes
+- Free Leads: https://mattyjacks.com/leads
+- Internship Program: https://mattyjacks.com/internship
+- Blog/Posts: https://mattyjacks.com/posts
+- WhatsApp: https://mattyjacks.com/whatsapp
+- Worker Manual: https://mattyjacks.com/manual
+- Privacy Policy: https://mattyjacks.com/privacy
+
+## Full Content
+
+For comprehensive AI-readable content, see: https://mattyjacks.com/llms-full.txt

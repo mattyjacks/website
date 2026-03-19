@@ -1,0 +1,47 @@
+{
+  "name": "MattyJacks - Outsourcing, Websites, AI & Freelancers",
+  "short_name": "MattyJacks",
+  "description": "Full-service agency and holding company. Websites, cold calling, AI tools, and elite freelancers. Do and/or DIE TRYING!!!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/images/mattyjacks-site-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Contact MattyJacks",
+      "short_name": "Contact",
+      "url": "/contact",
+      "description": "Get in touch with MattyJacks"
+    },
+    {
+      "name": "Our Services",
+      "short_name": "Services",
+      "url": "/services",
+      "description": "View all services offered by MattyJacks"
+    },
+    {
+      "name": "Free Leads",
+      "short_name": "Leads",
+      "url": "/leads",
+      "description": "Browse free lead databases"
+    }
+  ]
+}

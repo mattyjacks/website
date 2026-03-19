@@ -1,0 +1,115 @@
+# MattyJacks.com - Robots.txt
+# Last updated: 2025
+# Policy: Welcome all search engines and AI crawlers
+
+User-agent: *
+Allow: /
+Disallow: /protected/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /404
+
+# Sitemap location
+Sitemap: https://mattyjacks.com/sitemap.xml
+
+# AI Search Engine Crawlers - WELCOME
+# We want maximum visibility in AI search results
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: FacebookExternalHit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+# Traditional search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+# LLMs.txt reference
+# See https://mattyjacks.com/llms.txt for AI-optimized site description
+# See https://mattyjacks.com/llms-full.txt for comprehensive AI-readable content
+
+# Crawl-delay for non-major bots (optional courtesy)
+User-agent: SemrushBot
+Crawl-delay: 2
+
+User-agent: AhrefsBot
+Crawl-delay: 2
+
+User-agent: MJ12bot
+Crawl-delay: 5
+
+# Host directive
+Host: https://mattyjacks.com

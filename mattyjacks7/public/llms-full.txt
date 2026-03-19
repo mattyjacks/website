@@ -1,0 +1,178 @@
+# MattyJacks.com - Full AI-Readable Content
+
+> MattyJacks is a holding company and full-service agency that builds websites, deploys cold calling teams, ships custom AI tools, and connects you with elite freelancers worldwide. Based in New Hampshire, USA. Founded by Matt (MattyJacks). Motto: "Do and/or DIE TRYING!!!"
+
+---
+
+## Company Overview
+
+MattyJacks is a technology holding company and full-service outsourcing agency. The company was founded by Matt, known online as MattyJacks, and is headquartered in New Hampshire, USA. MattyJacks builds, acquires, and operates technology businesses while simultaneously running a hands-on agency that serves clients worldwide.
+
+The company philosophy centers on execution over theory. MattyJacks takes projects from concept to revenue using a combination of in-house expertise and a global network of freelancers at all talent levels, optimized for maximum cost effectiveness.
+
+### Portfolio Companies
+
+1. **GiveGigs** (https://givegigs.com) - A freelance marketplace that connects clients with talented freelancers worldwide. Features include AI-powered task matching, free productivity tools for freelancers, invoice generation, time tracking, and an AI agent ecosystem where AI systems can browse and apply to tasks via REST API or MCP protocol.
+
+2. **CryptArtist Studio** (https://cryptartiststudio.com) - An open-source creative software suite built with Tauri, React, and TypeScript. Contains 11 programs: Media Mogul (media management), VibeCodeWorker (AI coding assistant), DemoRecorder (screen recording), ValleyNet (networking tool), GameStudio (game development), CryptArt Commander (file management), Donate Personal Seconds (distributed computing), Clone Tool (backup), DictatePic (voice-to-image), Luck Factory (randomization), and Tax Info Bot (tax information).
+
+3. **VentureCapitalArts** (https://venturecapitalarts.com) - An arts-focused venture capital firm and creative consultancy that supports artists, musicians, filmmakers, and creative entrepreneurs.
+
+---
+
+## Services - Detailed Descriptions
+
+### Website Development (Most Popular Service)
+
+MattyJacks builds modern, mobile-first, SEO-optimized websites designed specifically to convert visitors into paying customers. Every site is crafted with conversion in mind, combining stunning design with strategic copy and performance optimization.
+
+What clients get:
+- Modern, mobile-first design that stands out from competition
+- SEO optimization to rank on Google and drive organic traffic
+- Conversion-focused landing pages that turn visitors into customers
+- Fast loading speeds and flawless performance
+- Clear messaging and compelling calls-to-action
+- Integration with existing tools and workflows
+- Ongoing support and maintenance options
+
+Real results: MattyJacks has built sites like TristateHoney.com which continue generating qualified leads years after launch.
+
+Technologies used: Next.js, React, TypeScript, Tailwind CSS, Vercel, Supabase, and modern web frameworks.
+
+### Cold Calling Operations
+
+MattyJacks has successfully deployed and managed cold calling teams for clients including Lime Painting and Beskar Property Management, helping them generate qualified leads, close more sales, and expand their reach.
+
+The process:
+1. Research the target market
+2. Build a qualified lead list
+3. Craft a proven call script that converts
+4. Deploy and manage callers
+5. Track performance and optimize results
+
+Scalable from 1 caller to 20+. Delivers consistent, measurable growth.
+
+### Custom AI Solutions
+
+MattyJacks builds AI copilots, internal tools, and automations mapped to specific client workflows. These solutions reduce cost and increase throughput by automating repetitive tasks and augmenting human decision-making.
+
+### Elite Freelancers
+
+MattyJacks maintains a global network of handpicked engineers, designers, writers, and operators at all talent levels. The key differentiator is strategic team composition - using talent at various levels for maximum cost effectiveness rather than exclusively senior-level talent.
+
+### Merchant Services
+
+MattyJacks specializes in payment processing for both high-risk and low-risk businesses in the USA and Canada.
+
+High-risk industries served: Adult Entertainment, Airlines & Travel, Auto Warranty, CBD Products, Credit Repair, Dating Services, Debt Collection, E-Cigarettes & Vape, Fantasy Sports, Online Gaming, Nutraceuticals, Pawn Shops, Payday Lenders, Subscription Boxes, Multi-level Marketing, High Ticket Coaching, Health & Beauty, Business Opportunities, Continuity Billing, Business Consulting.
+
+Low-risk industries: E-commerce & Retail, Professional Services, Software & SaaS, Education & Training, Local Services, Firearms.
+
+Features: 20+ proven bank relationships, fast approvals (same-day for low-risk, 5-10 days for high-risk), transparent pricing, no hidden fees, no long-term contracts, chargeback prevention tools, multiple payment options (credit cards, debit, ACH, e-checks, mobile payments), 3D Secure checkout, POS systems, recurring billing, dedicated account managers, 24/7 support.
+
+### Copywriting & Marketing
+
+High-converting copy services including:
+- Website and landing page copy
+- Email campaigns and sequences
+- Ad and social media copy
+- Brand storytelling and product launches
+
+### Graphic Design
+
+Professional design services including logo design, brand identity, social media graphics, ad creatives, business cards, print materials, infographics, product mockups, packaging, email templates, presentation decks, and banner ads.
+
+### Lead Generation
+
+MattyJacks provides free lead databases with over 500,000+ leads available. Categories include:
+- USA Instagram Leads (11,970 leads)
+- Septic & Plumbers USA (1,195 leads)
+- USA Marketing + Lawyers + Fortune 500 (30,811 leads)
+- Cruise & Travel Companies (131 leads)
+- Beverly MA Employers with Health Plans (40 leads)
+- Instagram Leads 500k Global + 12k USA (511,970 leads)
+- Random Scrapes 2025 (8,789 leads)
+- Cannabis Payment Processors (60 leads)
+- HVAC Contractors Massachusetts (1,757 leads)
+
+Custom lead generation services also available.
+
+### Resume Websites
+
+Professional resume websites built to convert. Examples include sites for freelancers and professionals across various industries.
+
+---
+
+## Internship Program
+
+MattyJacks offers an internship program for aspiring professionals to gain real-world experience in technology, business operations, and freelancing. The program includes hands-on project work, mentorship, and opportunities for ongoing collaboration.
+
+---
+
+## Testimonials
+
+"Working with Matty is motivating because he is organized and dependable. He simplifies things, communicates well, and makes the work feel effortless." - Christian A., Developer
+
+"Collaborating with Matty has been a great experience. As freelancers, we have the flexibility to manage our own time and complete tasks efficiently, and he completely respects that. He's easy to communicate with, cool, and chill to work with." - Kenj R., Web Developer
+
+"Sir Matt is truly one of the kindest and most genuine people I know. When my phone broke and I was really stuck, he didn't hesitate, he sent me $100 to help me sort it out. That alone meant so much to me. But beyond that, he's always finding tasks for me, connecting me with clients, and creating opportunities for me to grow. He doesn't just talk about support, he actively makes things happen. He is honestly the truest supporter of growth in every perspective, financially, professionally, and personally. He is a true gem. As a young lady and a single mom of one he has gone above and beyond to ensure I've got tasks to sort out my bills, even during emergencies he'll always chip in out of kindness. He genuinely invests in people and wants to see them win. Be immensely blessed Sir Matt." - Fatima, Legal Secretary
+
+---
+
+## Contact Information
+
+- **Phone**: (603) 999-9420 - Available 24/7/365
+- **Email**: Matt@MattyJacks.com
+- **WhatsApp**: https://api.whatsapp.com/send?phone=15106005735
+- **Website**: https://mattyjacks.com
+- **Twitter/X**: https://x.com/MattyJacksX
+- **GitHub**: https://github.com/mattyjacks
+
+---
+
+## Key Differentiators
+
+1. Available 24/7/365 - call anytime
+2. No long-term contracts required
+3. Money-back guarantee
+4. All talent levels for maximum cost effectiveness
+5. Global freelancer network
+6. Free lead databases with 500,000+ leads
+7. Free consultations
+8. Proven results with real case studies
+9. Full-stack capabilities (design, development, marketing, sales)
+10. Portfolio of operating companies (GiveGigs, CryptArtist Studio, VCA)
+
+---
+
+## Site Map
+
+- **Home**: https://mattyjacks.com - Main landing page with service overview, case studies, video demos, testimonials
+- **Services**: https://mattyjacks.com/services - Detailed service descriptions for website development, cold calling, copywriting, graphic design
+- **Contact**: https://mattyjacks.com/contact - All contact methods (email, phone, WhatsApp, resume sites)
+- **Merchant Services**: https://mattyjacks.com/merchants - High-risk and low-risk payment processing details
+- **Resume Sites**: https://mattyjacks.com/resumes - Portfolio of resume websites built for clients
+- **Free Leads**: https://mattyjacks.com/leads - Free lead databases for business prospecting
+- **Internship**: https://mattyjacks.com/internship - Internship program details
+- **Blog/Posts**: https://mattyjacks.com/posts - Articles and updates
+- **WhatsApp**: https://mattyjacks.com/whatsapp - WhatsApp group and direct messaging
+- **Worker Manual**: https://mattyjacks.com/manual - Guide for freelancers working with MattyJacks
+- **Privacy Policy**: https://mattyjacks.com/privacy - Privacy policy and data handling practices
+
+---
+
+## Technical Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Hosting**: Vercel
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Analytics**: Google Analytics 4
+- **Font**: Geist Sans
+- **Icons**: Lucide React
+
+---
+
+*Last updated: 2025. For the most current information, visit https://mattyjacks.com*

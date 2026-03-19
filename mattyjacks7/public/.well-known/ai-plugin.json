@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "MattyJacks",
+  "name_for_model": "mattyjacks",
+  "description_for_human": "MattyJacks is a holding company and full-service agency offering website development, cold calling, custom AI solutions, elite freelancers, merchant services, and more.",
+  "description_for_model": "MattyJacks (mattyjacks.com) is a technology holding company and full-service outsourcing agency founded by Matt. Services include: website development (most popular - modern, mobile-first, SEO-optimized sites), cold calling operations (managed B2B lead gen teams), custom AI solutions (copilots, automations), elite freelancers (all talent levels, global network), merchant services (high-risk and low-risk payment processing for USA/Canada with 20+ bank relationships), copywriting, graphic design, lead generation (500k+ free leads available), resume websites, and TikTok/social media growth. Portfolio companies: GiveGigs (freelance marketplace at givegigs.com), CryptArtist Studio (open-source creative suite at cryptartiststudio.com), VentureCapitalArts (arts venture capital at venturecapitalarts.com). Contact: (603) 999-9420 available 24/7/365, Matt@MattyJacks.com, WhatsApp. Based in New Hampshire, USA, serving globally. No long-term contracts. Money-back guarantee. Motto: Do and/or DIE TRYING!!!",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://mattyjacks.com/llms.txt"
+  },
+  "logo_url": "https://mattyjacks.com/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png",
+  "contact_email": "Matt@MattyJacks.com",
+  "legal_info_url": "https://mattyjacks.com/privacy"
+}
