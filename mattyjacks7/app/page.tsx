@@ -601,79 +601,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Merchant Services Section */}
-      <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-700 dark:from-emerald-900 dark:via-emerald-800 dark:to-emerald-950 py-20">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
-          <div ref={merchantServicesRef} className="text-center space-y-8">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-bold uppercase tracking-wider mb-4">
-              <CreditCard className="w-5 h-5" />
-              <span>Payment Processing Solutions</span>
-            </div>
-
-            {/* Main Heading */}
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Accept Payments.
-              <br />
-              <span className="text-emerald-100">Grow Your Business.</span>
-            </h2>
-
-            {/* Subheading */}
-            <p className="text-xl md:text-2xl text-emerald-50 max-w-3xl mx-auto leading-relaxed mb-12">
-              We provide merchant account solutions for both high-risk and low-risk businesses across the USA & Canada. Get approved fast with transparent pricing and expert support.
-            </p>
-
-            {/* Feature Grid */}
-            <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto mb-12">
-              {[
-                { icon: Zap, title: "3 Day Approvals", desc: "Fast processing for both low and high-risk accounts" },
-                { icon: Shield, title: "High-Risk Specialists", desc: "20+ bank relationships to handle any business" },
-                { icon: DollarSign, title: "Competitive Rates", desc: "Transparent pricing with no hidden fees" },
-              ].map((feat, i) => (
-                <div key={i} className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
-                  <div className="absolute top-3 right-3 text-[10px] font-bold text-white/20 group-hover:text-white/40 transition-colors">{String(i + 1).padStart(2, "0")}</div>
-                  <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-white/30 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-white/10 transition-all duration-300">
-                    <feat.icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">{feat.title}</h3>
-                  <p className="text-emerald-100/80 text-sm leading-relaxed">{feat.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* CTA Button */}
-            <div className="flex justify-center">
-              <Link
-                href="/merchants"
-                className="group inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-emerald-700 bg-white rounded-2xl shadow-2xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 hover:bg-emerald-50"
-              >
-                <span>Explore Merchant Services</span>
-                <ArrowRight className="ml-3 w-6 h-6 transition-transform group-hover:translate-x-2" />
-              </Link>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="mt-12 pt-8 border-t border-white/15">
-              <p className="text-emerald-200/80 text-xs uppercase tracking-[0.2em] font-semibold mb-4">Trusted by businesses in 20+ industries</p>
-              <div className="flex flex-wrap justify-center gap-6 text-white/70 text-sm">
-                {["Secured Processing", "24/7 Support", "Multiple Payment Options", "Chargeback Protection"].map((t, i) => (
-                  <span key={i} className="flex items-center gap-1.5">
-                    <span className="w-1 h-1 rounded-full bg-emerald-300"></span>
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Process */}
       <section id="process" className="px-4 py-20 pb-40">
@@ -824,18 +751,9 @@ export default function Home() {
                 TristateHoney.com is still getting real inquiries! One recent message came from a company looking to order bulk honey for a new product they&apos;re developing.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-                <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 hover:-translate-y-1 bg-white dark:bg-zinc-900">
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/90 dark:bg-zinc-900/90 text-zinc-600 dark:text-zinc-400 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-700/50">Lead Inquiry</span>
-                  </div>
-                  <Image src="/images/tristatehoney-lead.jpg" alt="TristateHoney.com lead inquiry from bulk honey buyer - real client lead generated by MattyJacks website development" width={600} height={400} className="w-full h-auto group-hover:scale-[1.02] transition-transform duration-700" priority />
-                </div>
-                <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 hover:-translate-y-1 bg-white dark:bg-zinc-900">
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/90 dark:bg-zinc-900/90 text-zinc-600 dark:text-zinc-400 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-700/50">Live Website</span>
-                  </div>
-                  <Image src="/images/tristatehoney-website-screenshot.jpg" alt="TristateHoney.com homepage screenshot - e-commerce honey website built by MattyJacks that still generates leads years after launch" width={600} height={400} className="w-full h-auto group-hover:scale-[1.02] transition-transform duration-700" priority />
+              <div className="group relative max-w-4xl mb-6 h-[400px] md:h-[500px]">
+                <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 bg-white dark:bg-zinc-900 h-full">
+                  <ScaledIframe src="https://tristatehoney.com/" title="TristateHoney.com live website preview - e-commerce honey site built by MattyJacks" targetWidth={1280} />
                 </div>
               </div>
 
@@ -916,7 +834,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section Divider: Case Studies -> Video Demos */}
+      {/* Section Divider: Case Studies -> Merchant Services */}
+      <div className="relative h-10 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
+          <div className="h-px w-32 bg-gradient-to-r from-transparent to-zinc-300/40 dark:to-zinc-700/30"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-zinc-300/50 dark:bg-zinc-700/40 mx-3"></div>
+          <div className="h-px w-32 bg-gradient-to-l from-transparent to-zinc-300/40 dark:to-zinc-700/30"></div>
+        </div>
+      </div>
+
+      {/* Merchant Services Section - Compact */}
+      <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-700 dark:from-emerald-900 dark:via-emerald-800 dark:to-emerald-950 py-12">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute top-10 left-10 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
+          <div ref={merchantServicesRef} className="text-center space-y-6">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wider">
+              <CreditCard className="w-4 h-4" />
+              <span>Payment Processing</span>
+            </div>
+
+            {/* Main Heading */}
+            <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+              Accept Payments. Grow Your Business.
+            </h2>
+
+            {/* Subheading */}
+            <p className="text-base md:text-lg text-emerald-50 max-w-2xl mx-auto leading-relaxed">
+              High-risk & low-risk merchant accounts for USA & Canada. Fast approvals, transparent pricing, expert support.
+            </p>
+
+            {/* Feature Grid - Compact */}
+            <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-6">
+              {[
+                { icon: Zap, title: "3 Day Approvals", desc: "Fast processing" },
+                { icon: Shield, title: "High-Risk Specialists", desc: "20+ bank relationships" },
+                { icon: DollarSign, title: "Competitive Rates", desc: "No hidden fees" },
+              ].map((feat, i) => (
+                <div key={i} className="group bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-0.5">
+                  <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mx-auto mb-2 group-hover:bg-white/30 group-hover:scale-105 transition-all duration-300">
+                    <feat.icon className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-sm font-bold text-white mb-1">{feat.title}</h3>
+                  <p className="text-emerald-100/70 text-xs leading-relaxed">{feat.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Button */}
+            <div className="flex justify-center">
+              <Link
+                href="/merchants"
+                className="group inline-flex items-center justify-center px-6 py-3 text-base font-bold text-emerald-700 bg-white rounded-xl shadow-lg hover:shadow-white/30 transition-all duration-300 hover:scale-105 hover:bg-emerald-50"
+              >
+                <span>Explore Services</span>
+                <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Divider: Merchant Services -> Video Demos */}
       <div className="relative h-10 overflow-hidden">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
           <div className="h-px w-32 bg-gradient-to-r from-transparent to-zinc-300/40 dark:to-zinc-700/30"></div>

@@ -7,6 +7,7 @@ import Navigation from "../components/navigation";
 import SmoothScroll from "../components/smooth-scroll";
 import ViewTracker from "../components/view-tracker";
 import CloutCalculations from "../components/clout-calculations";
+import AnythingButton from "../components/anything-button";
 import "./globals.css";
 
 const siteUrl = process.env.VERCEL_URL
@@ -532,9 +533,19 @@ export default function RootLayout({
                   {/* Company Info Section */}
                   <div className="md:text-right">
                     <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 mb-4">MattyJacks</h3>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
+                      <a
+                        href="https://x.com/MattyJacksX"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 font-medium"
+                        aria-label="Follow MattyJacks on X"
+                      >
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        Follow on X
+                      </a>
                       <div className="text-zinc-600 dark:text-zinc-400 text-sm">
-                        © 2025 MattyJacks. All rights reserved.
+                        &copy; 2025 MattyJacks. All rights reserved.
                       </div>
                       <div className="text-zinc-500 dark:text-zinc-500 text-sm">
                         Do and/or DIE TRYING!!!
@@ -547,6 +558,7 @@ export default function RootLayout({
                 <CloutCalculations />
               </div>
             </footer>          </div>
+          <AnythingButton />
           </SmoothScroll>
         </ThemeProvider>
       </body>
