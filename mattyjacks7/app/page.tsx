@@ -256,7 +256,7 @@ export default function Home() {
             </div>
             {/* Trust badges */}
             <div className="mt-5 flex flex-wrap justify-center gap-3">
-              {["No Long-term Contracts", "Senior Talent Only", "Money-back Guarantee"].map((badge, i) => (
+              {["No Long-term Contracts", "All Talent Levels", "Money-back Guarantee"].map((badge, i) => (
                 <span key={i} className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                   <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                   {badge}
@@ -554,7 +554,7 @@ export default function Home() {
               },
               {
                 t: "Elite Freelancers",
-                d: "Handpicked engineers, designers, writers, and operators. Senior talent only. Coordinated for speed and quality.",
+                d: "Handpicked engineers, designers, writers, and operators at all talent levels. Maximum cost effectiveness through strategic team composition.",
                 icon: Users,
                 accent: "from-emerald-500 to-green-500"
               },
