@@ -87,7 +87,7 @@ export default function CloutCalculations() {
 
       <div className="space-y-3 text-xs text-zinc-600 dark:text-zinc-400 mb-4">
         <div>
-          <span className="font-semibold">Website Visits Since 3/19/2026 AD</span> = {siteStats.total} (Site Reported)
+          <span className="font-semibold">Website Visits Since 3/19/2026 AD</span> = {siteStats.total} (Self-Reported)
         </div>
       </div>
 
