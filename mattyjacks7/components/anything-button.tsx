@@ -12,11 +12,11 @@ interface ChatMessage {
 }
 
 const GREETING_VARIANTS = [
-  "Let's make some money together for the good of humanity. I'll answer ANY question, no matter how wild, and naturally with Artificial Intelligence.",
-  "Ready to make moves, Boss! I'll answer ANY question, no matter how wild, and naturally with Artificial Intelligence. Let's build something great for humanity.",
-  "Let's get to work for the good of humanity, Boss! I'll answer ANY question, no matter how wild, and naturally with Artificial Intelligence.",
-  "Time to make things happen! I'll answer ANY question, no matter how wild, and naturally with Artificial Intelligence. Let's do this for humanity.",
-  "Boss! Let's make some money and do some good for humanity. I'll answer ANY question, no matter how wild, and naturally with Artificial Intelligence.",
+  "Let's make some money together for the common good of humanity. I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. What are your orders, boss? \n👱🏻‍♀️ Valley Net 💘",
+  "Ready to make moves, Boss! I'm Valley Net, and I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. Let's build something great for humanity. \n👱🏻‍♀️ Valley Net 💘",
+  "Let's get to work for the good of humanity, Boss! I'm Valley Net, and I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. \n👱🏻‍♀️ Valley Net 💘",
+  "Time to make things happen! I'm Valley Net, and I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. Let's do this for humanity. \n👱🏻‍♀️ Valley Net 💘",
+  "Boss! Let's make some money and do some good for humanity. I'm Valley Net, and I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. \n👱🏻‍♀️ Valley Net 💘",
 ];
 
 function getRandomGreeting(): string {
