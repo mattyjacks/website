@@ -1027,7 +1027,36 @@ export default function Home() {
       {/* Worker Feedback Carousel */}
       <WorkerFeedbackCarousel />
 
-      {/* Section Divider: Testimonials -> CTA */}
+      {/* Section Divider: Testimonials -> Updates */}
+      <div className="relative h-10 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
+      </div>
+
+      {/* Latest Updates / Social Proof */}
+      <section id="updates" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Latest <span className="font-bold text-red-600 dark:text-red-500">Updates</span></p>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Building in Public</h2>
+            <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Follow along as we ship new features and improvements.</p>
+          </div>
+          
+          {/* Tweet Embed */}
+          <div className="flex justify-center">
+            <div className="w-full max-w-md">
+              <blockquote className="twitter-tweet" data-theme="dark">
+                <p lang="en" dir="ltr">
+                  <a href="https://t.co/tOHBDXj8ki">https://t.co/tOHBDXj8ki</a> Just launched the latest version of my website, haven&apos;t even updated the environment variables for the integration yet! They say if you&apos;re not embarrassed when you launch, you launched too late. Please visit my website and give me feedback. I love you. ❤️
+                </p>
+                &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2034681421063725133?ref_src=twsrc%5Etfw">March 19, 2026</a>
+              </blockquote>
+              <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Divider: Updates -> CTA */}
       <div className="relative h-10 overflow-hidden">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
       </div>
