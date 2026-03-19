@@ -1102,7 +1102,7 @@ export default function Home() {
               </a>
             </div>
             <div className="flex flex-wrap justify-center gap-6 text-emerald-200/70 text-sm pt-4">
-              {["24/7 Available", "Free Consultation", "Results or We Die Trying"].map((t, i) => (
+              {["24/7 Available", "Free Consultation", "Do and/or DIE TRYING!!!"].map((t, i) => (
                 <span key={i} className="flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-emerald-400/80"></span>{t}</span>
               ))}
             </div>

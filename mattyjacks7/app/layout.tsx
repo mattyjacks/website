@@ -13,7 +13,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "MattyJacks - Holding Company & Agency | We'll make you money and/or DIE TRYING!!!",
+  title: "MattyJacks - Holding Company & Agency | Do and/or DIE TRYING!!!",
   description:
     "MattyJacks is a holding company that builds, acquires, and operates technology businesses. Our portfolio includes GiveGigs, CryptArtist Studio, VentureCapitalArts, and a full-service outsourcing agency with global talent.",
   openGraph: {
@@ -187,7 +187,7 @@ export default function RootLayout({
                         © 2025 MattyJacks. All rights reserved.
                       </div>
                       <div className="text-zinc-500 dark:text-zinc-500 text-sm">
-                        We&apos;ll make you money and/or DIE TRYING!!!
+                        Do and/or DIE TRYING!!!
                       </div>
                     </div>
                   </div>

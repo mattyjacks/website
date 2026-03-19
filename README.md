@@ -5,7 +5,7 @@
 <h1 align="center">🚀 MattyJacks.com — Official Website</h1>
 
 <p align="center">
-  <strong>We'll make you money and/or DIE TRYING!!!</strong>
+  <strong>Do and/or DIE TRYING!!!</strong>
 </p>
 
 <p align="center">
@@ -581,7 +581,7 @@ The application uses **Supabase** for authentication and backend services:
 ### SEO
 
 - **Meta tags**: Title, description, and Open Graph metadata defined in `layout.tsx`
-- **Title**: *"MattyJacks - We'll make you money and/or DIE TRYING!!!"*
+- **Title**: *"MattyJacks - Do and/or DIE TRYING!!!"*
 - **Description**: *"Outsourcing, Websites, Sales, Consulting, Software, Custom AI, elite freelancers, idea-to-income execution, and web design that converts."*
 - **Open Graph image**: Custom branded image at `/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png`
 - **Twitter card image**: Same as OG image
@@ -791,5 +791,5 @@ MattyJacks.com is the parent company and hub for the entire CryptArtist ecosyste
 
 <p align="center">
   <strong>© 2025 MattyJacks. All rights reserved.</strong><br />
-  <em>We'll make you money and/or DIE TRYING!!!</em>
+  <em>Do and/or DIE TRYING!!!</em>
 </p>
