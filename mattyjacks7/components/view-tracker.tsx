@@ -11,21 +11,13 @@ export default function ViewTracker() {
       return;
     }
 
-    // Track view with deduplication per session
-    const sessionKey = `view-tracked-${path}`;
-    const hasTracked = sessionStorage.getItem(sessionKey);
-
-    if (!hasTracked) {
-      // Record the view
-      fetch("/api/views", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path }),
-      }).catch((err) => console.error("View tracking failed:", err));
-
-      // Mark as tracked for this session
-      sessionStorage.setItem(sessionKey, "true");
-    }
+    // Track view - allow multiple views per page per session
+    // Each page load/refresh will record a new view
+    fetch("/api/views", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path }),
+    }).catch((err) => console.error("View tracking failed:", err));
   }, []);
 
   return null; // This component doesn't render anything

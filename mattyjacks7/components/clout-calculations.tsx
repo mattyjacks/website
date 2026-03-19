@@ -21,31 +21,40 @@ export default function CloutCalculations() {
     unknown: 0,
     total: 0,
   });
-  const [currentPath, setCurrentPath] = useState<string>("/");
+  const [currentPath, setCurrentPath] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   // Static GA4 number - update manually as needed
   const GA4_TOTAL_HUMANS = 2353;
 
   useEffect(() => {
-    setCurrentPath(window.location.pathname || "/");
+    const path = window.location.pathname || "/";
+    setCurrentPath(path);
     
     // Fetch view stats
-    fetch("/api/views")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.allStats) {
-          setPageStats(data.allStats);
-        }
-        if (data.siteStats) {
-          setSiteStats(data.siteStats);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch view stats:", err);
-        setLoading(false);
-      });
+    const fetchStats = () => {
+      fetch("/api/views")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.allStats) {
+            setPageStats(data.allStats);
+          }
+          if (data.siteStats) {
+            setSiteStats(data.siteStats);
+          }
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch view stats:", err);
+          setLoading(false);
+        });
+    };
+
+    fetchStats();
+
+    // Refresh stats every 2 seconds to show live updates
+    const interval = setInterval(fetchStats, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   const getDisplayPath = (path: string): string => {
