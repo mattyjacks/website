@@ -13,9 +13,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "MattyJacks - We'll make you money and/or DIE TRYING!!!",
+  title: "MattyJacks - Holding Company & Agency | We'll make you money and/or DIE TRYING!!!",
   description:
-    "Outsourcing, Websites, Sales, Consulting, Software, Custom AI, elite freelancers, idea-to-income execution, and web design that converts.",
+    "MattyJacks is a holding company that builds, acquires, and operates technology businesses. Our portfolio includes GiveGigs, CryptArtist Studio, VentureCapitalArts, and a full-service outsourcing agency with global talent.",
   openGraph: {
     images: [
       {

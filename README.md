@@ -743,6 +743,41 @@ When deploying via the Vercel button, the Supabase integration automatically pro
 
 ---
 
+## 🌐 CryptArtist Ecosystem Integration
+
+MattyJacks.com is the parent company and hub for the entire CryptArtist ecosystem:
+
+| Project | Relationship | Integration |
+|---|---|---|
+| **GiveGigs** | 96.8% owned subsidiary | SSO auth provider, worker marketplace, freelancer hiring |
+| **CryptArtist Studio** | 100% owned subsidiary | Creative suite built by MattyJacks team |
+| **CryptArtist Website** | 100% owned subsidiary | Digital art platform |
+| **VentureCapitalArts** | 100% owned subsidiary | Investment portfolio and SAAS marketplace |
+| **VibeCodeWorker** | 100% owned subsidiary | Dev services and SAAS templates |
+| **GraveGain** | Game project | Dark fantasy RPG built with CryptArtist tools |
+| **WebsiteBlog** | Blog platform | Devlogs, announcements, and articles |
+
+### Shared Infrastructure
+
+- **Supabase**: Shared authentication and database across all web properties
+- **GiveGigs Control Plane**: Ecosystem orchestration API connecting all apps
+- **Vercel**: Hosting for mattyjacks.com, givegigs.com, venturecapitalarts.com
+- **Design Language**: Consistent dark/light theme, Tailwind CSS, shadcn/ui across all sites
+
+---
+
+## 🔗 Related Projects
+
+| Project | Description | Link |
+|---|---|---|
+| **GiveGigs** | Freelance marketplace with AI agent ecosystem | [Website](https://givegigs.com) / [GitHub](https://github.com/mattyjacks/GiveGigs) |
+| **CryptArtist Studio** | Open creative suite with 11 programs | [GitHub](https://github.com/mattyjacks/CryptArtistStudio) |
+| **VentureCapitalArts** | Satirical investment portfolio marketplace | [GitHub](https://github.com/mattyjacks/VCA) |
+| **GraveGain** | Dark fantasy action RPG with emoji graphics | [GitHub](https://github.com/mattyjacks/GraveGain) |
+| **WebsiteBlog** | Blog platform with devlogs and articles | [GitHub](https://github.com/mattyjacks/websiteBlog) |
+
+---
+
 ## 📞 Contact
 
 | Channel | Details |

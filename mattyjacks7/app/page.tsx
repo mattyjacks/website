@@ -6,7 +6,7 @@ import Image from "next/image";
 import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
 import { ClientThemeProvider } from "../components/client-theme-mount";
-import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store, ExternalLink, CreditCard, Shield, DollarSign, ArrowRight } from "lucide-react";
+import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Code2, ShoppingCart, MapPin, Briefcase, GraduationCap, Store, ExternalLink, CreditCard, Shield, DollarSign, ArrowRight, Building2, Globe, Layers, Rocket } from "lucide-react";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 import WorkerFeedbackCarousel from "@/components/worker-feedback";
@@ -19,6 +19,7 @@ export default function Home() {
   // Scroll animation refs
   const heroContentRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const aboutRef = useScrollAnimation<HTMLDivElement>(fadeInLeft);
+  const companiesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const servicesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const processRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const industriesRef = useScrollAnimation<HTMLUListElement>(scaleIn);
@@ -214,30 +215,62 @@ export default function Home() {
         </ClientThemeProvider>
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-8 xl:gap-12 items-center justify-center px-6 sm:px-6 w-full overflow-visible">
           <div ref={heroContentRef} className="relative z-30 flex flex-col items-center lg:items-center text-center mx-auto">
-            {/* Enhanced contrast helper with better readability */}
+            {/* Enhanced contrast helper with frosted glass effect */}
             <div
               aria-hidden
-              className="pointer-events-none absolute -inset-8 -z-10 rounded-3xl backdrop-blur-sm bg-gradient-to-br from-white/20 via-white/10 to-transparent dark:from-zinc-800/30 dark:via-zinc-900/20 dark:to-transparent"
+              className="pointer-events-none absolute -inset-8 -z-10 rounded-3xl backdrop-blur-md bg-gradient-to-br from-white/30 via-white/15 to-white/5 dark:from-zinc-900/40 dark:via-zinc-900/25 dark:to-zinc-900/10 border border-white/20 dark:border-zinc-700/20"
               style={{
-                boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)"
+                boxShadow: "0 8px 32px rgba(0,0,0,0.1), 0 0 80px rgba(16,185,129,0.04), inset 0 1px 0 rgba(255,255,255,0.25)"
               }}
             />
-            <div className="mb-6">
-              <p className="text-xl md:text-2xl font-semibold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300">Outsourcing, Websites, Sales, Consulting, Software</p>
+            <div className="mb-4">
+              <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-900/40 px-4 py-2 rounded-full mb-4 border border-emerald-200/50 dark:border-emerald-800/30 shadow-sm">
+                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
+                Holding Company &amp; Agency
+              </span>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.08] text-zinc-900 dark:text-white">
+                We Build Companies.
+                <br />
+                <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-red-500 bg-clip-text text-transparent">We Deploy Talent.</span>
+              </h1>
             </div>
-            <div className="mt-8 space-y-6 px-2 text-center">
-              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">MattyJacks deploys cost-effective workers from far away lands.</p>
-              <p className="text-base md:text-md text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">We have sales callers, web developers, marketers, virtual assistants, and many other talents.</p>
-              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-lg mx-auto">You bring the vision, we bring the results. Simple.</p>
+            <div className="mt-6 space-y-3 px-2 text-center">
+              <p className="text-base md:text-lg text-zinc-700 dark:text-zinc-200 font-medium leading-relaxed max-w-xl mx-auto">MattyJacks builds, acquires, and operates technology businesses - while running a full-service outsourcing agency with global talent.</p>
+              <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-lg mx-auto">You bring the vision, we bring the results. Simple.</p>
             </div>
-            <div className="relative z-40 mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+            {/* Stats bar */}
+            <div className="mt-8 flex flex-wrap justify-center gap-0 text-center">
+              {[
+                { value: "6+", label: "Companies" },
+                { value: "20+", label: "Industries" },
+                { value: "24/7", label: "Operations" },
+              ].map((stat, i) => (
+                <div key={i} className="flex items-center">
+                  {i > 0 && <div className="w-px h-8 bg-zinc-300/60 dark:bg-zinc-600/40 mx-5 sm:mx-7 hidden sm:block"></div>}
+                  <div>
+                    <div className="text-2xl sm:text-3xl font-black bg-gradient-to-b from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-300 bg-clip-text text-transparent">{stat.value}</div>
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-[0.2em] font-semibold mt-0.5">{stat.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Trust badges */}
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              {["No Long-term Contracts", "Senior Talent Only", "Money-back Guarantee"].map((badge, i) => (
+                <span key={i} className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  {badge}
+                </span>
+              ))}
+            </div>
+            <div className="relative z-40 mt-6 sm:mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
-                className="group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-red-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
+                className="group relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white rounded-xl shadow-lg hover:shadow-emerald-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50 overflow-hidden"
+                style={{ background: "linear-gradient(135deg, #059669, #10b981, #ef4444, #059669)", backgroundSize: "300% 300%", animation: "gradient-shift 6s ease infinite" }}
               >
                 <span className="relative z-10">Share Your Vision</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <svg className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="relative z-10 ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
@@ -253,20 +286,32 @@ export default function Home() {
               </a>
             </div>
 
+            {/* Scroll indicator */}
+            <div className="mt-10 flex justify-center">
+              <div className="animate-bounce opacity-40 hover:opacity-70 transition-opacity cursor-pointer" onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}>
+                <svg className="w-5 h-5 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+              </div>
+            </div>
+
             {/* Internship Banner */}
-            <div className="relative z-40 mt-10 w-full max-w-lg mx-auto">
+            <div className="relative z-40 mt-6 w-full max-w-lg mx-auto">
               <Link href="/internship" className="block w-full group">
-                <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-500/30 bg-gradient-to-r from-zinc-900 via-emerald-950 to-zinc-900 p-4 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/20 hover:border-emerald-400/50">
-                  <div className="absolute inset-0 bg-[url('/images/seamless-space-jpg-_upscayl_3x_upscayl-standard-4x.jpg')] opacity-20 group-hover:opacity-30 transition-opacity bg-cover mix-blend-screen"></div>
-                  <div className="absolute top-0 right-0 p-2 text-2xl animate-bounce">🍉</div>
+                <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-zinc-900 via-emerald-950 to-zinc-900 p-4 shadow-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-emerald-500/20 hover:border-emerald-400/50">
+                  <div className="absolute inset-0 bg-[url('/images/seamless-space-jpg-_upscayl_3x_upscayl-standard-4x.jpg')] opacity-15 group-hover:opacity-25 transition-opacity bg-cover mix-blend-screen"></div>
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
                   <div className="relative z-10 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 animate-pulse">
-                      <Bot className="w-6 h-6 text-emerald-400" />
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <Bot className="w-5 h-5 text-white" />
                     </div>
-                    <div className="text-left">
-                      <h3 className="text-white font-bold text-lg mb-0.5 group-hover:text-emerald-400 transition-colors">Vibe Coding Internship</h3>
-                      <p className="text-emerald-100/70 text-sm m-0">Learn AI tools. Build a portfolio. Make $4/hr.</p>
+                    <div className="text-left flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="text-white font-bold text-base group-hover:text-emerald-300 transition-colors">Vibe Coding Internship</h3>
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Hiring</span>
+                      </div>
+                      <p className="text-emerald-100/60 text-sm m-0">Learn AI tools. Build a portfolio. Make $4/hr.</p>
                     </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
                   </div>
                 </div>
               </Link>
@@ -281,93 +326,270 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About: Led by Matt */}
-      <section id="about" className="px-4 py-16">
+      {/* Section Divider: Hero -> About */}
+      <div className="relative h-16 overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"></div>
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-zinc-300/40 dark:via-zinc-700/40 to-transparent"></div>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500/40"></div>
+      </div>
+
+      {/* About: Holding Company + Agency */}
+      <section id="about" className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 lg:p-8 xl:p-10 bg-white dark:bg-zinc-950">
-            <div ref={aboutRef} className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Global Talent <span className="font-bold text-red-600 dark:text-red-500">Meets</span> Technology</p>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">Scale smarter, faster, and more efficiently with cost-effective global talent and shiny new technology.</h2>
-              <div className="space-y-6">
-                <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">We specialize in building high-performing remote teams that handle:</p>
-                <ul className="grid sm:grid-cols-2 gap-3 text-zinc-600 dark:text-zinc-300">
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
-                    <span>Software development & website creation</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
-                    <span>Cold calling and sales outreach</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
-                    <span>Lead generation with custom AI tools</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
-                    <span>Graphic design & visual branding</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
-                    <span>Copywriting and marketing communication</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">✅</span>
-                    <span>Virtual assistance and BPO tasks</span>
-                  </li>
-                </ul>
-                <p className="text-zinc-700 dark:text-zinc-200 font-semibold text-lg">We don&apos;t just outsource: we help you unlock the full power of humanity.</p>
-                <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">Grow your business with good and affordable services from skilled professionals across the world, saving time, reducing costs, and improving efficiency.</p>
+          {/* Gradient border wrapper */}
+          <div className="relative rounded-2xl p-[1px] bg-gradient-to-br from-emerald-500/30 via-zinc-300/20 to-red-500/30 dark:from-emerald-500/20 dark:via-zinc-700/20 dark:to-red-500/20 animate-border-glow">
+            <div className="rounded-2xl p-8 lg:p-12 bg-white dark:bg-zinc-950">
+              <div ref={aboutRef} className="space-y-8">
+                <div className="max-w-3xl">
+                  <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Holding Company <span className="font-bold text-red-600 dark:text-red-500">&amp;</span> Agency</p>
+                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-300 bg-clip-text text-transparent">We build companies, deploy global talent, and ship technology that makes money.</h2>
+                  <p className="mt-4 text-zinc-600 dark:text-zinc-300 leading-relaxed text-lg">MattyJacks operates as both a <strong className="text-zinc-900 dark:text-white">holding company</strong> for our portfolio of technology businesses and a <strong className="text-zinc-900 dark:text-white">full-service agency</strong> that deploys cost-effective global talent.</p>
+                </div>
+
+                {/* Two-pillar cards */}
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div className="group rounded-xl border border-emerald-200/60 dark:border-emerald-800/40 p-6 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 dark:from-emerald-950/30 dark:via-zinc-950 dark:to-emerald-950/10 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-400 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <Building2 className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="font-bold text-zinc-900 dark:text-white text-lg">Holding Company</h3>
+                    </div>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">We build, acquire, and operate technology companies. Our portfolio spans freelance marketplaces, creative software, and payment solutions.</p>
+                    <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-emerald-400 to-emerald-600 opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+                  </div>
+                  <div className="group rounded-xl border border-red-200/60 dark:border-red-800/40 p-6 bg-gradient-to-br from-red-50/80 via-white to-red-50/40 dark:from-red-950/30 dark:via-zinc-950 dark:to-red-950/10 hover:shadow-xl hover:shadow-red-500/10 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-400 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <Globe className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="font-bold text-zinc-900 dark:text-white text-lg">Outsourcing Agency</h3>
+                    </div>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">We deploy skilled remote workers worldwide: developers, designers, sales callers, VAs, and more. Cost-effective talent, coordinated for results.</p>
+                    <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-red-400 to-red-600 opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+                  </div>
+                </div>
+
+                {/* Capabilities grid with numbered items */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { label: "Software Development", sub: "Web, mobile, desktop apps" },
+                    { label: "Sales Outreach", sub: "Cold calling, lead gen, closers" },
+                    { label: "AI Solutions", sub: "Custom tools, copilots, automation" },
+                    { label: "Design & Branding", sub: "Visual identity, UI/UX, graphics" },
+                    { label: "Content & Copy", sub: "Marketing, SEO, social media" },
+                    { label: "Virtual Assistance", sub: "Admin, BPO, operations" },
+                  ].map((cap, i) => (
+                    <div key={i} className="group/cap flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 border border-transparent hover:border-emerald-200/50 dark:hover:border-emerald-800/30 transition-all duration-300 cursor-default">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-sm font-bold text-emerald-700 dark:text-emerald-400 group-hover/cap:bg-emerald-500 group-hover/cap:text-white group-hover/cap:shadow-md transition-all duration-300">
+                        {String(i + 1).padStart(2, "0")}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm text-zinc-900 dark:text-white group-hover/cap:text-emerald-700 dark:group-hover/cap:text-emerald-300 transition-colors duration-300">{cap.label}</div>
+                        <div className="text-xs text-zinc-500 dark:text-zinc-400">{cap.sub}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-4 pt-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/30 via-emerald-400/10 to-transparent"></div>
+                  <p className="text-zinc-700 dark:text-zinc-200 font-semibold text-sm sm:text-base text-center max-w-md">We don&apos;t just outsource - we build entire ecosystems of technology and talent.</p>
+                  <div className="h-px flex-1 bg-gradient-to-l from-red-500/30 via-red-400/10 to-transparent"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Section Divider: About -> Portfolio */}
+      <div className="relative h-12 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center gap-2">
+          <div className="h-px flex-1 max-w-[200px] bg-gradient-to-r from-transparent to-emerald-500/20"></div>
+          <div className="flex gap-1">
+            <div className="w-1 h-1 rounded-full bg-emerald-500/30"></div>
+            <div className="w-1 h-1 rounded-full bg-red-500/30"></div>
+            <div className="w-1 h-1 rounded-full bg-emerald-500/30"></div>
+          </div>
+          <div className="h-px flex-1 max-w-[200px] bg-gradient-to-l from-transparent to-emerald-500/20"></div>
+        </div>
+      </div>
+
+      {/* Our Companies / Portfolio */}
+      <section id="companies" className="px-4 py-20 bg-gradient-to-br from-zinc-900 via-zinc-950 to-zinc-900 dark:from-black dark:via-zinc-950 dark:to-black relative overflow-hidden">
+        {/* Subtle grid background */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }}></div>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-400 mb-2">Our <span className="font-bold text-red-400">Portfolio</span></p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Companies We Own &amp; Operate</h2>
+            <p className="mt-3 text-zinc-400 max-w-2xl mx-auto">Each company in the MattyJacks portfolio is built to solve real problems. Together, they form a connected ecosystem powered by shared infrastructure.</p>
+            {/* Ecosystem connection line */}
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <div className="h-px w-20 bg-gradient-to-r from-transparent to-emerald-500/50"></div>
+              <div className="flex items-center gap-2 px-5 py-2 rounded-full border border-zinc-700/80 bg-zinc-900/90 backdrop-blur-sm shadow-lg shadow-emerald-500/5">
+                <div className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></div>
+                <span className="text-xs text-zinc-300 font-semibold tracking-wide">Unified Ecosystem</span>
+              </div>
+              <div className="h-px w-20 bg-gradient-to-l from-transparent to-emerald-500/50"></div>
+            </div>
+          </div>
+          <div ref={companiesRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                name: "GiveGigs",
+                url: "https://givegigs.com",
+                description: "Freelance marketplace connecting businesses with skilled remote workers. Features AI-powered task matching, invoicing, time tracking, and a full moderator control plane.",
+                color: "from-emerald-500 to-emerald-700",
+                icon: Users,
+                status: "Live",
+              },
+              {
+                name: "CryptArtist Studio",
+                url: "https://github.com/mattyjacks/CryptArtistStudio",
+                description: "Desktop creative suite for media production, AI-assisted design, game development, and digital art. Built with Tauri and React.",
+                color: "from-purple-500 to-purple-700",
+                icon: Palette,
+                status: "In Development",
+              },
+              {
+                name: "VentureCapitalArts",
+                url: "https://venturecapitalarts.com",
+                description: "Investment and startup advisory platform connecting founders with resources, mentorship, and funding opportunities.",
+                color: "from-amber-500 to-amber-700",
+                icon: TrendingUp,
+                status: "Live",
+              },
+              {
+                name: "MattyJacks Agency",
+                url: "/services",
+                description: "Full-service outsourcing agency deploying global talent for web development, sales, marketing, AI solutions, and virtual assistance.",
+                color: "from-red-500 to-red-700",
+                icon: Rocket,
+                status: "Live",
+              },
+              {
+                name: "Merchant Services",
+                url: "/merchants",
+                description: "Payment processing solutions for high-risk and low-risk businesses across the USA and Canada. Fast approvals and competitive rates.",
+                color: "from-blue-500 to-blue-700",
+                icon: CreditCard,
+                status: "Live",
+              },
+              {
+                name: "Ecosystem Platform",
+                url: "https://givegigs.com/api/ecosystem/control-plane",
+                description: "Shared authentication, database, and control plane infrastructure connecting all MattyJacks companies into one unified ecosystem.",
+                color: "from-cyan-500 to-cyan-700",
+                icon: Layers,
+                status: "Live",
+              },
+            ].map((company, i) => {
+              const IconComponent = company.icon;
+              return (
+                <a
+                  key={i}
+                  href={company.url}
+                  target={company.url.startsWith("http") ? "_blank" : undefined}
+                  rel={company.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="group relative rounded-2xl border border-zinc-700/60 p-6 bg-zinc-900/80 backdrop-blur-sm hover:border-zinc-500/60 hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden hover:shadow-2xl hover:shadow-emerald-500/8"
+                >
+                  {/* Gradient overlay */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${company.color} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500`}></div>
+                  {/* Top glow line */}
+                  <div className={`absolute top-0 left-4 right-4 h-[1px] bg-gradient-to-r ${company.color} opacity-0 group-hover:opacity-40 transition-opacity duration-500`}></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-2.5 rounded-xl bg-gradient-to-br ${company.color} shadow-lg group-hover:shadow-xl transition-shadow duration-300`}>
+                        <IconComponent className="w-5 h-5 text-white" />
+                      </div>
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${company.status === "Live" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"}`}>
+                        {company.status === "Live" && <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>}
+                        {company.status}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors duration-300">{company.name}</h3>
+                    <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-zinc-300 transition-colors duration-300">{company.description}</p>
+                    <div className="mt-5 flex items-center gap-1.5 text-xs font-medium text-zinc-500 group-hover:text-emerald-400 transition-colors duration-300">
+                      <span>Learn more</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1.5" />
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Section Divider: Portfolio -> Services */}
+      <div className="relative h-12 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-zinc-300/50 dark:via-zinc-700/30 to-transparent"></div>
+      </div>
+
       {/* Services */}
-      <section id="services" className="px-4 py-16 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
+      <section id="services" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Our <span className="font-bold text-red-600 dark:text-red-500">Services</span></p>
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-red-600 dark:text-red-500">Services</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">What can we do for you?</h2>
+            <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">Four core pillars that drive revenue for our clients.</p>
+            <div className="mt-6 flex justify-center">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/40">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Currently accepting new clients</span>
+              </div>
+            </div>
           </div>
           <div ref={servicesRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 t: "Custom AI Solutions",
                 d: "AI copilots, internal tools, and automations mapped to your workflows to reduce cost and increase throughput.",
-                icon: Bot
+                icon: Bot,
+                accent: "from-blue-500 to-cyan-500"
               },
               {
                 t: "Elite Freelancers",
                 d: "Handpicked engineers, designers, writers, and operators. Senior talent only. Coordinated for speed and quality.",
-                icon: Users
+                icon: Users,
+                accent: "from-emerald-500 to-green-500"
               },
               {
                 t: "Idea-to-Income",
                 d: "From napkin sketch to MVP to first dollars. We prototype fast, test in the wild, and iterate with real feedback.",
-                icon: TrendingUp
+                icon: TrendingUp,
+                accent: "from-amber-500 to-orange-500"
               },
               {
                 t: "Web Design",
                 d: "Beautiful, disciplined, conversion-focused sites. Clear offers, crisp copy, and performance that ranks.",
-                icon: Palette
+                icon: Palette,
+                accent: "from-purple-500 to-pink-500"
               },
             ].map((s, i) => {
               const IconComponent = s.icon;
               return (
                 <div
                   key={i}
-                  className="group relative rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 hover:-translate-y-2 transition-all duration-300 ease-out cursor-pointer"
+                  className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-red-500/10 hover:border-zinc-300 dark:hover:border-zinc-600 hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer overflow-hidden"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {/* Top accent line */}
+                  <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${s.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                  {/* Bottom accent line */}
+                  <div className={`absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r ${s.accent} opacity-0 group-hover:opacity-30 transition-opacity duration-500`}></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-300">
-                        <IconComponent className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`p-2.5 rounded-xl bg-gradient-to-br ${s.accent} shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}>
+                        <IconComponent className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300">{s.t}</h3>
+                      <span className="text-xs font-bold text-zinc-300 dark:text-zinc-700 group-hover:text-zinc-400 dark:group-hover:text-zinc-500 transition-colors">{String(i + 1).padStart(2, "0")}</span>
                     </div>
+                    <h3 className="font-bold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300 mb-2">{s.t}</h3>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{s.d}</p>
                   </div>
                 </div>
@@ -407,37 +629,28 @@ export default function Home() {
             </p>
 
             {/* Feature Grid */}
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
-                  <Zap className="w-8 h-8 text-white" />
+            <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto mb-12">
+              {[
+                { icon: Zap, title: "3 Day Approvals", desc: "Fast processing for both low and high-risk accounts" },
+                { icon: Shield, title: "High-Risk Specialists", desc: "20+ bank relationships to handle any business" },
+                { icon: DollarSign, title: "Competitive Rates", desc: "Transparent pricing with no hidden fees" },
+              ].map((feat, i) => (
+                <div key={i} className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
+                  <div className="absolute top-3 right-3 text-[10px] font-bold text-white/20 group-hover:text-white/40 transition-colors">{String(i + 1).padStart(2, "0")}</div>
+                  <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-white/30 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-white/10 transition-all duration-300">
+                    <feat.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{feat.title}</h3>
+                  <p className="text-emerald-100/80 text-sm leading-relaxed">{feat.desc}</p>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">3 Day Approvals</h3>
-                <p className="text-emerald-100">Fast processing for both low and high-risk accounts</p>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">High-Risk Specialists</h3>
-                <p className="text-emerald-100">20+ bank relationships to handle any business</p>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
-                  <DollarSign className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Competitive Rates</h3>
-                <p className="text-emerald-100">Transparent pricing with no hidden fees</p>
-              </div>
+              ))}
             </div>
 
             {/* CTA Button */}
             <div className="flex justify-center">
               <Link
                 href="/merchants"
-                className="group inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-emerald-600 bg-white rounded-2xl shadow-2xl hover:shadow-white/50 transition-all duration-300 hover:scale-110"
+                className="group inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-emerald-700 bg-white rounded-2xl shadow-2xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 hover:bg-emerald-50"
               >
                 <span>Explore Merchant Services</span>
                 <ArrowRight className="ml-3 w-6 h-6 transition-transform group-hover:translate-x-2" />
@@ -445,13 +658,15 @@ export default function Home() {
             </div>
 
             {/* Trust Indicators */}
-            <div className="mt-12 pt-8 border-t border-white/20">
-              <p className="text-emerald-100 text-sm mb-4">Trusted by businesses in 20+ industries</p>
-              <div className="flex flex-wrap justify-center gap-8 text-white/80 text-sm">
-                <span>✓ Secured Processing</span>
-                <span>✓ 24/7 Support</span>
-                <span>✓ Multiple Payment Options</span>
-                <span>✓ Chargeback Protection</span>
+            <div className="mt-12 pt-8 border-t border-white/15">
+              <p className="text-emerald-200/80 text-xs uppercase tracking-[0.2em] font-semibold mb-4">Trusted by businesses in 20+ industries</p>
+              <div className="flex flex-wrap justify-center gap-6 text-white/70 text-sm">
+                {["Secured Processing", "24/7 Support", "Multiple Payment Options", "Chargeback Protection"].map((t, i) => (
+                  <span key={i} className="flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-emerald-300"></span>
+                    {t}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
@@ -462,45 +677,44 @@ export default function Home() {
       <section id="process" className="px-4 py-20 pb-40">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Our <span className="font-bold text-red-600 dark:text-red-500">Process</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-red-600 dark:text-red-500">Process</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">How we work with you</h2>
+            <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">From first call to measurable results in four focused steps.</p>
           </div>
 
           {/* Desktop Workflow */}
           <div className="hidden lg:block">
             <div className="relative">
-              {/* Process Cards with Numbers */}
+              {/* Continuous dashed connector line behind all steps */}
+              <div className="absolute top-6 left-[12.5%] right-[12.5%] h-[2px] z-10" style={{ backgroundImage: "repeating-linear-gradient(90deg, rgb(16 185 129) 0px, rgb(16 185 129) 8px, transparent 8px, transparent 16px)" }}></div>
+
               <div ref={processRef} className="grid grid-cols-4 gap-8">
                 {[
-                  { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle },
-                  { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes-in plain English.", icon: Target },
-                  { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap },
-                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics-we track what moves revenue.", icon: Trophy },
+                  { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle, color: "from-emerald-500 to-emerald-600" },
+                  { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes - in plain English.", icon: Target, color: "from-blue-500 to-blue-600" },
+                  { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap, color: "from-amber-500 to-amber-600" },
+                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-red-500 to-red-600" },
                 ].map((step, index) => (
                   <div key={index} className="group text-center relative">
-                    {/* Step Number Circle positioned above each card */}
+                    {/* Step Number Circle */}
                     <div className="flex justify-center mb-6">
-                      <div className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center shadow-lg relative z-20">
+                      <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${step.color} text-white text-lg font-bold flex items-center justify-center shadow-lg ring-4 ring-white dark:ring-zinc-950 relative z-20 group-hover:scale-110 group-hover:ring-emerald-100 dark:group-hover:ring-emerald-900/30 transition-all duration-300`}>
                         {index + 1}
                       </div>
                     </div>
 
-                    {/* Connecting line from this number to next (except last) */}
-                    {index < 3 && (
-                      <div className="absolute top-6 left-1/2 w-full h-0.5 bg-emerald-500 dark:bg-emerald-400 z-10 transform translate-x-4"></div>
-                    )}
-
                     {/* Step Content Card */}
-                    <div className="group-hover:scale-105 transition-transform duration-300 h-full">
-                      <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-xl hover:shadow-red-500/15 hover:border-red-400 dark:hover:border-red-500 transition-all duration-300 relative overflow-hidden h-full flex flex-col">
-                        <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="h-full">
+                      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-xl hover:shadow-emerald-500/10 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-500 relative overflow-hidden h-full flex flex-col group-hover:-translate-y-1">
+                        <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${step.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                        <div className={`absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r ${step.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
 
                         <div className="relative z-10 flex-1 flex flex-col">
-                          <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4 mx-auto group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-300">
-                            <step.icon className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
+                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-4 mx-auto opacity-15 group-hover:opacity-25 transition-opacity duration-300`}>
+                            <step.icon className="w-6 h-6 text-zinc-900 dark:text-white" style={{ opacity: 1 }} />
                           </div>
-                          <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300">{step.t}</h3>
-                          <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed flex-1">{step.d}</p>
+                          <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-white">{step.t}</h3>
+                          <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed flex-1">{step.d}</p>
                         </div>
                       </div>
                     </div>
@@ -513,31 +727,26 @@ export default function Home() {
           {/* Mobile Workflow */}
           <div className="lg:hidden">
             <div className="relative">
-              {/* Vertical connecting line on the left */}
-              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-emerald-500 dark:bg-emerald-400 z-0"></div>
+              {/* Vertical dashed connector */}
+              <div className="absolute left-6 top-6 bottom-6 w-[2px] z-0" style={{ backgroundImage: "repeating-linear-gradient(180deg, rgb(16 185 129) 0px, rgb(16 185 129) 8px, transparent 8px, transparent 16px)" }}></div>
 
               <div className="space-y-6">
                 {[
-                  { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle },
-                  { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes-in plain English.", icon: Target },
-                  { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap },
-                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics-we track what moves revenue.", icon: Trophy },
+                  { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle, color: "from-emerald-500 to-emerald-600" },
+                  { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes - in plain English.", icon: Target, color: "from-blue-500 to-blue-600" },
+                  { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap, color: "from-amber-500 to-amber-600" },
+                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-red-500 to-red-600" },
                 ].map((step, index) => (
-                  <div key={index} className="relative flex items-center gap-6">
-                    {/* Step Number Circle on the left */}
-                    <div className="w-12 h-12 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-lg font-bold flex items-center justify-center shadow-lg flex-shrink-0 z-10">
+                  <div key={index} className="relative flex items-center gap-5">
+                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${step.color} text-white text-lg font-bold flex items-center justify-center shadow-lg flex-shrink-0 z-10 ring-4 ring-white dark:ring-zinc-950`}>
                       {index + 1}
                     </div>
-
-                    {/* Content Card */}
-                    <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 p-4 bg-white dark:bg-zinc-950 flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                          <step.icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        </div>
+                    <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-950 flex-1 shadow-sm">
+                      <div className="flex items-center gap-3 mb-2">
+                        <step.icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                         <h3 className="font-bold text-base text-zinc-900 dark:text-white">{step.t}</h3>
                       </div>
-                      <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">{step.d}</p>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{step.d}</p>
                     </div>
                   </div>
                 ))}
@@ -548,13 +757,14 @@ export default function Home() {
       </section>
 
       {/* Industries */}
-      <section className="px-4 py-16 bg-zinc-50 dark:bg-zinc-900/30">
+      <section className="px-4 py-20 bg-zinc-50 dark:bg-zinc-900/30">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Who We <span className="font-bold text-red-600 dark:text-red-500">Help</span></p>
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Who We <span className="font-bold text-red-600 dark:text-red-500">Help</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Industries we serve</h2>
+            <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Deep experience across verticals that need speed, quality, and results.</p>
           </div>
-          <ul ref={industriesRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 list-none">
+          <ul ref={industriesRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 list-none">
             {[
               { name: "Software & SaaS", icon: Code2 },
               { name: "E-commerce & DTC", icon: ShoppingCart },
@@ -569,12 +779,13 @@ export default function Home() {
               return (
                 <li
                   key={index}
-                  className="group flex items-center gap-4 p-3 rounded-lg hover:bg-white/50 dark:hover:bg-zinc-800/30 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                  className="group flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-lg hover:shadow-emerald-500/5 hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden"
                 >
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald-100/60 dark:bg-emerald-900/30 flex items-center justify-center group-hover:bg-red-200/80 dark:group-hover:bg-red-800/50 group-hover:scale-110 transition-all duration-200">
-                    <IconComponent className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                  <div className="absolute top-0 left-0 bottom-0 w-[2px] bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-100/80 dark:bg-emerald-900/30 flex items-center justify-center group-hover:bg-emerald-500 group-hover:shadow-lg transition-all duration-300">
+                    <IconComponent className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <span className="text-base font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-200">
+                  <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300">
                     {industry.name}
                   </span>
                 </li>
@@ -584,158 +795,141 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TristateHoney Lead Generation */}
-      <section className="px-4 py-16 border-t border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-emerald-50/30 via-white to-emerald-50/30 dark:from-emerald-950/10 dark:via-zinc-900/10 dark:to-emerald-950/10">
-        <div className="max-w-4xl mx-auto">
-          {/* See Our Work Header */}
-          <div className="text-center mb-12">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">See Our <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
+      {/* Case Studies */}
+      <section className="px-4 py-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">See Our <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Case Studies</h2>
+            <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Real projects. Real results. No fluff.</p>
           </div>
 
-          <div ref={tristateRef} className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
-                TristateHoney.com — Still Bringing in Leads
-              </span>
-            </h2>
-            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-              TristateHoney.com is still getting real inquiries! One recent message came from a company looking to order bulk honey for a new product they’re developing.
-            </p>
+          <div className="space-y-20">
+            {/* Case Study 1: TristateHoney */}
+            <div ref={tristateRef} className="relative">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">01</div>
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">TristateHoney.com</h3>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">Lead Generation - E-commerce</p>
+                </div>
+                <span className="ml-auto hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Still generating leads
+                </span>
+              </div>
+              <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-6 max-w-3xl leading-relaxed">
+                TristateHoney.com is still getting real inquiries! One recent message came from a company looking to order bulk honey for a new product they&apos;re developing.
+              </p>
 
-            {/* Recent Inquiry Label */}
-            <div className="mb-4">
-              <span className="inline-block text-sm font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-4 py-2 rounded-full">
-                Recent Inquiry:
-              </span>
-            </div>
-
-            {/* Screenshots - Lead and Website */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-6">
-              {/* Lead Screenshot */}
-              <div className="group relative">
-                <div className="rounded-2xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] bg-white dark:bg-zinc-900">
-                  <Image
-                    src="/images/tristatehoney-lead.jpg"
-                    alt="TristateHoney lead inquiry screenshot"
-                    width={600}
-                    height={400}
-                    className="w-full h-auto"
-                    priority
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 hover:-translate-y-1 bg-white dark:bg-zinc-900">
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/90 dark:bg-zinc-900/90 text-zinc-600 dark:text-zinc-400 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-700/50">Lead Inquiry</span>
+                  </div>
+                  <Image src="/images/tristatehoney-lead.jpg" alt="TristateHoney lead inquiry screenshot" width={600} height={400} className="w-full h-auto group-hover:scale-[1.02] transition-transform duration-700" priority />
+                </div>
+                <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 hover:-translate-y-1 bg-white dark:bg-zinc-900">
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/90 dark:bg-zinc-900/90 text-zinc-600 dark:text-zinc-400 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-700/50">Live Website</span>
+                  </div>
+                  <Image src="/images/tristatehoney-website-screenshot.jpg" alt="TristateHoney website screenshot" width={600} height={400} className="w-full h-auto group-hover:scale-[1.02] transition-transform duration-700" priority />
                 </div>
               </div>
-              {/* Website Screenshot */}
-              <div className="group relative">
-                <div className="rounded-2xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] bg-white dark:bg-zinc-900">
-                  <Image
-                    src="/images/tristatehoney-website-screenshot.jpg"
-                    alt="TristateHoney website screenshot"
-                    width={600}
-                    height={400}
-                    className="w-full h-auto"
-                    priority
-                  />
+
+              <a href="https://tristatehoney.com" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                Visit TristateHoney.com <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+              </a>
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-4">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent"></div>
+            </div>
+
+            {/* Case Study 2: Opority */}
+            <div className="relative">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">02</div>
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">Opority</h3>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">Web Design - Agency Client</p>
+                </div>
+                <span className="ml-auto hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200/60 dark:border-purple-800/40">
+                  Design for Designers
+                </span>
+              </div>
+              <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-6 max-w-3xl leading-relaxed">
+                Opority is a web design firm that hired us to design their website because they liked our work better. We created a beautiful, polished UI that matches their high standards.
+              </p>
+
+              <div className="group relative max-w-4xl mb-6 h-[400px] md:h-[500px]">
+                <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-500 bg-white dark:bg-zinc-900 h-full">
+                  <ScaledIframe src="https://www.opority.com/" title="Opority Website Preview" targetWidth={1280} />
                 </div>
               </div>
-            </div>
 
-            {/* Visit Link */}
-            <div className="flex items-center justify-center gap-2 text-base md:text-lg">
-              <span className="text-2xl">💡</span>
-              <span className="text-zinc-700 dark:text-zinc-300">Visit</span>
-              <a
-                href="https://tristatehoney.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
-              >
-                TristateHoney.com
-                <ExternalLink className="w-4 h-4" />
+              <a href="https://www.opority.com/" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                Visit Opority.com <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </a>
-              <span className="text-zinc-700 dark:text-zinc-300">to see it live!</span>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Opority Portfolio Item */}
-      <section className="px-4 py-16 border-t border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-emerald-50/30 via-white to-emerald-50/30 dark:from-emerald-950/10 dark:via-zinc-900/10 dark:to-emerald-950/10">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
-                Opority — Design for Designers
-              </span>
-            </h2>
-            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Opority is a web design firm that hired us to design their website because they liked our work better. We created a beautiful, polished UI that matches their high standards.
-            </p>
+            {/* Divider */}
+            <div className="flex items-center gap-4">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent"></div>
+            </div>
 
-            {/* Website Live Preview */}
-            <div className="group relative max-w-4xl mx-auto mb-6 h-[400px] md:h-[500px]">
-              <div className="rounded-2xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 bg-white dark:bg-zinc-900 h-full">
-                <ScaledIframe
-                  src="https://www.opority.com/"
-                  title="Opority Website Preview"
-                  targetWidth={1280}
-                />
+            {/* Case Study 3: TikTok */}
+            <div className="relative">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">03</div>
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">TikTok Algorithm Mastery</h3>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">Social Media - Growth Hacking</p>
+                </div>
               </div>
-            </div>
+              <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-6 max-w-3xl leading-relaxed">
+                We helped our client Eric Escobedo go viral on TikTok on a new account. His third video got 2,300+ likes with 0 marketing. Results obtained purely through manipulating the TikTok algorithm. Grew account to 3,000+ followers in 30 days.
+              </p>
 
-            {/* Visit Link */}
-            <div className="flex items-center justify-center gap-2 text-base md:text-lg">
-              <span className="text-2xl">✨</span>
-              <span className="text-zinc-700 dark:text-zinc-300">Visit</span>
-              <a
-                href="https://www.opority.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
-              >
-                Opority.com
-              </a>
-              <span className="text-zinc-700 dark:text-zinc-300">to see it live!</span>
-            </div>
-          </div>
-        </div>
-      </section>
+              {/* Stats row */}
+              <div className="flex flex-wrap gap-4 mb-6">
+                {[
+                  { value: "2,300+", label: "Likes on 3rd video" },
+                  { value: "3,000+", label: "Followers in 30 days" },
+                  { value: "$0", label: "Marketing spend" },
+                ].map((s, i) => (
+                  <div key={i} className="group/stat px-5 py-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200/60 dark:border-red-800/40 hover:bg-red-100 dark:hover:bg-red-950/40 hover:border-red-300 dark:hover:border-red-700/60 transition-all duration-300 cursor-default">
+                    <div className="text-lg font-black text-red-600 dark:text-red-400 group-hover/stat:scale-105 transition-transform duration-300 origin-left">{s.value}</div>
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wider font-semibold">{s.label}</div>
+                  </div>
+                ))}
+              </div>
 
-      {/* TikTok Viral Case Study */}
-      <section className="px-4 py-16 border-t border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-red-50/30 via-white to-red-50/30 dark:from-red-950/10 dark:via-zinc-900/10 dark:to-red-950/10">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
-                TikTok Algorithm Mastery
-              </span>
-            </h2>
-            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-              We helped our client Eric Escobedo go viral on TikTok on a new account. His third video got 2,300+ likes with 0 marketing. Results obtained purely through manipulating the TikTok algorithm. Grew account to 3,000+ followers in 30 days.
-            </p>
-
-            {/* TikTok Video Link */}
-            <div className="flex items-center justify-center gap-2 text-base md:text-lg">
-              <span className="text-2xl">🎯</span>
-              <span className="text-zinc-700 dark:text-zinc-300">Watch the viral video on</span>
-              <a
-                href="https://www.tiktok.com/@eric_escobedo/video/7520191936905383169"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-semibold text-red-600 dark:text-red-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors underline decoration-red-500 hover:decoration-emerald-500"
-              >
-                TikTok
-                <ExternalLink className="w-4 h-4" />
+              <a href="https://www.tiktok.com/@eric_escobedo/video/7520191936905383169" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-red-600 dark:text-red-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                Watch the viral video on TikTok <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-0.5" />
               </a>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Section Divider: Case Studies -> Video Demos */}
+      <div className="relative h-10 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
+          <div className="h-px w-32 bg-gradient-to-r from-transparent to-zinc-300/40 dark:to-zinc-700/30"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-zinc-300/50 dark:bg-zinc-700/40 mx-3"></div>
+          <div className="h-px w-32 bg-gradient-to-l from-transparent to-zinc-300/40 dark:to-zinc-700/30"></div>
+        </div>
+      </div>
 
       {/* Video Demos */}
-      <section id="video-demos" className="px-4 py-16 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
+      <section id="video-demos" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Watch Us <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Video Demos</h2>
+            <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">See our process and results in action.</p>
           </div>
           <div ref={videoDemosRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
@@ -748,8 +942,12 @@ export default function Home() {
             ].map((videoId, index) => (
               <div
                 key={index}
-                className="group relative rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-black hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 transition-all duration-300"
+                className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-black hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-zinc-300 dark:hover:border-zinc-600 hover:-translate-y-1 transition-all duration-500"
               >
+                {/* Video number badge */}
+                <div className="absolute top-3 left-3 z-10 w-7 h-7 rounded-lg bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-white/80">{String(index + 1).padStart(2, "0")}</span>
+                </div>
                 <div className="aspect-video">
                   <iframe
                     width="100%"
@@ -769,24 +967,57 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Section Divider: Video Demos -> Testimonials */}
+      <div className="relative h-10 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center gap-2">
+          <div className="h-px flex-1 max-w-[160px] bg-gradient-to-r from-transparent to-zinc-300/30 dark:to-zinc-700/20"></div>
+          <div className="w-1 h-1 rounded-full bg-emerald-500/30"></div>
+          <div className="h-px flex-1 max-w-[160px] bg-gradient-to-l from-transparent to-zinc-300/30 dark:to-zinc-700/20"></div>
+        </div>
+      </div>
+
       {/* Testimonials */}
-      <section id="testimonials" className="px-4 py-16">
+      <section id="testimonials" className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">What <span className="font-bold text-red-600 dark:text-red-500">Clients</span> Say</p>
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">What <span className="font-bold text-red-600 dark:text-red-500">Clients</span> Say</p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Testimonials</h2>
+            <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Real feedback from real clients. No scripts, no edits.</p>
           </div>
           <div ref={testimonialsRef} className="max-w-md mx-auto">
-            <div className="rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-shadow duration-300">
-              <video className="w-full aspect-[9/16] object-cover max-h-[600px]" controls playsInline preload="metadata">
-                <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+            <div className="relative">
+              {/* Decorative quote mark */}
+              <div className="absolute -top-8 -left-4 text-8xl font-serif text-emerald-200/60 dark:text-emerald-900/30 select-none z-0 leading-none">&ldquo;</div>
+              <div className="relative z-10 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-emerald-500/15 hover:border-emerald-500/30 transition-all duration-500 group">
+                {/* Video label */}
+                <div className="absolute top-3 right-3 z-20">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-black/50 backdrop-blur-sm text-white/70 border border-white/10">Video Testimonial</span>
+                </div>
+                <video className="w-full aspect-[9/16] object-cover max-h-[600px]" controls playsInline preload="metadata">
+                  <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
             </div>
-            <div className="mt-6 flex items-center justify-center gap-4 p-6 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
-              <div className="text-center">
-                <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Justin Hughes</p>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">CEO, FirebringerAI</p>
+            <div className="mt-5 relative">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800/40 transition-all duration-300">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0 shadow-lg">J</div>
+                  {/* Verified checkmark */}
+                  <div className="absolute -bottom-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-blue-500 flex items-center justify-center ring-2 ring-white dark:ring-zinc-950">
+                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Justin Hughes</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">CEO, FirebringerAI</p>
+                </div>
+                <div className="flex flex-col items-end gap-0.5">
+                  <div className="flex gap-0.5">
+                    {[1,2,3,4,5].map(s => <span key={s} className="text-amber-400 text-xs">&#9733;</span>)}
+                  </div>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500">Verified Client</span>
+                </div>
               </div>
             </div>
           </div>
@@ -796,9 +1027,14 @@ export default function Home() {
       {/* Worker Feedback Carousel */}
       <WorkerFeedbackCarousel />
 
+      {/* Section Divider: Testimonials -> CTA */}
+      <div className="relative h-10 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
+      </div>
+
       {/* Final CTA */}
       <section
-        className="px-4 py-16 bg-emerald-600 text-white relative"
+        className="px-4 py-24 text-white relative overflow-hidden"
         style={{
           backgroundImage: "url('/images/bg-100-dollar-ai-bills-1.png')",
           backgroundSize: "400px 400px",
@@ -806,20 +1042,40 @@ export default function Home() {
           backgroundRepeat: "repeat"
         }}
       >
-        {/* Semi-transparent overlay for better text readability */}
-        <div className="absolute inset-0 bg-emerald-600/60"></div>
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <div ref={ctaRef} className="text-center md:text-left md:flex md:items-center md:justify-center md:gap-8 lg:gap-12">
-            <div className="mb-6 md:mb-0 md:flex-shrink-0">
-              <h2 className="text-2xl md:text-3xl font-bold drop-shadow-lg mb-3 md:mb-2">
-                <span className="text-red-700 font-black" style={{
-                  textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.3)'
-                }}>Ready</span> to Make Money?
+        {/* Layered overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-700/85 via-emerald-600/80 to-emerald-800/85"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_rgba(0,0,0,0.3)_100%)]"></div>
+        {/* Subtle animated shimmer */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(135deg, transparent 40%, white 50%, transparent 60%)", backgroundSize: "200% 200%", animation: "shimmer 8s ease-in-out infinite" }}></div>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div ref={ctaRef} className="text-center space-y-8">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                <span className="text-emerald-200 text-xs uppercase tracking-[0.2em] font-semibold">Let&apos;s Build Something</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight drop-shadow-lg">
+                <span className="text-white">Ready to </span>
+                <span className="text-red-400" style={{
+                  textShadow: '2px 2px 8px rgba(0,0,0,0.5)'
+                }}>Make Money?</span>
               </h2>
-              <p className="opacity-90 drop-shadow-md text-sm md:text-base md:max-w-md">Share your vision with us, and let&apos;s turn it into reality.</p>
+              <p className="mt-5 text-emerald-100/80 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md leading-relaxed">Whether you need a company built, talent deployed, or technology shipped - share your vision and let&apos;s make it real.</p>
             </div>
-            <div className="flex justify-center md:justify-start md:flex-shrink-0">
-              <Link href="/contact" className="inline-flex items-center rounded-md bg-white text-red-700 px-6 py-3 font-semibold hover:bg-zinc-100 shadow-lg transition-all duration-200 hover:scale-105">Contact Us</Link>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/contact" className="group relative inline-flex items-center justify-center rounded-xl bg-white text-emerald-700 px-8 py-4 text-lg font-bold shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:scale-105 overflow-hidden">
+                <span className="relative z-10">Share Your Vision</span>
+                <ArrowRight className="relative z-10 ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <div className="absolute inset-0 bg-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </Link>
+              <a href="tel:+16039999420" className="inline-flex items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm text-white border border-white/20 px-8 py-4 text-lg font-bold hover:bg-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105">
+                Call (603) 999-9420
+              </a>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6 text-emerald-200/70 text-sm pt-4">
+              {["24/7 Available", "Free Consultation", "Results or We Die Trying"].map((t, i) => (
+                <span key={i} className="flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-emerald-400/80"></span>{t}</span>
+              ))}
             </div>
           </div>
         </div>

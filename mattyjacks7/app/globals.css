@@ -197,3 +197,36 @@ body::-webkit-scrollbar-thumb:hover {
 .dark body::-webkit-scrollbar-thumb:hover {
   background: #059669; /* emerald-600 */
 }
+
+/* Shimmer animation for CTA section */
+@keyframes shimmer {
+  0%, 100% { background-position: 200% 200%; }
+  50% { background-position: 0% 0%; }
+}
+
+/* Gradient text shimmer for hero */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Subtle float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Gradient border animation */
+@keyframes border-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.animate-border-glow {
+  animation: border-glow 3s ease-in-out infinite;
+}
