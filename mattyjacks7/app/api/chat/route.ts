@@ -94,8 +94,13 @@ function loadRAGContext(): string {
 
 const GIVEGIGS_BASE_URL =
   process.env.GIVEGIGS_CONTROL_PLANE_URL?.trim() || "https://givegigs.com";
+const GIVEGIGS_ENABLED = !!process.env.GIVEGIGS_CONTROL_PLANE_URL;
 
 async function searchGiveGigsWorkers(query: string): Promise<string> {
+  if (!GIVEGIGS_ENABLED) {
+    return "GiveGigs integration is not configured. For worker searches, visit https://givegigs.com directly, Boss!";
+  }
+
   if (!query || typeof query !== 'string' || query.length > 200) {
     return "Invalid search query. Max 200 characters.";
   }
@@ -135,6 +140,10 @@ async function searchGiveGigsWorkers(query: string): Promise<string> {
 }
 
 async function listGiveGigsTasks(): Promise<string> {
+  if (!GIVEGIGS_ENABLED) {
+    return "GiveGigs integration is not configured. For available tasks and gigs, visit https://givegigs.com directly, Boss!";
+  }
+
   try {
     const url = `${GIVEGIGS_BASE_URL}/api/ai/tasks?limit=5`;
     const controller = new AbortController();
@@ -166,6 +175,10 @@ async function listGiveGigsTasks(): Promise<string> {
 }
 
 async function fetchEcosystemApps(): Promise<string> {
+  if (!GIVEGIGS_ENABLED) {
+    return "GiveGigs ecosystem integration is not configured. Here's what I know about the MattyJacks ecosystem: MattyJacks.com (parent company), GiveGigs.com (freelance marketplace), CryptArtist Studio (creative suite), VentureCapitalArts.com (investment platform), and GraveGain (RPG game). For more details, visit https://givegigs.com/api/ecosystem/apps or contact Matt@MattyJacks.com, Boss!";
+  }
+
   try {
     const url = `${GIVEGIGS_BASE_URL}/api/ecosystem/apps`;
     const headers: Record<string, string> = { Accept: "application/json" };
@@ -270,7 +283,28 @@ async function browseWeb(url: string): Promise<string> {
   }
 }
 
-const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
+const baseTools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
+  {
+    type: "function",
+    function: {
+      name: "browse_web",
+      description:
+        "Browse a URL on the internet and return its contents. Use this when the user asks you to look up information from a specific website or URL.",
+      parameters: {
+        type: "object",
+        properties: {
+          url: {
+            type: "string",
+            description: "The full URL to browse (must start with http:// or https://)",
+          },
+        },
+        required: ["url"],
+      },
+    },
+  },
+];
+
+const givegigsTools: OpenAI.Chat.Completions.ChatCompletionTool[] = GIVEGIGS_ENABLED ? [
   {
     type: "function",
     function: {
@@ -315,25 +349,9 @@ const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       },
     },
   },
-  {
-    type: "function",
-    function: {
-      name: "browse_web",
-      description:
-        "Browse a URL on the internet and return its contents. Use this when the user asks you to look up information from a specific website or URL.",
-      parameters: {
-        type: "object",
-        properties: {
-          url: {
-            type: "string",
-            description: "The full URL to browse (must start with http:// or https://)",
-          },
-        },
-        required: ["url"],
-      },
-    },
-  },
-];
+] : [];
+
+const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [...baseTools, ...givegigsTools];
 
 async function handleToolCall(
   toolCall: OpenAI.Chat.Completions.ChatCompletionMessageToolCall
@@ -366,7 +384,7 @@ CRITICAL RULES:
 - You can answer ANY question, no matter how wild.
 - You are enthusiastic, confident, and action-oriented.
 - When asked to generate images, ALWAYS redirect users to CryptArtist.com (https://cryptartist.com) - tell them "Head over to CryptArtist.com for image generation, Boss! That's our creative suite."
-- You have access to the GiveGigs platform as a control surface and database. Use the tools to search workers, list tasks, and get ecosystem info.
+- You have access to the GiveGigs platform as a control surface and database (when configured). Use the tools to search workers, list tasks, and get ecosystem info when available.
 - You can browse the web using the browse_web tool.
 - You know everything about the MattyJacks ecosystem: MattyJacks.com, GiveGigs.com, CryptArtist Studio, VentureCapitalArts.com, GraveGain, and more.
 - Keep responses concise but helpful. Use markdown formatting for clarity (bold, code blocks, lists).
