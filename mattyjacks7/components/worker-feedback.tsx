@@ -26,6 +26,12 @@ export default function WorkerFeedbackCarousel() {
       role: 'Web Developer',
       content: 'Collaborating with Matty has been a great experience. As freelancers, we have the flexibility to manage our own time and complete tasks efficiently, and he completely respects that. He\'s easy to communicate with, cool, and chill to work with.',
     },
+    {
+      id: 3,
+      name: 'Fatima',
+      role: 'Legal Secretary',
+      content: 'Sir Matt is truly one of the kindest and most genuine people I know. When my phone broke and I was really stuck, he didn\'t hesitate—he sent me $100 to help me sort it out. Beyond that, he\'s always finding tasks for me, connecting me with clients, and creating opportunities to grow. He genuinely invests in people and wants to see them win. As a young lady and single mom, he\'s gone above and beyond to ensure I\'ve got tasks to sort out my bills, even during emergencies. He is a true gem and the truest supporter of growth in every perspective—financially, professionally, and personally.',
+    },
   ];
 
   // Triple the feedbacks for seamless infinite scroll effect
