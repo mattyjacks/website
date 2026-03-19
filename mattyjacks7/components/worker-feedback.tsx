@@ -30,7 +30,7 @@ export default function WorkerFeedbackCarousel() {
       id: 3,
       name: 'Fatima',
       role: 'Legal Secretary',
-      content: 'Sir Matt is truly one of the kindest and most genuine people I know. When my phone broke and I was really stuck, he didn\'t hesitate—he sent me $100 to help me sort it out. Beyond that, he\'s always finding tasks for me, connecting me with clients, and creating opportunities to grow. He genuinely invests in people and wants to see them win. As a young lady and single mom, he\'s gone above and beyond to ensure I\'ve got tasks to sort out my bills, even during emergencies. He is a true gem and the truest supporter of growth in every perspective—financially, professionally, and personally.',
+      content: 'Hello Everyone 👋 I\'d like to take a moment to appreciate someone who truly embodies growth and development in action. Sir Matt is truly one of the kindest and most genuine people I know. When my phone broke and I was really stuck, he didn\'t hesitate, he sent me $100 to help me sort it out. That alone meant so much to me. But beyond that, he\'s always finding tasks for me, connecting me with clients, and creating opportunities for me to grow. He doesn\'t just talk about support, he actively makes things happen. He is honestly the truest supporter of growth in every perspective, financially, professionally, and personally. He is a true gem 💎. As a young lady and a single mom of one he has gone above and beyond to ensure I\'ve got tasks to sort out my bills, even during emergencies he\'ll always chip in out of kindness. He genuinely invests in people and wants to see them win. Be immensely blessed Sir Matt🙏❤️',
     },
   ];
 
