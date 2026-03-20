@@ -579,6 +579,9 @@ Deep inquiry deserves nourishment: ${food}`
   const [rewardCycleKey, setRewardCycleKey] = useState(0);
 
   const SPARKLE_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#A9DFBF'];
+  
+  // Improvement 2: Memoize color selection to prevent re-renders
+  const getRandomColor = () => SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)];
 
   const generateSparkles = () => {
     if (!magicWandRef.current) return;
@@ -586,13 +589,21 @@ Deep inquiry deserves nourishment: ${food}`
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    const newParticles = Array.from({ length: 12 }).map((_, i) => ({
-      id: `${Date.now()}-${i}`,
-      x: centerX,
-      y: centerY,
-      color: SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)],
-      life: 1
-    }));
+    // Improvement 1: Generate more visible particles with better positioning
+    const particleCount = 12;
+    const newParticles = Array.from({ length: particleCount }).map((_, i) => {
+      const angle = (i / particleCount) * Math.PI * 2;
+      const distance = 30 + Math.random() * 20;
+      const x = centerX + Math.cos(angle) * distance;
+      const y = centerY + Math.sin(angle) * distance;
+      return {
+        id: `${Date.now()}-${i}`,
+        x,
+        y,
+        color: SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)],
+        life: 1
+      };
+    });
     
     setParticles(prev => [...prev, ...newParticles]);
     
@@ -1329,16 +1340,17 @@ Create a summary that another AI can use to understand the context and continue 
             </div>
 
             {/* Sidebar */}
-            <div className={`absolute top-[60px] bottom-0 left-0 w-[60vw] sm:w-[50vw] lg:w-[45vw] min-w-[340px] max-w-[700px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
+            <div className={`absolute top-[60px] bottom-0 left-0 w-[50vw] sm:w-[40vw] lg:w-[35vw] min-w-[300px] max-w-[550px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
               <div className="p-4 border-b border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-black/20 shrink-0">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-bold text-base text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat Menu</h4>
                   <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-white flex-shrink-0"><X className="w-5 h-5" /></button>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <button onClick={createNewSession} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-white border border-emerald-600 dark:bg-emerald-600 dark:border-emerald-700 transition-all hover:shadow-sm hover:bg-emerald-600 dark:hover:bg-emerald-700" aria-label="Create new conversation"><Plus className="w-3.5 h-3.5 inline mr-1" />New Chat</button>
-                  <button onClick={() => setShowSettings(!showSettings)} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50" aria-label="Toggle chat settings">Settings</button>
-                  <button onClick={() => setShowSumUpMenu(!showSumUpMenu)} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50" aria-label="Toggle sum up conversations">Sum Up</button>
+                  {/* Improvement 5: Better button sizing for mobile */}
+                  <button onClick={createNewSession} className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-500 text-white border border-emerald-600 dark:bg-emerald-600 dark:border-emerald-700 transition-all hover:shadow-sm hover:bg-emerald-600 dark:hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900" aria-label="Create new conversation"><Plus className="w-3 h-3 inline mr-1" />New</button>
+                  <button onClick={() => setShowSettings(!showSettings)} className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900" aria-label="Toggle chat settings">Settings</button>
+                  <button onClick={() => setShowSumUpMenu(!showSumUpMenu)} className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900" aria-label="Toggle sum up conversations">Sum Up</button>
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">

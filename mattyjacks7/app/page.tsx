@@ -16,183 +16,61 @@ import ScaledIframe from "@/components/scaled-iframe";
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
 
-  // Scroll animation refs
-  const heroContentRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const aboutRef = useScrollAnimation<HTMLDivElement>(fadeInLeft);
-  const companiesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
-  const servicesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
-  const processRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const industriesRef = useScrollAnimation<HTMLUListElement>(scaleIn);
-  const merchantServicesRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const tristateRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const videoDemosRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
-  const testimonialsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  // Scroll animation refs with lazy loading via Intersection Observer
+  const heroContentRef = useRef<HTMLDivElement>(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const companiesRef = useRef<HTMLDivElement>(null);
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const processRef = useRef<HTMLDivElement>(null);
+  const industriesRef = useRef<HTMLUListElement>(null);
+  const merchantServicesRef = useRef<HTMLDivElement>(null);
+  const tristateRef = useRef<HTMLDivElement>(null);
+  const videoDemosRef = useRef<HTMLDivElement>(null);
+  const testimonialsRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
-  // Global emoji particle system for the hero section
+  // Lazy-load animations when sections become visible
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    const animationRefs = [
+      { ref: heroContentRef, animation: fadeInUp },
+      { ref: aboutRef, animation: fadeInLeft },
+      { ref: companiesRef, animation: slideInGrid },
+      { ref: servicesRef, animation: slideInGrid },
+      { ref: processRef, animation: fadeInUp },
+      { ref: industriesRef, animation: scaleIn },
+      { ref: merchantServicesRef, animation: fadeInUp },
+      { ref: tristateRef, animation: fadeInUp },
+      { ref: videoDemosRef, animation: slideInGrid },
+      { ref: testimonialsRef, animation: fadeInUp },
+      { ref: ctaRef, animation: fadeInUp },
+    ];
 
-    const heroSection = heroRef.current;
-    if (!heroSection) return;
-
-    // Create or reuse global particles root
-    let root = document.getElementById("money-particles-root") as HTMLDivElement | null;
-    if (!root) {
-      root = document.createElement("div");
-      root.id = "money-particles-root";
-      Object.assign(root.style, {
-        position: "fixed",
-        left: "0",
-        top: "0",
-        right: "0",
-        bottom: "0",
-        pointerEvents: "none",
-        zIndex: "50",
-        overflow: "hidden",
-      } as CSSStyleDeclaration);
-      document.body.appendChild(root);
-    }
-
-    const particles: Array<{
-      el: HTMLSpanElement;
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      g: number;
-      r: number;
-      vr: number;
-      bornAt: number;
-      minTtlMs: number;
-      kind: "bill" | "fly";
-    }> = [];
-
-    let isHovering = false;
-    let emitterId: number | null = null;
-    let lastMousePos = { x: 0, y: 0 };
-
-    const spawn = () => {
-      if (!root) return;
-      const cx = lastMousePos.x + (Math.random() * 2 - 1) * 20;
-      const cy = lastMousePos.y + (Math.random() * 2 - 1) * 20;
-      const kind: "bill" | "fly" = Math.random() < 0.6 ? "bill" : "fly";
-      const el = document.createElement("span");
-      el.textContent = kind === "bill" ? "💵" : "💸";
-      el.style.position = "fixed";
-      el.style.left = "0";
-      el.style.top = "0";
-      el.style.fontSize = `${24 + Math.round(Math.random() * 10)}px`;
-      el.style.willChange = "transform, opacity";
-      el.style.pointerEvents = "none";
-      el.style.zIndex = "60";
-      root.appendChild(el);
-      const vx = (Math.random() * 2 - 1) * 100;
-      const vy = kind === "bill" ? -(100 + Math.random() * 120) : (110 + Math.random() * 120);
-      const g = kind === "bill" ? (260 + Math.random() * 160) : -(280 + Math.random() * 180);
-      const now = performance.now();
-      const minTtlMs = 550 + Math.random() * 550;
-      const p = { el, x: cx, y: cy, vx, vy, g, r: Math.random() * 360, vr: (Math.random() * 2 - 1) * 120, bornAt: now, minTtlMs, kind };
-      particles.push(p);
-    };
-
-    const startEmitter = () => {
-      if (emitterId) return; // already running
-      const loop = () => {
-        if (!isHovering) return;
-        spawn();
-        const perSec = 2 + Math.random() * 3; // 2–5/sec
-        const delay = 1000 / perSec;
-        emitterId = window.setTimeout(loop, delay);
-      };
-      loop();
-    };
-
-    const stopEmitter = () => {
-      if (emitterId) {
-        window.clearTimeout(emitterId);
-        emitterId = null;
-      }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      lastMousePos = { x: e.clientX, y: e.clientY };
-    };
-
-    const handleMouseEnter = (e: MouseEvent) => {
-      isHovering = true;
-      lastMousePos = { x: e.clientX, y: e.clientY };
-      startEmitter();
-    };
-
-    const handleMouseLeave = () => {
-      isHovering = false;
-      stopEmitter();
-    };
-
-    // Touch handlers for mobile
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 0) return;
-      const touch = e.touches[0];
-      lastMousePos = { x: touch.clientX, y: touch.clientY };
-      if (!isHovering) {
-        isHovering = true;
-        startEmitter();
-      }
-    };
-
-    const handleTouchEnd = () => {
-      isHovering = false;
-      stopEmitter();
-    };
-
-    // Animation loop for particles
-    let animationFrame: number;
-    const animateParticles = () => {
-      const now = performance.now();
-      const dt = 0.016; // ~60fps
-      const H = window.innerHeight;
-
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.vy += p.g * dt;
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.r += p.vr * dt;
-        p.el.style.transform = `translate3d(${Math.round(p.x)}px, ${Math.round(p.y)}px, 0) rotate(${p.r}deg)`;
-
-        if (p.kind === "bill") {
-          if (p.y > H + 100 && (now - p.bornAt) >= p.minTtlMs) {
-            p.el.remove();
-            particles.splice(i, 1);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const animRef = animationRefs.find((a) => a.ref.current === entry.target);
+            if (animRef) {
+              animRef.animation(entry.target as HTMLElement);
+              observer.unobserve(entry.target);
+            }
           }
-        } else {
-          if (p.y < -60 && (now - p.bornAt) >= p.minTtlMs) {
-            p.el.remove();
-            particles.splice(i, 1);
-          }
-        }
-      }
-      animationFrame = requestAnimationFrame(animateParticles);
-    };
-    animationFrame = requestAnimationFrame(animateParticles);
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-    heroSection.addEventListener("mousemove", handleMouseMove);
-    heroSection.addEventListener("mouseenter", handleMouseEnter);
-    heroSection.addEventListener("mouseleave", handleMouseLeave);
-    heroSection.addEventListener("touchmove", handleTouchMove, { passive: true });
-    heroSection.addEventListener("touchend", handleTouchEnd, { passive: true });
+    animationRefs.forEach((a) => {
+      if (a.ref.current) observer.observe(a.ref.current);
+    });
 
-    return () => {
-      heroSection.removeEventListener("mousemove", handleMouseMove);
-      heroSection.removeEventListener("mouseenter", handleMouseEnter);
-      heroSection.removeEventListener("mouseleave", handleMouseLeave);
-      heroSection.removeEventListener("touchmove", handleTouchMove);
-      heroSection.removeEventListener("touchend", handleTouchEnd);
-      stopEmitter();
-      cancelAnimationFrame(animationFrame);
-      particles.forEach((p) => p.el.remove());
-    };
+    return () => observer.disconnect();
+  }, []);
+
+  // Particle system disabled for performance
+  useEffect(() => {
+    // Particle animations disabled to fix scroll performance
+    return () => {};
   }, []);
   return (
     <main className="min-h-screen flex flex-col">
