@@ -490,9 +490,11 @@ function addLog(msg: string) {
 
 export async function POST(request: NextRequest) {
   debugLogs.length = 0;
+  addLog(`[CHAT] POST request started`);
   const clientIp = getClientIp(request);
   let isAdmin = process.env.NODE_ENV === 'development';
   const DEBUG = isAdmin;
+  addLog(`[CHAT] Client IP: ${clientIp}, isAdmin: ${isAdmin}`);
   
   try {
     const supabase = await createClient();
@@ -517,23 +519,25 @@ export async function POST(request: NextRequest) {
 
   try {
     if (!checkRateLimit(clientIp)) {
+      addLog(`[CHAT] Rate limit exceeded`);
       return NextResponse.json(
-        { error: getErrorResponse("Too many requests. Please wait a moment, Boss.", isAdmin) },
+        { error: getErrorResponse("Too many requests. Please wait a moment, Boss.", isAdmin), debugLogs },
         { status: 429, headers: { "Retry-After": "60" } }
       );
     }
 
     if (!process.env.OPENAI_API_KEY) {
+      addLog(`[CHAT] OPENAI_API_KEY not configured`);
       return NextResponse.json(
-        { error: getErrorResponse("AI service not configured", isAdmin) },
+        { error: getErrorResponse("AI service not configured", isAdmin), debugLogs },
         { status: 503 }
       );
     }
 
     if (process.env.OPENAI_API_KEY.length < 20) {
-      if (DEBUG) console.error("[CHAT] Invalid OPENAI_API_KEY length");
+      addLog(`[CHAT] Invalid OPENAI_API_KEY length: ${process.env.OPENAI_API_KEY.length}`);
       return NextResponse.json(
-        { error: getErrorResponse("AI service misconfigured", isAdmin) },
+        { error: getErrorResponse("AI service misconfigured", isAdmin), debugLogs },
         { status: 503 }
       );
     }
