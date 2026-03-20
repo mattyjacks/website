@@ -72,55 +72,47 @@ function computeRectTargets(torusGeo: THREE.TorusGeometry, rectW: number, rectH:
   const count = posAttr.count;
   const targets = new Float32Array(count * 3);
   
-  // Map each vertex by its angle around the torus to a point on a rectangle perimeter
-  const torusRadius = 1.65;
-  
   for (let i = 0; i < count; i++) {
     const x = posAttr.getX(i);
+    const y = posAttr.getY(i);
     const z = posAttr.getZ(i);
     
-    // Get the angle of this vertex around the torus center (in the XZ plane)
-    let angle = Math.atan2(z, x);
+    // THREE.TorusGeometry major circle lies in the XY plane, so use atan2(y, x)
+    let angle = Math.atan2(y, x);
     if (angle < 0) angle += Math.PI * 2;
     
-    // Map angle to rectangle perimeter
+    // Map angle to rectangle perimeter point
     const perimeter = 2 * (rectW + rectH);
     const dist = (angle / (Math.PI * 2)) * perimeter;
     
     let rx: number, ry: number;
-    
     if (dist < rectW) {
-      // Top edge: left to right
       rx = -rectW / 2 + dist;
       ry = rectH / 2;
     } else if (dist < rectW + rectH) {
-      // Right edge: top to bottom
       rx = rectW / 2;
       ry = rectH / 2 - (dist - rectW);
     } else if (dist < 2 * rectW + rectH) {
-      // Bottom edge: right to left
       rx = rectW / 2 - (dist - rectW - rectH);
       ry = -rectH / 2;
     } else {
-      // Left edge: bottom to top
       rx = -rectW / 2;
       ry = -rectH / 2 + (dist - 2 * rectW - rectH);
     }
     
-    // Add slight tube thickness variation from the minor radius
-    const origY = posAttr.getY(i);
-    const tubeOffset = origY * 0.15; // Keep a tiny bit of depth
+    // Keep a thin slice of the tube depth for a 3D flat frame look
+    const tubeDepth = z * 0.12;
     
-    targets[i * 3] = rx;
-    targets[i * 3 + 1] = ry + tubeOffset;
-    targets[i * 3 + 2] = tubeOffset * 0.5;
+    targets[i * 3]     = rx;
+    targets[i * 3 + 1] = ry;
+    targets[i * 3 + 2] = tubeDepth;
   }
   
   return targets;
 }
 
 // ─── Renderer factory ────────────────────────────────────────────────────────
-function buildScene(size: number) {
+function buildScene(size: number, rectW = 3.0, rectH = 4.0) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
   camera.position.z = 5;
@@ -155,8 +147,8 @@ function buildScene(size: number) {
   rim.position.set(0, 4, -5);
   scene.add(rim);
 
-  // Compute rectangle targets (aspect ratio ~3:4 of chat window)
-  const rectTargets = computeRectTargets(geo, 3.0, 4.0);
+  // Compute rectangle targets (defaults to ~3:4 of chat window, overridable)
+  const rectTargets = computeRectTargets(geo, rectW, rectH);
   
   // Store original torus positions
   const origPositions = new Float32Array(geo.attributes.position.array);
@@ -165,16 +157,16 @@ function buildScene(size: number) {
 }
 
 // ─── Layer component ─────────────────────────────────────────────────────────
-interface LayerProps { size?: number; layer: "back" | "front"; }
+interface LayerProps { size?: number; layer: "back" | "front"; rectWidth?: number; rectHeight?: number; }
 
-function ThreeBorderLayer({ size = 160, layer }: LayerProps) {
+function ThreeBorderLayer({ size = 160, layer, rectWidth = 3.0, rectHeight = 4.0 }: LayerProps) {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
     while (mountRef.current.firstChild) mountRef.current.removeChild(mountRef.current.firstChild);
 
-    const { scene, camera, renderer, torus, geo, mat, rectTargets, origPositions } = buildScene(size);
+    const { scene, camera, renderer, torus, geo, mat, rectTargets, origPositions } = buildScene(size, rectWidth, rectHeight);
     mountRef.current.appendChild(renderer.domElement);
 
     const posAttr = geo.attributes.position;

@@ -4,9 +4,13 @@ import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAI() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is missing");
+  }
+  return new OpenAI({ apiKey });
+}
 
 let cachedContext: string | null = null;
 let contextLastLoaded = 0;
@@ -573,6 +577,7 @@ export async function POST(request: NextRequest) {
 
     let response: OpenAI.Chat.Completions.ChatCompletion;
     try {
+      const openai = getOpenAI();
       response = await openai.chat.completions.create({
         model: "gpt-5-mini",
         messages: chatMessages,
@@ -623,6 +628,7 @@ export async function POST(request: NextRequest) {
       }
 
       try {
+        const openai = getOpenAI();
         response = await openai.chat.completions.create({
           model: "gpt-5-mini",
           messages: chatMessages,

@@ -199,23 +199,30 @@ export default function AnythingButton() {
 
   const [showTeaser, setShowTeaser] = useState(false);
   const [currentTeaser, setCurrentTeaser] = useState("");
-  const [threeSize, setThreeSize] = useState(160);
+  const [threeSize, setThreeSize] = useState(180);
   const [chatBounds, setChatBounds] = useState<{x:number;y:number;width:number;height:number} | null>(null);
   const [chatReady, setChatReady] = useState(false);
 
   useEffect(() => {
-    setThreeSize(window.innerWidth < 640 ? 150 : 180);
-    const handleResize = () => setThreeSize(window.innerWidth < 640 ? 150 : 180);
+    const calcThreeSize = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const base = Math.min(vw, vh);
+      // On mobile, nearly full width with a small margin. Desktop slightly smaller.
+      return vw < 640 ? Math.max(140, Math.min(base - 20, 360)) : Math.max(180, Math.min(base * 0.45, 340));
+    };
+    setThreeSize(calcThreeSize());
+    const handleResize = () => setThreeSize(calcThreeSize());
     window.addEventListener('resize', handleResize);
 
     // Calculate chat window bounds once on the client
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const isMobile = vw < 640;
-    const w = isMobile ? vw - 16 : Math.min(420, vw - 48);
-    const h = Math.min(Math.floor(vh * 0.80), 640);
-    const x = Math.max(0, vw - w - (isMobile ? 8 : 24));
-    const y = Math.max(60, vh - h - 24);
+    const w = isMobile ? vw - 20 : Math.min(440, vw - 48);
+    const h = isMobile ? vh - 20 : Math.min(Math.floor(vh * 0.80), 680);
+    const x = isMobile ? 10 : Math.max(0, vw - w - 24);
+    const y = isMobile ? 10 : Math.max(60, vh - h - 24);
     setChatBounds({ x, y, width: w, height: h });
 
     return () => window.removeEventListener('resize', handleResize);
@@ -401,12 +408,10 @@ export default function AnythingButton() {
 
   return (
     <>
+      {/* Floating launcher with torus border */}
       <div className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 pointer-events-none flex items-center justify-center" style={{ zIndex: 50, width: threeSize, height: threeSize }}>
         <div className="relative flex items-center justify-center w-full h-full">
-          {/* Layer 1: Ring behind the image */}
           <ThreeBorderBack size={threeSize} />
-
-          {/* Layer 2: The image button */}
           <motion.button
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -435,46 +440,24 @@ export default function AnythingButton() {
             </AnimatePresence>
             {!isOpen && <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />}
           </motion.button>
-
-          {/* Layer 3: Ring in front of the image (clipped to front arc only) */}
           <ThreeBorderFront size={threeSize} />
         </div>
       </div>
 
+      {/* Chat window */}
       <AnimatePresence>
         {chatReady && chatBounds && (
           <motion.div
-            key="chat-window"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            key="chat"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
-            style={{ position: 'fixed', inset: 0, zIndex: 60, pointerEvents: 'none' }}
+            style={{ position: 'fixed', left: chatBounds.x, top: chatBounds.y, width: chatBounds.width, height: chatBounds.height, zIndex: 60 }}
+            className="flex flex-col rounded-2xl border border-zinc-200/80 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
           >
-            <Rnd
-              default={chatBounds}
-              minWidth={320}
-              minHeight={400}
-              bounds="window"
-              dragHandleClassName="drag-handle"
-              className="pointer-events-auto flex flex-col rounded-3xl border border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-zinc-950/80 shadow-[0_30px_60px_rgba(0,0,0,0.3)] backdrop-blur-2xl overflow-hidden group/rnd"
-            >
-              <style dangerouslySetInnerHTML={{__html: `
-                .group\\/rnd .react-resizable-handle { opacity: 0; transition: opacity 0.2s; }
-                .group\\/rnd:hover .react-resizable-handle { opacity: 1; }
-                .group\\/rnd .react-resizable-handle-top { border-top: 2px dashed #10b981; }
-                .group\\/rnd .react-resizable-handle-right { border-right: 2px dashed #10b981; }
-                .group\\/rnd .react-resizable-handle-bottom { border-bottom: 2px dashed #10b981; }
-                .group\\/rnd .react-resizable-handle-left { border-left: 2px dashed #10b981; }
-                .group\\/rnd .react-resizable-handle-topLeft { border-top: 2px dashed #10b981; border-left: 2px dashed #10b981; }
-                .group\\/rnd .react-resizable-handle-topRight { border-top: 2px dashed #10b981; border-right: 2px dashed #10b981; }
-                .group\\/rnd .react-resizable-handle-bottomLeft { border-bottom: 2px dashed #10b981; border-left: 2px dashed #10b981; }
-                .group\\/rnd .react-resizable-handle-bottomRight { border-bottom: 2px dashed #10b981; border-right: 2px dashed #10b981; }
-              `}} />
             {/* Header */}
-            <div 
-              className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0"
-            >
+            <div className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="text-white/80 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/20"
@@ -482,7 +465,7 @@ export default function AnythingButton() {
               >
                 <Menu className="w-5 h-5" />
               </button>
-              
+
               <div className="flex flex-col flex-1 min-w-0 pointer-events-none select-none">
                 <div className="flex items-center justify-center gap-2">
                   <button 
@@ -512,7 +495,7 @@ export default function AnythingButton() {
               </button>
             </div>
 
-            {/* Sidebar Overlay */}
+            {/* Sidebar */}
             <div className={`absolute top-[60px] bottom-0 left-0 w-[280px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
               <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/50 dark:bg-black/20">
                 <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat History</h4>
@@ -538,7 +521,7 @@ export default function AnythingButton() {
               </div>
             </div>
 
-            {/* Messages Area */}
+            {/* Messages */}
             <div 
               ref={scrollAreaRef}
               onScroll={handleScroll}
@@ -559,7 +542,7 @@ export default function AnythingButton() {
                 </div>
               )}
 
-              {messages.map((msg, idx) => (
+              {messages.map((msg) => (
                 <MessageBubble key={msg.id} message={msg} onCopy={(text) => copyToClipboard(text, msg.id)} />
               ))}
 
@@ -576,16 +559,16 @@ export default function AnythingButton() {
               )}
             </div>
 
-            {/* Scroll to bottom button */}
+            {/* Scroll to bottom */}
             <AnimatePresence>
               {showScrollBottom && (
                 <motion.button initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} onClick={() => scrollToBottom()} className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30 bg-zinc-900/90 dark:bg-white/90 text-white dark:text-black border border-white/10 dark:border-black/10 rounded-full p-2.5 shadow-xl backdrop-blur-md">
-                   <ChevronDown className="w-5 h-5" />
+                  <ChevronDown className="w-5 h-5" />
                 </motion.button>
               )}
             </AnimatePresence>
 
-            {/* Input Area */}
+            {/* Input */}
             <div className="p-4 border-t border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-xl shrink-0 z-20">
               <div className="relative flex items-end gap-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 focus-within:border-emerald-500 dark:focus-within:border-emerald-500/50 rounded-2xl shadow-sm transition-colors p-1 pl-3 pr-1.5">
                 <textarea
@@ -596,10 +579,9 @@ export default function AnythingButton() {
                   placeholder="Ask me anything..."
                   rows={1}
                   disabled={isLoading}
-                  className="w-full resize-none py-3.5 bg-transparent text-[15px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none custom-scrollbar"
+                  className="w-full resize-none py-3.5 bg-transparent text-[15px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder-text-zinc-600 focus:outline-none custom-scrollbar"
                   style={{ maxHeight: "200px" }}
                 />
-                
                 <div className="flex gap-1 pb-1.5 pl-1 shrink-0">
                   {isLoading ? (
                     <button
@@ -622,17 +604,15 @@ export default function AnythingButton() {
                 </div>
               </div>
 
-              {/* Progress/Footer Bar */}
               <div className="flex justify-between items-center mt-3 px-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
                   {isLoading ? "Thinking..." : "Ready"}
                 </span>
-                
                 <div className="flex items-center gap-2">
                   {charCount > 4000 && (
-                     <div className="w-16 h-1 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
-                       <div className={`h-full ${charCount > 4800 ? 'bg-sky-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min((charCount / 5000) * 100, 100)}%` }} />
-                     </div>
+                    <div className="w-16 h-1 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+                      <div className={`h-full ${charCount > 4800 ? 'bg-sky-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min((charCount / 5000) * 100, 100)}%` }} />
+                    </div>
                   )}
                   <span className="text-[10px] font-bold text-zinc-400 tracking-wider">
                     Powered by Valley Net
@@ -640,48 +620,45 @@ export default function AnythingButton() {
                 </div>
               </div>
             </div>
-            </Rnd>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Teaser popup */}
       <AnimatePresence>
         {showTeaser && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ type: "spring", bounce: 0.25, duration: 0.3 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm shadow-2xl pointer-events-auto"
-            onClick={() => setShowTeaser(false)}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-[130px] right-6 sm:right-10 z-[70] w-[320px] max-w-[90vw] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl overflow-hidden"
           >
-            <motion.div
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-w-sm w-full bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl"
-            >
-              <button 
-                onClick={() => setShowTeaser(false)} 
-                className="absolute top-3 right-3 z-10 px-3 py-1 text-xs font-bold text-white bg-black/50 hover:bg-black/80 rounded-md border border-white/20 backdrop-blur-sm transition-colors tracking-widest uppercase"
-               >
-                Close
-              </button>
-              <div className="relative w-full aspect-square">
-                <Image
-                  src="/images/valley%20net%20v23.2%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
-                  alt="Valley Net Perfection"
-                  fill
-                  className="object-cover"
-                  priority
-                />
+            <div className="p-4 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-emerald-200 dark:border-emerald-900 shadow-sm">
+                <Image src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png" alt="Valley Net" width={40} height={40} className="object-cover w-full h-full" />
               </div>
-              <div className="p-6 text-center bg-gradient-to-b from-zinc-900 to-black">
-                <p className="text-[17px] font-bold text-emerald-50 mb-4 italic leading-relaxed uppercase tracking-wide">&quot;{currentTeaser}&quot;</p>
-                <div className="flex items-center justify-center gap-2 mt-2 text-emerald-500 font-bold uppercase tracking-widest text-[10px]">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                   Valley Net 💘
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="text-sm font-bold text-zinc-900 dark:text-white">Valley Net 💘</h4>
+                  <button onClick={() => setShowTeaser(false)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200" aria-label="Close teaser">
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
+                <p className="text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed whitespace-pre-line">{currentTeaser}</p>
               </div>
-            </motion.div>
+            </div>
+            <div className="px-4 pb-4">
+              <button
+                onClick={() => {
+                  setShowTeaser(false);
+                  setIsOpen(true);
+                }}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 text-white text-sm font-bold py-2.5 shadow-sm hover:bg-emerald-700 transition-colors"
+              >
+                Open Chat <Send className="w-4 h-4" />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
