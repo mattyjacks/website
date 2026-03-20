@@ -929,6 +929,18 @@ Create a summary that another AI can use to understand the context and continue 
                 </div>
               </div>
 
+              <div className="mt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={applyMagicPrompt}
+                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-full px-3 py-1 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                  title="Insert a magic prompt"
+                >
+                  <span role="img" aria-label="magic wand">🪄</span>
+                  Magic Prompt
+                </button>
+              </div>
+
               <div className="flex justify-between items-center mt-3 px-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-700 dark:text-zinc-100">
                   {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : `Ready (${messages.length}/50)`}
