@@ -204,7 +204,7 @@ export default function AnythingButton() {
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [charCount, setCharCount] = useState(0);
 
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState("Boss");
   const [magicPrompt, setMagicPrompt] = useState("");
 
   const [showSettings, setShowSettings] = useState(false);
