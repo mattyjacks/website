@@ -4,6 +4,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw } from "lucide-react";
 import { motion, useDragControls, AnimatePresence } from "framer-motion";
+import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
+import { Rnd } from "react-rnd";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -117,21 +120,8 @@ function MessageBubble({ message, onCopy }: { message: ChatMessage; onCopy: (tex
       layout
       className={`flex w-full ${isUser ? "justify-end" : "justify-start"} group mb-5`}
     >
-      <div className={`flex w-full gap-3 ${isUser ? "flex-row-reverse" : "flex-row"} max-w-[95%] sm:max-w-[90%]`}>
-        <div className="flex-shrink-0 mt-1">
-          {isUser ? (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-md">
-              <User className="w-4 h-4 text-white" />
-            </div>
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-800 to-black border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-500/10 relative">
-              <Bot className="w-4 h-4 text-emerald-400 z-10" />
-              {(!isUser && message.id.includes("temp")) && <div className="absolute inset-0 rounded-full border-2 border-emerald-500/50 border-t-transparent animate-spin z-0" />}
-            </div>
-          )}
-        </div>
-
-        <div className="relative group/bubble flex flex-col min-w-0 max-w-[calc(100%-2.5rem)]">
+      <div className={`flex w-full gap-3 ${isUser ? "flex-row-reverse" : "flex-row"} max-w-[95%] sm:max-w-[85%]`}>
+        <div className="relative group/bubble flex flex-col min-w-0 max-w-full">
           <div
             className={`px-4 py-3 sm:px-5 sm:py-4 text-[15px] leading-[1.6] overflow-hidden break-words transition-all shadow-sm ${
               isUser
@@ -205,6 +195,9 @@ export default function AnythingButton() {
   const [error, setError] = useState<string | null>(null);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [charCount, setCharCount] = useState(0);
+
+  const [showTeaser, setShowTeaser] = useState(false);
+  const [currentTeaser, setCurrentTeaser] = useState("");
 
   const dragControls = useDragControls();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -395,8 +388,13 @@ export default function AnythingButton() {
               <ChevronDown className="w-8 h-8 flex-shrink-0" />
             </motion.div>
           ) : (
-            <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center">
-               <Bot className="w-8 h-8 flex-shrink-0" />
+            <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center w-full h-full relative p-[2px]">
+              <Image 
+                src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
+                alt="Valley Net"
+                fill
+                className="rounded-full object-cover shadow-inner"
+              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -406,21 +404,40 @@ export default function AnythingButton() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            drag
-            dragControls={dragControls}
-            dragListener={false}
-            dragMomentum={false}
-            initial={{ opacity: 0, y: 40, scale: 0.95, transformOrigin: 'bottom right' }}
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: "spring", bounce: 0.3, duration: 0.4 }}
-            style={{ resize: "both" }}
-            className="fixed bottom-24 right-3 sm:right-6 z-50 w-[94vw] sm:w-[420px] min-w-[320px] h-[75vh] sm:h-[650px] max-h-[85vh] min-h-[400px] flex flex-col rounded-3xl border border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-zinc-950/80 shadow-2xl backdrop-blur-2xl overflow-hidden"
+            className="fixed inset-0 z-50 pointer-events-none"
           >
+            <Rnd
+              default={{
+                x: typeof window !== 'undefined' ? window.innerWidth - Math.min(window.innerWidth * 0.94, 420) - (window.innerWidth < 640 ? 12 : 24) : 0,
+                y: typeof window !== 'undefined' ? window.innerHeight - Math.min(window.innerHeight * 0.75, 650) - 96 : 0,
+                width: typeof window !== 'undefined' ? Math.min(window.innerWidth * 0.94, 420) : 420,
+                height: typeof window !== 'undefined' ? Math.min(window.innerHeight * 0.75, 650) : 650,
+              }}
+              minWidth={320}
+              minHeight={400}
+              bounds="window"
+              dragHandleClassName="drag-handle"
+              className="pointer-events-auto flex flex-col rounded-3xl border border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-zinc-950/80 shadow-[0_30px_60px_rgba(0,0,0,0.3)] backdrop-blur-2xl overflow-hidden group/rnd"
+            >
+              <style dangerouslySetInnerHTML={{__html: `
+                .group\\/rnd .react-resizable-handle { opacity: 0; transition: opacity 0.2s; }
+                .group\\/rnd:hover .react-resizable-handle { opacity: 1; }
+                .group\\/rnd .react-resizable-handle-top { border-top: 2px dashed #10b981; }
+                .group\\/rnd .react-resizable-handle-right { border-right: 2px dashed #10b981; }
+                .group\\/rnd .react-resizable-handle-bottom { border-bottom: 2px dashed #10b981; }
+                .group\\/rnd .react-resizable-handle-left { border-left: 2px dashed #10b981; }
+                .group\\/rnd .react-resizable-handle-topLeft { border-top: 2px dashed #10b981; border-left: 2px dashed #10b981; }
+                .group\\/rnd .react-resizable-handle-topRight { border-top: 2px dashed #10b981; border-right: 2px dashed #10b981; }
+                .group\\/rnd .react-resizable-handle-bottomLeft { border-bottom: 2px dashed #10b981; border-left: 2px dashed #10b981; }
+                .group\\/rnd .react-resizable-handle-bottomRight { border-bottom: 2px dashed #10b981; border-right: 2px dashed #10b981; }
+              `}} />
             {/* Header */}
             <div 
-              onPointerDown={(e) => dragControls.start(e)}
-              className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative"
+              className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0"
             >
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -432,9 +449,22 @@ export default function AnythingButton() {
               
               <div className="flex flex-col flex-1 min-w-0 pointer-events-none select-none">
                 <div className="flex items-center justify-center gap-2">
-                  <GripHorizontal className="w-4 h-4 text-emerald-300 opacity-50" />
+                  <button 
+                    onClick={() => {
+                      setCurrentTeaser(TEASER_PHRASES[Math.floor(Math.random() * TEASER_PHRASES.length)]);
+                      setShowTeaser(true);
+                    }}
+                    className="w-7 h-7 relative shrink-0 rounded-[6px] overflow-hidden shadow-sm border border-black/10 hover:scale-110 hover:shadow-md transition-all pointer-events-auto"
+                    aria-label="View Profile"
+                  >
+                    <Image 
+                      src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
+                      alt="Valley Net"
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
                   <h3 className="text-white font-bold tracking-wide text-base whitespace-nowrap">Valley Net <span className="text-[14px]">💘</span></h3>
-                  <GripHorizontal className="w-4 h-4 text-emerald-300 opacity-50" />
                 </div>
               </div>
 
@@ -499,10 +529,6 @@ export default function AnythingButton() {
 
               {isLoading && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start mb-4 gap-3 max-w-[90%]">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-800 to-black border border-emerald-500/30 flex items-center justify-center shadow-lg relative flex-shrink-0 mt-1">
-                    <div className="absolute inset-0 rounded-full border-2 border-emerald-500/50 border-t-transparent animate-spin" />
-                    <Bot className="w-4 h-4 text-emerald-400" />
-                  </div>
                   <div className="px-5 py-4 rounded-2xl rounded-tl-sm bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex items-center gap-2">
                     <div className="flex space-x-1.5">
                       <motion.div className="w-2 h-2 rounded-full bg-emerald-500" animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }} />
@@ -578,6 +604,48 @@ export default function AnythingButton() {
                 </div>
               </div>
             </div>
+            </Rnd>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showTeaser && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: "spring", bounce: 0.25, duration: 0.3 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm shadow-2xl pointer-events-auto"
+            onClick={() => setShowTeaser(false)}
+          >
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-sm w-full bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl"
+            >
+              <button 
+                onClick={() => setShowTeaser(false)} 
+                className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/80 border border-white/20 text-white backdrop-blur-md transition-colors"
+               >
+                 <X className="w-4 h-4" />
+              </button>
+              <div className="relative w-full aspect-square">
+                <Image
+                  src="/images/valley%20net%20v23.2%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
+                  alt="Valley Net Perfection"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+              <div className="p-6 text-center bg-gradient-to-b from-zinc-900 to-black">
+                <p className="text-[17px] font-bold text-emerald-50 mb-4 italic leading-relaxed uppercase tracking-wide">&quot;{currentTeaser}&quot;</p>
+                <div className="flex items-center justify-center gap-2 mt-2 text-emerald-500 font-bold uppercase tracking-widest text-[10px]">
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                   Valley Net 💘
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

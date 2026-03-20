@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -420,20 +421,72 @@ TONE & PERSONALITY:
 PROJECT DOCUMENTATION CONTEXT:
 {RAG_CONTEXT}`;
 
+const ERROR_VARIATIONS = [
+  "Sorry, boss! Try again! Error! I love you!",
+  "Oops, boss! Try again! We hit an error! I love you!",
+  "My bad, boss! Try again! Error encountered! I love you!",
+  "Apologies, boss! Try again! Error! I love you though!",
+  "Sorry, boss! Error! Please try again! I love you!",
+  "Sorry, boss! Try again! Big error! I love you!",
+  "Whoops, boss! Try again! Error! I love you!",
+  "Dang it, boss! Try again! Error! I love you!",
+  "Sorry, boss! Hit an error, try again! I love you!",
+  "Yikes, boss! Try again! Error! I love you!",
+  "Sorry, boss! Try again! Error occurred! I love you!",
+  "My apologies, boss! Try again! Error! I love you!",
+  "Sorry, boss! Try again! Unexpected error! I love you!",
+  "Oopsie, boss! Try again! Error! I love you!",
+  "Sorry, boss! Try again! System error! I love you!",
+  "Bummer, boss! Try again! Error! I love you!",
+  "Sorry, boss! Try again! Internal error! I love you!",
+  "Ah shoot, boss! Try again! Error! I love you!",
+  "Sorry, boss! Try again! Fatal error! I love you!",
+  "My fault, boss! Try again! Error! I love you!",
+  "Sorry, boss! Try again! Network error! I love you!",
+  "Ouch, boss! Try again! Error! I love you!",
+  "Sorry, boss! Try again! AI error! I love you!",
+  "Sorry, boss! Try again! Unknown error! I love you!",
+  "Gosh, boss! Try again! Error! I love you!"
+];
+
+function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
+  if (isAdmin) {
+    if (errOrMsg instanceof Error) {
+      return `[ADMIN ERROR LOG]\nMessage: ${errOrMsg.message}\nStack: ${errOrMsg.stack || 'No stack trace available'}`;
+    }
+    return `[ADMIN ERROR LOG] ${typeof errOrMsg === 'string' ? errOrMsg : JSON.stringify(errOrMsg)}`;
+  }
+  return ERROR_VARIATIONS[Math.floor(Math.random() * ERROR_VARIATIONS.length)];
+}
+
 export async function POST(request: NextRequest) {
   const clientIp = getClientIp(request);
+  let isAdmin = false;
+  
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const role = user.user_metadata?.role || user.app_metadata?.role;
+      if (role === 'admin' || role === 'moderator') {
+        isAdmin = true;
+      }
+    }
+  } catch (e) {
+    // Gracefully fallback if not logged in or misconfigured
+  }
 
   try {
     if (!checkRateLimit(clientIp)) {
       return NextResponse.json(
-        { error: "Too many requests. Please wait a moment, Boss." },
+        { error: getErrorResponse("Too many requests. Please wait a moment, Boss.", isAdmin) },
         { status: 429, headers: { "Retry-After": "60" } }
       );
     }
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
-        { error: "AI service not configured" },
+        { error: getErrorResponse("AI service not configured", isAdmin) },
         { status: 503 }
       );
     }
@@ -441,7 +494,7 @@ export async function POST(request: NextRequest) {
     const contentType = request.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       return NextResponse.json(
-        { error: "Content-Type must be application/json" },
+        { error: getErrorResponse("Content-Type must be application/json", isAdmin) },
         { status: 415 }
       );
     }
@@ -450,7 +503,7 @@ export async function POST(request: NextRequest) {
     const bodySize = new TextEncoder().encode(body).byteLength;
     if (bodySize > 50000) {
       return NextResponse.json(
-        { error: "Request too large (max 50KB)" },
+        { error: getErrorResponse("Request too large (max 50KB)", isAdmin) },
         { status: 413 }
       );
     }
@@ -458,14 +511,12 @@ export async function POST(request: NextRequest) {
     let parsed: unknown;
     try {
       parsed = JSON.parse(body, (key, value) => {
-        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
-          return undefined;
-        }
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') return undefined;
         return value;
       });
-    } catch {
+    } catch (err) {
       return NextResponse.json(
-        { error: "Invalid JSON" },
+        { error: getErrorResponse(err instanceof Error ? err : "Invalid JSON", isAdmin) },
         { status: 400 }
       );
     }
@@ -475,40 +526,30 @@ export async function POST(request: NextRequest) {
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
-        { error: "Messages array is required and cannot be empty" },
+        { error: getErrorResponse("Messages array is required and cannot be empty", isAdmin) },
         { status: 400 }
       );
     }
 
     if (messages.length > 50) {
       return NextResponse.json(
-        { error: "Too many messages (max 50)" },
+        { error: getErrorResponse("Too many messages (max 50)", isAdmin) },
         { status: 400 }
       );
     }
 
-    const validRoles = new Set(["user", "assistant"]);
+    const validRoles = new Set(["user", "assistant", "tool", "system"]);
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i] as Record<string, unknown>;
-
       if (typeof msg?.role !== "string" || !validRoles.has(msg.role)) {
         return NextResponse.json(
-          { error: `Message ${i}: invalid role` },
+          { error: getErrorResponse(`Message ${i}: invalid role`, isAdmin) },
           { status: 400 }
         );
       }
-
-      if (typeof msg?.content !== "string") {
+      if (typeof msg?.content !== "string" && msg.role !== "assistant") {
         return NextResponse.json(
-          { error: `Message ${i}: content must be string` },
-          { status: 400 }
-        );
-      }
-
-      const contentLen = new TextEncoder().encode(msg.content).byteLength;
-      if (contentLen === 0 || contentLen > 5000) {
-        return NextResponse.json(
-          { error: `Message ${i}: content must be 1-5000 bytes` },
+          { error: getErrorResponse(`Message ${i}: content must be string`, isAdmin) },
           { status: 400 }
         );
       }
@@ -519,15 +560,11 @@ export async function POST(request: NextRequest) {
 
     const chatMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: "system", content: systemMessage },
-      ...messages.map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      })),
+      ...messages.map((m) => m as OpenAI.Chat.Completions.ChatCompletionMessageParam),
     ];
 
     let response: OpenAI.Chat.Completions.ChatCompletion;
     try {
-      const msgLen = chatMessages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
       response = await openai.chat.completions.create({
         model: "gpt-5-mini",
         messages: chatMessages,
@@ -541,82 +578,39 @@ export async function POST(request: NextRequest) {
       const msg = rawMsg.slice(0, 200).toLowerCase();
 
       if (msg.includes("rate_limit")) {
-        return NextResponse.json(
-          { error: "OpenAI rate limited. Try again in a moment, Boss." },
-          { status: 429 }
-        );
+        return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 429 });
       }
       if (msg.includes("invalid_request")) {
-        return NextResponse.json(
-          { error: "Invalid request to AI model" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 400 });
       }
-      if (
-        msg.includes("authentication") ||
-        msg.includes("api key") ||
-        msg.includes("apikey") ||
-        msg.includes("api_key") ||
-        msg.includes("no api key")
-      ) {
-        return NextResponse.json(
-          { error: "AI service authentication failed. Check your OPENAI_API_KEY, Boss." },
-          { status: 503 }
-        );
+      if (msg.includes("authentication") || msg.includes("api key") || msg.includes("no api key")) {
+        return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 503 });
       }
-      if (
-        msg.includes("enotfound") ||
-        msg.includes("getaddrinfo") ||
-        msg.includes("self signed certificate") ||
-        msg.includes("fetch failed") ||
-        msg.includes("timeout")
-      ) {
-        return NextResponse.json(
-          { error: "AI service unreachable. Check network connectivity and try again, Boss." },
-          { status: 503 }
-        );
+      if (msg.includes("timeout") || msg.includes("fetch failed")) {
+        return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 503 });
       }
-      return NextResponse.json(
-        { error: "AI service error. Please try again in a moment, Boss." },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 503 });
     }
 
     let assistantMessage = response.choices[0]?.message;
     if (!assistantMessage) {
-      return NextResponse.json(
-        { error: "No response from AI model" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: getErrorResponse("No response from AI model", isAdmin) }, { status: 500 });
     }
 
     let toolCallDepth = 0;
     const maxToolCalls = 5;
 
-    while (
-      assistantMessage?.tool_calls &&
-      assistantMessage.tool_calls.length > 0 &&
-      toolCallDepth < maxToolCalls
-    ) {
+    while (assistantMessage?.tool_calls && assistantMessage.tool_calls.length > 0 && toolCallDepth < maxToolCalls) {
       toolCallDepth++;
-
       chatMessages.push(assistantMessage);
 
       for (const toolCall of assistantMessage.tool_calls) {
         try {
           const result = await handleToolCall(toolCall);
-          chatMessages.push({
-            role: "tool",
-            tool_call_id: toolCall.id,
-            content: result.slice(0, 10000),
-          });
+          chatMessages.push({ role: "tool", tool_call_id: toolCall.id, content: result.slice(0, 10000) });
         } catch (err) {
           const errorMsg = err instanceof Error ? err.message : "Tool error";
-          chatMessages.push({
-            role: "tool",
-            tool_call_id: toolCall.id,
-            content: `Error: ${errorMsg.slice(0, 500)}`,
-          });
+          chatMessages.push({ role: "tool", tool_call_id: toolCall.id, content: `Error: ${errorMsg.slice(0, 500)}` });
         }
       }
 
@@ -632,61 +626,21 @@ export async function POST(request: NextRequest) {
       } catch (err) {
         const rawMsg = err instanceof Error ? err.message : "Unknown error";
         const msg = rawMsg.slice(0, 200).toLowerCase();
-        if (msg.includes("rate_limit")) {
-          break;
-        }
-        if (
-          msg.includes("authentication") ||
-          msg.includes("api key") ||
-          msg.includes("apikey") ||
-          msg.includes("api_key") ||
-          msg.includes("no api key")
-        ) {
-          break;
-        }
-        if (
-          msg.includes("enotfound") ||
-          msg.includes("getaddrinfo") ||
-          msg.includes("self signed certificate") ||
-          msg.includes("fetch failed") ||
-          msg.includes("timeout")
-        ) {
+        if (msg.includes("rate_limit") || msg.includes("authentication") || msg.includes("timeout")) {
           break;
         }
         throw err;
       }
-
       assistantMessage = response.choices[0]?.message;
     }
 
-    const content =
-      assistantMessage?.content ||
-      "Sorry Boss, I hit a snag. The AI didn't return a response. Try again!";
-
-    return NextResponse.json(
-      {
-        message: content.slice(0, 8000),
-        model: "gpt-5-mini",
-        toolCalls: toolCallDepth,
-      },
-      {
-        headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-        },
-      }
-    );
+    const content = assistantMessage?.content || "Sorry Boss, I hit a snag. The AI didn't return a response. Try again!";
+    return NextResponse.json({ message: content.slice(0, 8000), model: "gpt-5-mini", toolCalls: toolCallDepth }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("Chat API error:", message.slice(0, 200));
-
+    console.error("Chat API error:", error);
     return NextResponse.json(
-      { error: "Something went wrong. Give it another shot, Boss!" },
-      {
-        status: 500,
-        headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-        },
-      }
+      { error: getErrorResponse(error, isAdmin) },
+      { status: 500, headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } }
     );
   }
 }
