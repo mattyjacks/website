@@ -652,13 +652,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate and sanitize each message
+    // Validate and sanitize each message (including images)
     const validRoles = new Set(["user", "assistant", "tool", "system"]);
-    const sanitizedMessages: Array<{role: string; content: string}> = [];
+    const sanitizedMessages: Array<{role: string; content: string | Array<{type: string; text?: string; image_url?: {url: string}}>}> = [];
     for (let i = 0; i < rawMessages.length; i++) {
       const msg = rawMessages[i] as Record<string, unknown>;
       const role = typeof msg?.role === 'string' ? msg.role : '';
       const content = typeof msg?.content === 'string' ? msg.content : '';
+      const images = Array.isArray(msg?.images) ? msg.images : [];
 
       if (!validRoles.has(role)) {
         addLog(`[CHAT] Message ${i} invalid role: "${role}"`);
@@ -668,8 +669,35 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Truncate overly long messages for safety
-      sanitizedMessages.push({ role, content: content.slice(0, 6000) });
+      // For user messages with images, use vision API format
+      if (role === 'user' && images.length > 0) {
+        const contentArray: Array<{type: string; text?: string; image_url?: {url: string}}> = [];
+        
+        // Add text content if present
+        if (content) {
+          contentArray.push({ type: 'text', text: content.slice(0, 6000) });
+        }
+        
+        // Add images (max 20 images per message for safety)
+        for (let j = 0; j < Math.min(images.length, 20); j++) {
+          const img = images[j] as Record<string, unknown>;
+          const base64 = typeof img?.base64 === 'string' ? img.base64 : '';
+          const mimeType = typeof img?.mimeType === 'string' ? img.mimeType : 'image/jpeg';
+          
+          if (base64 && base64.startsWith('data:')) {
+            contentArray.push({
+              type: 'image_url',
+              image_url: { url: base64 }
+            });
+            addLog(`[CHAT] Message ${i} includes image ${j + 1}/${images.length}`);
+          }
+        }
+        
+        sanitizedMessages.push({ role, content: contentArray });
+      } else {
+        // Regular text message
+        sanitizedMessages.push({ role, content: content.slice(0, 6000) });
+      }
     }
     const allowedModels = new Set(["gpt-5.4-mini-2026-03-17", "gpt-5-mini-2025-08-07", "gpt-4o-mini"]);
     const requestedModel = typeof requestedModelRaw === 'string' && allowedModels.has(requestedModelRaw) ? requestedModelRaw : null;
@@ -679,9 +707,15 @@ export async function POST(request: NextRequest) {
     let systemMessage = SYSTEM_PROMPT.replace("{RAG_CONTEXT}", ragContext).replace(/Boss/g, String(nickname));
 
     // Add quick-context RAG for OpenServ queries
-    const firstUserMsg = sanitizedMessages.find(m => m.role === 'user')?.content || '';
-    if (isOpenservQuery(firstUserMsg)) {
-      const openservContext = selectRelevantContext(firstUserMsg);
+    const firstUserMsgContent = sanitizedMessages.find(m => m.role === 'user')?.content;
+    let firstUserMsgText = '';
+    if (typeof firstUserMsgContent === 'string') {
+      firstUserMsgText = firstUserMsgContent;
+    } else if (Array.isArray(firstUserMsgContent)) {
+      firstUserMsgText = firstUserMsgContent.find(c => c.type === 'text')?.text || '';
+    }
+    if (isOpenservQuery(firstUserMsgText)) {
+      const openservContext = selectRelevantContext(firstUserMsgText);
       if (openservContext) {
         systemMessage += `\n\nOPENSERV DOCUMENTATION CONTEXT:\n${openservContext}`;
       }
@@ -805,7 +839,13 @@ export async function POST(request: NextRequest) {
     // Track API costs
     const inputTokens = response.usage?.prompt_tokens || 0;
     const outputTokens = response.usage?.completion_tokens || 0;
-    const userPromptText = sanitizedMessages.find(m => m.role === 'user')?.content || '';
+    const userPromptContent = sanitizedMessages.find(m => m.role === 'user')?.content;
+    let userPromptText = '';
+    if (typeof userPromptContent === 'string') {
+      userPromptText = userPromptContent;
+    } else if (Array.isArray(userPromptContent)) {
+      userPromptText = userPromptContent.find(c => c.type === 'text')?.text || '';
+    }
     const isOpenserv = userPromptText.toLowerCase().includes('openserv');
     trackApiCall(response.model, inputTokens, outputTokens, isOpenserv);
     

@@ -9,6 +9,7 @@ import { SHORT_PROMPTS } from "./short-prompts";
 import { ThreeBorderBack, ThreeBorderFront, triggerWobble, setMorphTarget } from "./three-border";
 import { renameConversation, createRenameData, updateRenameDataOnOpen, markAsManuallyRenamed, shouldAttemptRename, type ConversationRenameData } from "@/lib/conversation-renamer";
 import { processImageFiles, handlePasteEvent, handleDropEvent, type UploadedImage } from "@/lib/image-upload-handler";
+import { getRandomPlaceholder } from "@/lib/chat-placeholders";
 import { ImageGallery } from "./image-preview";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
@@ -256,6 +257,8 @@ export default function AnythingButton() {
 
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [isDragActive, setIsDragActive] = useState(false);
+  const [currentPlaceholder, setCurrentPlaceholder] = useState("");
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
@@ -670,6 +673,27 @@ Deep inquiry deserves nourishment: ${food}`
     setUploadedImages((prev) => prev.filter((img) => img.id !== id));
   };
 
+  const handleClearInput = () => {
+    if (input.length > 100) {
+      setShowClearConfirm(true);
+    } else {
+      setInput("");
+      setCharCount(0);
+      if (inputRef.current) inputRef.current.style.height = 'auto';
+    }
+  };
+
+  const confirmClear = () => {
+    setInput("");
+    setCharCount(0);
+    if (inputRef.current) inputRef.current.style.height = 'auto';
+    setShowClearConfirm(false);
+  };
+
+  const cancelClear = () => {
+    setShowClearConfirm(false);
+  };
+
   const generateRandomId = (): string => {
     return Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
   };
@@ -929,6 +953,14 @@ Create a summary that another AI can use to understand the context and continue 
       createNewSession();
     }
   }, []);
+
+  useEffect(() => {
+    setCurrentPlaceholder(getRandomPlaceholder(nickname));
+    const interval = setInterval(() => {
+      setCurrentPlaceholder(getRandomPlaceholder(nickname));
+    }, 4200);
+    return () => clearInterval(interval);
+  }, [nickname]);
 
   useEffect(() => {
     if (sessions.length > 0) {
@@ -1459,7 +1491,7 @@ Create a summary that another AI can use to understand the context and continue 
                   onChange={handleInput}
                   onKeyDown={handleKeyDown}
                   onPaste={handlePaste}
-                  placeholder="Ask me anything... (paste images, drag-drop, or use upload button)"
+                  placeholder={currentPlaceholder || "Ask me anything..."}
                   rows={1}
                   disabled={isLoading}
                   className="w-full resize-none py-3.5 bg-transparent text-[15px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder-text-zinc-600 focus:outline-none custom-scrollbar"
@@ -1473,6 +1505,14 @@ Create a summary that another AI can use to understand the context and continue 
                     title="Upload images (supports drag-drop and paste)"
                   >
                     <Upload className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleClearInput}
+                    disabled={isLoading || input.length === 0}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-900/50 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Clear input"
+                  >
+                    <X className="w-5 h-5" />
                   </button>
                   {isLoading ? (
                     <button
@@ -1511,6 +1551,36 @@ Create a summary that another AI can use to understand the context and continue 
                     <Upload className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
                     <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Drop images here</p>
                   </div>
+                </div>
+              )}
+
+              {showClearConfirm && (
+                <div className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center backdrop-blur-sm z-50">
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    className="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 max-w-sm mx-4"
+                  >
+                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">Clear FR FR, no cap?</h3>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
+                      You're about to clear {input.length} characters of text. This action cannot be undone.
+                    </p>
+                    <div className="flex gap-3 justify-end">
+                      <button
+                        onClick={cancelClear}
+                        className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+                      >
+                        No
+                      </button>
+                      <button
+                        onClick={confirmClear}
+                        className="px-4 py-2 rounded-lg bg-orange-600 text-white font-semibold hover:bg-orange-700 transition-colors"
+                      >
+                        Yes
+                      </button>
+                    </div>
+                  </motion.div>
                 </div>
               )}
 
