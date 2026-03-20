@@ -596,7 +596,9 @@ export async function POST(request: NextRequest) {
     let response: OpenAI.Chat.Completions.ChatCompletion;
     const openai = getOpenAI();
 
-    const createCompletion = async () => {
+    const fallbackMessage = "I'm having trouble reaching the AI right now, Boss. Please try again in a moment.";
+
+    const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
@@ -634,11 +636,15 @@ export async function POST(request: NextRequest) {
       if (msg.includes("timeout") || msg.includes("fetch failed")) {
         return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
       }
-      return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
+      // Final fallback: return friendly text instead of HTTP error to keep UX responsive
+      return typeof lastError === "string" ? lastError : fallbackMessage;
     };
 
     const completionResult = await createCompletion();
     if (completionResult instanceof NextResponse) return completionResult;
+    if (typeof completionResult === "string") {
+      return NextResponse.json({ message: completionResult, model: "gpt-5.4-mini", toolCalls: 0 }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+    }
     response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
 
     let assistantMessage = response.choices[0]?.message;
@@ -666,6 +672,9 @@ export async function POST(request: NextRequest) {
       try {
         const completionResult = await createCompletion();
         if (completionResult instanceof NextResponse) return completionResult;
+        if (typeof completionResult === "string") {
+          return NextResponse.json({ message: completionResult, model: "gpt-5.4-mini", toolCalls: toolCallDepth }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+        }
         response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
       } catch (err) {
         const rawMsg = err instanceof Error ? err.message : "Unknown error";
