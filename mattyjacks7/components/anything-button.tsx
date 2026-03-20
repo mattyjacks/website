@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw } from "lucide-react";
 import { motion, useDragControls, AnimatePresence } from "framer-motion";
 import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
-import { ThreeBorderBack, ThreeBorderFront } from "./three-border";
+import { ThreeBorderBack, ThreeBorderFront, triggerWobble } from "./three-border";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -208,7 +208,10 @@ export default function AnythingButton() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const dragControls = useDragControls();
+  useEffect(() => {
+    triggerWobble();
+  }, [isOpen]);
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -425,12 +428,16 @@ export default function AnythingButton() {
             className="fixed inset-0 z-50 pointer-events-none"
           >
             <Rnd
-              default={{
-                x: typeof window !== 'undefined' ? document.documentElement.clientWidth - Math.min(document.documentElement.clientWidth * 0.94, 420) - (document.documentElement.clientWidth < 640 ? 12 : 24) : 0,
-                y: typeof window !== 'undefined' ? window.innerHeight - Math.min(window.innerHeight * 0.75, 650) - 96 : 0,
-                width: typeof window !== 'undefined' ? Math.min(document.documentElement.clientWidth * 0.94, 420) : 420,
-                height: typeof window !== 'undefined' ? Math.min(window.innerHeight * 0.75, 650) : 650,
-              }}
+              default={(() => {
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const isMobile = vw < 640;
+                const w = isMobile ? vw - 12 : Math.min(420, vw - 48);
+                const h = Math.min(vh * 0.82, 650);
+                const x = Math.max(0, vw - w - (isMobile ? 6 : 24));
+                const y = Math.max(0, vh - h - 24);
+                return { x, y, width: w, height: h };
+              })()}
               minWidth={320}
               minHeight={400}
               bounds="window"
@@ -485,8 +492,8 @@ export default function AnythingButton() {
               <div className="hidden sm:flex items-center text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-50 border border-emerald-400/30">
                 Online
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition-colors ml-1">
-                <X className="w-4 h-4" />
+              <button onClick={() => setIsOpen(false)} className="text-white font-bold text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-md transition-colors ml-1 whitespace-nowrap">
+                Close Chat
               </button>
             </div>
 
