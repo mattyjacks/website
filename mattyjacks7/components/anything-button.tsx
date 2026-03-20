@@ -822,26 +822,32 @@ Create a summary that another AI can use to understand the context and continue 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const base = Math.min(vw, vh);
-      // Smaller footprint: favor lower-right corner
       return vw < 640 ? Math.max(110, Math.min(base * 0.30, 200)) : Math.max(120, Math.min(base * 0.25, 220));
     };
+
+    const calcChatBounds = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const isMobile = vw < 640;
+      const horizontalMargin = isMobile ? 10 : 16;
+      const verticalMargin = isMobile ? 10 : 12;
+      const w = isMobile ? vw - horizontalMargin * 2 : Math.min(520, vw - horizontalMargin * 2);
+      const h = isMobile ? vh - verticalMargin * 2 : Math.min(Math.floor(vh * 0.92), vh - verticalMargin * 2);
+      const x = isMobile ? horizontalMargin : Math.max(horizontalMargin, vw - w - horizontalMargin);
+      const y = isMobile ? verticalMargin : Math.max(verticalMargin, vh - h - verticalMargin);
+      setChatBounds({ x, y, width: w, height: h });
+    };
+
+    const handleResize = () => {
+      setThreeSize(calcThreeSize());
+      calcChatBounds();
+    };
+
+    // Initial compute
     setThreeSize(calcThreeSize());
-    const handleResize = () => setThreeSize(calcThreeSize());
+    calcChatBounds();
+
     window.addEventListener('resize', handleResize);
-
-    // Calculate chat window bounds once on the client
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const isMobile = vw < 640;
-    // Give more breathing room on desktop (wider and taller) while keeping margins
-    const horizontalMargin = isMobile ? 10 : 16;
-    const verticalMargin = isMobile ? 10 : 12;
-    const w = isMobile ? vw - horizontalMargin * 2 : Math.min(520, vw - horizontalMargin * 2);
-    const h = isMobile ? vh - verticalMargin * 2 : Math.min(Math.floor(vh * 0.92), vh - verticalMargin * 2);
-    const x = isMobile ? horizontalMargin : Math.max(horizontalMargin, vw - w - horizontalMargin);
-    const y = isMobile ? verticalMargin : Math.max(verticalMargin, vh - h - verticalMargin);
-    setChatBounds({ x, y, width: w, height: h });
-
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -851,14 +857,10 @@ Create a summary that another AI can use to understand the context and continue 
       setMorphTarget(1);
       // Delay showing the chat window so the morph animation plays
       const timer = setTimeout(() => setChatReady(true), 600);
-      // Lock background scroll while chat is open
-      const prevOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-    } else {
-      setMorphTarget(0);
-      setChatReady(false);
-      document.body.style.overflow = '';
+      return () => clearTimeout(timer);
     }
+    setMorphTarget(0);
+    setChatReady(false);
   }, [isOpen]);
 
   // Fetch cloud (GiveGigs) chat metadata; resilient to failure
