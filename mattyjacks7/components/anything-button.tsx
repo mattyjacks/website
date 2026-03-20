@@ -26,6 +26,13 @@ interface ChatSession {
   updatedAt: number;
 }
 
+interface CloudSessionMeta {
+  id: string;
+  title: string;
+  updatedAt: number;
+  messageCount?: number;
+}
+
 const GREETING_VARIANTS = [
   "Let's make some money together for the common good of humanity. I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. What are your orders, boss? \n\n👱🏻‍♀️ **Valley Net** 💘",
   "Ready to make moves, Boss! I'm **Valley Net**, your high-performance AI operator. Give me a strategy to break down or code to write. \n\n👱🏻‍♀️ **Valley Net** 💘",
@@ -218,6 +225,10 @@ export default function AnythingButton() {
   const [sumUpFiles, setSumUpFiles] = useState<Array<{id: string; name: string; date: number; preview: string}>>([]);
   const [showSumUpConfirm, setShowSumUpConfirm] = useState(false);
 
+  const [cloudSessions, setCloudSessions] = useState<CloudSessionMeta[]>([]);
+  const [cloudLoading, setCloudLoading] = useState(false);
+  const [cloudError, setCloudError] = useState<string | null>(null);
+
   const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
 
   const getRandomFoodEmojis = (count: number = 7): string => {
@@ -346,6 +357,42 @@ Create a summary that another AI can use to understand the context and continue 
       document.body.style.overflow = '';
     }
   }, [isOpen]);
+
+  // Fetch cloud (GiveGigs) chat metadata; resilient to failure
+  useEffect(() => {
+    let cancelled = false;
+    const fetchCloud = async () => {
+      setCloudLoading(true);
+      setCloudError(null);
+      try {
+        const res = await fetch('/api/cloud-sessions');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (cancelled) return;
+        if (Array.isArray(data)) {
+          const mapped: CloudSessionMeta[] = data.map((item: any) => ({
+            id: String(item.id ?? item.sessionId ?? generateId()),
+            title: String(item.title ?? item.name ?? 'Cloud Conversation'),
+            updatedAt: typeof item.updatedAt === 'number' ? item.updatedAt : Date.now(),
+            messageCount: typeof item.messageCount === 'number' ? item.messageCount : undefined,
+          }));
+          setCloudSessions(mapped);
+        } else {
+          setCloudSessions([]);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        setCloudSessions([]);
+        setCloudError('Cloud history unavailable');
+      } finally {
+        if (!cancelled) setCloudLoading(false);
+      }
+    };
+    fetchCloud();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -661,7 +708,7 @@ Create a summary that another AI can use to understand the context and continue 
             </div>
 
             {/* Sidebar */}
-            <div className={`absolute top-[60px] bottom-0 left-0 w-[320px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
+            <div className={`absolute top-[60px] bottom-0 left-0 w-[55vw] min-w-[320px] max-w-[560px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
               <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/50 dark:bg-black/20">
                 <div className="flex items-center gap-2">
                   <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat Menu</h4>
@@ -684,51 +731,104 @@ Create a summary that another AI can use to understand the context and continue 
                     </div>
                   </div>
                 ) : (
-                  <div className="p-3 rounded-2xl bg-white/80 dark:bg-black/30 border border-emerald-200 dark:border-emerald-800 shadow-sm space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h5 className="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Settings</h5>
-                      <span className="text-[10px] font-bold text-emerald-500">Valley Net</span>
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Local Conversations</h5>
+                        <button onClick={createNewSession} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black text-[11px] font-bold shadow-sm hover:scale-[1.02] transition-transform"><Plus className="w-3.5 h-3.5" /> New</button>
+                      </div>
+                      <div className="space-y-1 max-h-[240px] overflow-y-auto custom-scrollbar pr-1">
+                        {sessions.length === 0 && (
+                          <div className="text-xs text-zinc-500 py-2">No local conversations yet.</div>
+                        )}
+                        {sessions.map((session) => (
+                          <div key={session.id} onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); }} className={`group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-all ${currentSessionId === session.id ? "bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold" : "hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-transparent font-medium"}`}>
+                            <div className="flex items-center gap-2 truncate">
+                              <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentSessionId === session.id ? 'text-emerald-500' : 'opacity-60'}`} />
+                              <span className="truncate">{session.title}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] text-zinc-400">{session.messages.length}</span>
+                              <button onClick={(e) => deleteSession(e, session.id)} className="opacity-0 group-hover:opacity-100 hover:text-sky-600 transition-opacity p-1 bg-zinc-200/50 dark:bg-zinc-800 rounded-md" title="Delete Session">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
-                      <div className="flex flex-col">
-                        <span>Nickname</span>
-                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Your name in chat</span>
+
+                    <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-purple-200 dark:border-purple-800 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="text-xs font-bold uppercase tracking-widest text-purple-700 dark:text-purple-300">Cloud Conversations</h5>
+                        {cloudLoading && <span className="text-[11px] text-purple-500 font-semibold">Loading…</span>}
+                        {cloudError && !cloudLoading && <span className="text-[11px] text-rose-500 font-semibold">{cloudError}</span>}
                       </div>
-                      <input
-                        value={nickname}
-                        onChange={(e) => setNickname(e.target.value)}
-                        className="text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-2 py-1"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
-                      <div className="flex flex-col">
-                        <span>Model</span>
-                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Choose AI engine</span>
+                      <div className="space-y-1 max-h-[200px] overflow-y-auto custom-scrollbar pr-1">
+                        {cloudSessions.length === 0 && !cloudLoading && !cloudError && (
+                          <div className="text-xs text-zinc-500 py-2">No cloud conversations found.</div>
+                        )}
+                        {cloudSessions.map((session) => (
+                          <div key={session.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm bg-purple-50/70 dark:bg-purple-900/20 border border-purple-200/70 dark:border-purple-800/70 text-purple-800 dark:text-purple-200">
+                            <div className="flex items-center gap-2 truncate">
+                              <MessageSquare className="w-4 h-4 flex-shrink-0 text-purple-500" />
+                              <span className="truncate">{session.title}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-purple-600 dark:text-purple-300">
+                              {session.messageCount !== undefined && <span>{session.messageCount}</span>}
+                              <span>{new Date(session.updatedAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <select
-                        value={selectedModel}
-                        onChange={(e) => setSelectedModel(e.target.value)}
-                        className="text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-2 py-1"
-                      >
-                        <option value="gpt-5.4-mini-2026-03-17">GPT-5.4 Mini (primary)</option>
-                        <option value="gpt-5-mini-2025-08-07">GPT-5 Mini</option>
-                        <option value="gpt-4o-mini">GPT-4o Mini</option>
-                      </select>
-                    </label>
-                    <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
-                      <div className="flex flex-col">
-                        <span>Auto-scroll on replies</span>
-                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Keeps the newest message in view</span>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/80 dark:bg-black/30 border border-emerald-200 dark:border-emerald-800 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Settings</h5>
+                        <span className="text-[10px] font-bold text-emerald-500">Valley Net</span>
                       </div>
-                      <input type="checkbox" checked={autoScrollEnabled} onChange={(e) => setAutoScrollEnabled(e.target.checked)} className="h-4 w-4" />
-                    </label>
-                    <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
-                      <div className="flex flex-col">
-                        <span>Console debug logs</span>
-                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Show backend debug trail in DevTools</span>
-                      </div>
-                      <input type="checkbox" checked={consoleDebugEnabled} onChange={(e) => setConsoleDebugEnabled(e.target.checked)} className="h-4 w-4" />
-                    </label>
+                      <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
+                        <div className="flex flex-col">
+                          <span>Nickname</span>
+                          <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Your name in chat</span>
+                        </div>
+                        <input
+                          value={nickname}
+                          onChange={(e) => setNickname(e.target.value)}
+                          className="text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-2 py-1"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
+                        <div className="flex flex-col">
+                          <span>Model</span>
+                          <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Choose AI engine</span>
+                        </div>
+                        <select
+                          value={selectedModel}
+                          onChange={(e) => setSelectedModel(e.target.value)}
+                          className="text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-2 py-1"
+                        >
+                          <option value="gpt-5.4-mini-2026-03-17">GPT-5.4 Mini (primary)</option>
+                          <option value="gpt-5-mini-2025-08-07">GPT-5 Mini</option>
+                          <option value="gpt-4o-mini">GPT-4o Mini</option>
+                        </select>
+                      </label>
+                      <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
+                        <div className="flex flex-col">
+                          <span>Auto-scroll on replies</span>
+                          <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Keeps the newest message in view</span>
+                        </div>
+                        <input type="checkbox" checked={autoScrollEnabled} onChange={(e) => setAutoScrollEnabled(e.target.checked)} className="h-4 w-4" />
+                      </label>
+                      <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
+                        <div className="flex flex-col">
+                          <span>Console debug logs</span>
+                          <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Show backend debug trail in DevTools</span>
+                        </div>
+                        <input type="checkbox" checked={consoleDebugEnabled} onChange={(e) => setConsoleDebugEnabled(e.target.checked)} className="h-4 w-4" />
+                      </label>
+                    </div>
                   </div>
                 )}
               </div>
