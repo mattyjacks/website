@@ -481,7 +481,15 @@ function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
   return mapUserError(errOrMsg);
 }
 
+const debugLogs: string[] = [];
+
+function addLog(msg: string) {
+  debugLogs.push(`[${new Date().toISOString()}] ${msg}`);
+  console.log(msg);
+}
+
 export async function POST(request: NextRequest) {
+  debugLogs.length = 0;
   const clientIp = getClientIp(request);
   let isAdmin = process.env.NODE_ENV === 'development';
   const DEBUG = isAdmin;
@@ -616,7 +624,7 @@ export async function POST(request: NextRequest) {
 
       // Try primary model once
       try {
-        console.log(`[CHAT] Trying primary model: ${primaryModel}`);
+        addLog(`[CHAT] Trying primary model: ${primaryModel}`);
         const result = await openai.chat.completions.create({
           model: primaryModel,
           messages: chatMessages,
@@ -625,16 +633,16 @@ export async function POST(request: NextRequest) {
           max_tokens: 2000,
           temperature: 0.8,
         });
-        console.log(`[CHAT] Primary model succeeded`);
+        addLog(`[CHAT] Primary model succeeded`);
         return result;
       } catch (err) {
         lastError = err;
-        console.error(`[CHAT] Primary model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
+        addLog(`[CHAT] Primary model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
       }
 
       // Try fallback model once
       try {
-        console.log(`[CHAT] Trying fallback model: ${fallbackModel}`);
+        addLog(`[CHAT] Trying fallback model: ${fallbackModel}`);
         const result = await openai.chat.completions.create({
           model: fallbackModel,
           messages: chatMessages,
@@ -643,16 +651,16 @@ export async function POST(request: NextRequest) {
           max_tokens: 2000,
           temperature: 0.8,
         });
-        console.log(`[CHAT] Fallback model succeeded`);
+        addLog(`[CHAT] Fallback model succeeded`);
         return result;
       } catch (err) {
         lastError = err;
-        console.error(`[CHAT] Fallback model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
+        addLog(`[CHAT] Fallback model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
       }
 
       // Try tertiary model once
       try {
-        console.log(`[CHAT] Trying tertiary model: ${tertiaryModel}`);
+        addLog(`[CHAT] Trying tertiary model: ${tertiaryModel}`);
         const result = await openai.chat.completions.create({
           model: tertiaryModel,
           messages: chatMessages,
@@ -661,36 +669,40 @@ export async function POST(request: NextRequest) {
           max_tokens: 2000,
           temperature: 0.8,
         });
-        console.log(`[CHAT] Tertiary model succeeded`);
+        addLog(`[CHAT] Tertiary model succeeded`);
         return result;
       } catch (err) {
         lastError = err;
-        console.error(`[CHAT] Tertiary model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
+        addLog(`[CHAT] Tertiary model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
       }
 
       // All models failed
-      console.error(`[CHAT] All models exhausted. Final error: ${lastError instanceof Error ? lastError.message.slice(0, 150) : String(lastError)}`);
-      console.log(`[CHAT] Returning fallback message: ${fallbackMessage}`);
+      addLog(`[CHAT] All models exhausted. Final error: ${lastError instanceof Error ? lastError.message.slice(0, 150) : String(lastError)}`);
+      addLog(`[CHAT] Returning fallback message: ${fallbackMessage}`);
       return fallbackMessage;
     };
 
     const completionResult = await createCompletion();
     if (completionResult instanceof NextResponse) return completionResult;
     if (typeof completionResult === "string") {
-      return NextResponse.json({ message: completionResult, model: "gpt-5.4-mini", toolCalls: 0 }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+      return NextResponse.json({ message: completionResult, model: "gpt-5.4-mini", toolCalls: 0, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
     }
     response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
 
     let assistantMessage = response.choices[0]?.message;
     if (!assistantMessage) {
-      return NextResponse.json({ error: getErrorResponse("No response from AI model", isAdmin) }, { status: 500 });
+      addLog(`[CHAT] No assistant message in response`);
+      return NextResponse.json({ error: getErrorResponse("No response from AI model", isAdmin), debugLogs }, { status: 500 });
     }
+
+    addLog(`[CHAT] Got assistant message, tool_calls: ${assistantMessage.tool_calls?.length || 0}`);
 
     let toolCallDepth = 0;
     const maxToolCalls = 5;
 
     while (assistantMessage?.tool_calls && assistantMessage.tool_calls.length > 0 && toolCallDepth < maxToolCalls) {
       toolCallDepth++;
+      addLog(`[CHAT] Tool call depth: ${toolCallDepth}`);
       chatMessages.push(assistantMessage);
 
       for (const toolCall of assistantMessage.tool_calls) {
@@ -707,12 +719,14 @@ export async function POST(request: NextRequest) {
         const completionResult = await createCompletion();
         if (completionResult instanceof NextResponse) return completionResult;
         if (typeof completionResult === "string") {
-          return NextResponse.json({ message: completionResult, model: "gpt-5.4-mini", toolCalls: toolCallDepth }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+          addLog(`[CHAT] Tool loop returned fallback message`);
+          return NextResponse.json({ message: completionResult, model: "gpt-5.4-mini", toolCalls: toolCallDepth, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
         }
         response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
       } catch (err) {
         const rawMsg = err instanceof Error ? err.message : "Unknown error";
         const msg = rawMsg.slice(0, 200).toLowerCase();
+        addLog(`[CHAT] Tool loop error: ${rawMsg.slice(0, 100)}`);
         if (msg.includes("rate_limit") || msg.includes("authentication") || msg.includes("timeout")) {
           break;
         }
@@ -722,11 +736,12 @@ export async function POST(request: NextRequest) {
     }
 
     const content = assistantMessage?.content || "Sorry Boss, I hit a snag. The AI didn't return a response. Try again!";
-    return NextResponse.json({ message: content.slice(0, 8000), model: "gpt-5.4-mini", toolCalls: toolCallDepth }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+    addLog(`[CHAT] Returning success response with ${content.length} chars`);
+    return NextResponse.json({ message: content.slice(0, 8000), model: "gpt-5.4-mini", toolCalls: toolCallDepth, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
   } catch (error: unknown) {
-    console.error("Chat API error:", error);
+    addLog(`[CHAT] Caught top-level error: ${error instanceof Error ? error.message.slice(0, 150) : String(error)}`);
     return NextResponse.json(
-      { error: getErrorResponse(error, isAdmin) },
+      { error: getErrorResponse(error, isAdmin), debugLogs },
       { status: 500, headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } }
     );
   }
