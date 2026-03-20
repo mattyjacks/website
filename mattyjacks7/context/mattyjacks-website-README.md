@@ -27,6 +27,10 @@
 - [About the Project](#-about-the-project)
 - [Live Website](#-live-website)
 - [Tech Stack](#-tech-stack)
+- [Latest Features](#-latest-features)
+  - [AI Chat System](#ai-chat-system)
+  - [Category-Based Cost Tracking](#category-based-cost-tracking)
+  - [OpenServ RAG Integration](#openserv-rag-integration)
 - [Project Structure](#-project-structure)
 - [Pages & Routes](#-pages--routes)
   - [Home Page](#-home-page--)
@@ -62,6 +66,59 @@
 - [Deployment](#-deployment)
 - [Dependencies](#-dependencies)
 - [Contact](#-contact)
+
+---
+
+## ✨ Latest Features
+
+### AI Chat System
+
+An advanced conversational AI system integrated directly into the website with:
+
+- **Real-time chat interface** with message history and streaming responses
+- **Magic Prompt templates** - 20+ pre-built prompt templates for quick interactions
+- **Food emoji rewards** - Reinforce AI behavior with random food emojis (🍕🍯🍓🍇🍪🍉🍅🍑🥝)
+- **Short prompt suggestions** - Random prompt suggestions on new conversations
+- **Regen button** - Quickly generate new prompt suggestions
+- **Chat disclaimer** - `-+OUTPUT_NOT_100%_TRUE+-` displayed at bottom of responses
+- **Responsive design** - Works seamlessly on mobile and desktop
+
+**Files:**
+- `components/anything-button.tsx` - Main chat UI component
+- `components/short-prompts.ts` - Pre-built prompt library
+- `app/api/chat/route.ts` - Chat API endpoint with cost tracking
+
+### Category-Based Cost Tracking
+
+Intelligent cost tracking system that categorizes API usage:
+
+- **11 Categories**: MattyJacks, GiveGigs, CryptArtist, Other, Unknown, OpenServ, Personal, Coding, Weird, Marketing, Mischief
+- **AI Categorization**: gpt-5.4-nano automatically assigns 1-3 categories per prompt with reasoning
+- **Cost Splitting**: Costs split equally across assigned categories (50% for 2, 33% for 3)
+- **Live Dashboard**: Real-time cost breakdown in Clout Calculator with percentages and request counts
+- **Responsive Grid**: Category cards with cost, percentage, and request metrics
+
+**Files:**
+- `lib/category-cost-tracker.ts` - Core category tracking system
+- `lib/prompt-categorizer.ts` - AI categorization using gpt-5.4-nano
+- `app/api/category-costs/route.ts` - Category cost API endpoint
+- `components/clout-calculations.tsx` - Enhanced Clout Calculator display
+
+### OpenServ RAG Integration
+
+Comprehensive OpenServ documentation with intelligent retrieval:
+
+- **8 Documentation Files**: README, SDK, Agent Tutorial, API Concepts, Examples, Architecture, Deployment, Troubleshooting
+- **Selective RAG Scanning**: Intelligent document scanning with relevance scoring
+- **Quick-Context Mini-AI**: gpt-5.4-nano powered context retrieval for OpenServ queries
+- **OpenServ Counter**: 10% chance message showing prompt count and total spend
+- **API Cost Tracking**: Tracks OpenServ-specific costs separately
+
+**Files:**
+- `context/openserv/` - 8 comprehensive markdown documentation files
+- `lib/openserv-rag.ts` - Selective RAG document scanning
+- `lib/openserv-counter.ts` - OpenServ prompt counter and messaging
+- `app/api/quick-context/route.ts` - Quick-context RAG mini-AI endpoint
 
 ---
 

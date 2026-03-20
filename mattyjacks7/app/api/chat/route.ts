@@ -3,6 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
+import { trackApiCall, getOpenservStats } from "@/lib/api-cost-tracker";
+import { incrementOpenservCounter, getOpenservMessage } from "@/lib/openserv-counter";
+import { selectRelevantContext, isOpenservQuery } from "@/lib/openserv-rag";
+import { categorizePrompt } from "@/lib/prompt-categorizer";
+import { trackCategorizedCost } from "@/lib/category-cost-tracker";
 
 function getOpenAI() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -671,7 +676,16 @@ export async function POST(request: NextRequest) {
     addLog(`[CHAT] All ${sanitizedMessages.length} messages validated OK${requestedModel ? `, requestedModel=${requestedModel}` : ''}`);
 
     const ragContext = loadRAGContext();
-    const systemMessage = SYSTEM_PROMPT.replace("{RAG_CONTEXT}", ragContext).replace(/Boss/g, String(nickname));
+    let systemMessage = SYSTEM_PROMPT.replace("{RAG_CONTEXT}", ragContext).replace(/Boss/g, String(nickname));
+
+    // Add quick-context RAG for OpenServ queries
+    const firstUserMsg = sanitizedMessages.find(m => m.role === 'user')?.content || '';
+    if (isOpenservQuery(firstUserMsg)) {
+      const openservContext = selectRelevantContext(firstUserMsg);
+      if (openservContext) {
+        systemMessage += `\n\nOPENSERV DOCUMENTATION CONTEXT:\n${openservContext}`;
+      }
+    }
 
     const chatMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: "system", content: systemMessage },
@@ -787,9 +801,35 @@ export async function POST(request: NextRequest) {
 
     const content = assistantMessage?.content || "Sorry Boss, I hit a snag. The AI didn't return a response. Try again!";
     const totalMs = Date.now() - startTime;
+    
+    // Track API costs
+    const inputTokens = response.usage?.prompt_tokens || 0;
+    const outputTokens = response.usage?.completion_tokens || 0;
+    const userPromptText = sanitizedMessages.find(m => m.role === 'user')?.content || '';
+    const isOpenserv = userPromptText.toLowerCase().includes('openserv');
+    trackApiCall(response.model, inputTokens, outputTokens, isOpenserv);
+    
+    // Categorize prompt and track categorized costs
+    const categorization = await categorizePrompt(userPromptText);
+    const inputCost = (inputTokens / 1000) * 0.075; // gpt-5.4-mini pricing
+    const outputCost = (outputTokens / 1000) * 0.3;
+    const totalCost = inputCost + outputCost;
+    trackCategorizedCost(categorization, inputTokens, outputTokens, totalCost);
+    
+    // Track OpenServ prompts and potentially add counter message
+    let finalMessage = content;
+    if (isOpenserv) {
+      const stats = getOpenservStats();
+      incrementOpenservCounter(stats.cost);
+      const counterMessage = getOpenservMessage();
+      if (counterMessage) {
+        finalMessage = content + counterMessage;
+      }
+    }
+    
     addLog(`[CHAT] SUCCESS in ${totalMs}ms, ${content.length} chars, model: ${response.model}, tools: ${toolCallDepth}`);
     return NextResponse.json(
-      { message: content.slice(0, 8000), model: response.model, toolCalls: toolCallDepth, responseTimeMs: totalMs, debugLogs, requestId },
+      { message: finalMessage.slice(0, 8000), model: response.model, toolCalls: toolCallDepth, responseTimeMs: totalMs, debugLogs, requestId },
       { headers: { ...SECURITY_HEADERS, "X-Response-Time": `${totalMs}ms` } }
     );
   } catch (error: unknown) {

@@ -1030,7 +1030,7 @@ Create a summary that another AI can use to understand the context and continue 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
-            style={{ position: 'fixed', left: chatBounds.x, top: chatBounds.y, width: chatBounds.width, height: chatBounds.height, zIndex: 60 }}
+            style={{ position: 'fixed', left: chatBounds.x, top: chatBounds.y, width: chatBounds.width, height: chatBounds.height, zIndex: 110 }}
             className="flex flex-col rounded-2xl border border-zinc-200/80 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
           >
             {/* Header */}
@@ -1323,6 +1323,11 @@ Create a summary that another AI can use to understand the context and continue 
                     Powered by God
                   </span>
                 </div>
+              </div>
+              <div className="px-4 py-2 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
+                <span className="text-[9px] font-mono text-zinc-500 dark:text-zinc-400 tracking-widest">
+                  -+OUTPUT_NOT_100%_TRUE+-
+                </span>
               </div>
             </div>
           </motion.div>

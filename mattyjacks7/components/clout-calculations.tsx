@@ -14,6 +14,23 @@ interface PageStats {
   [path: string]: ViewStats;
 }
 
+interface ApiCostStats {
+  totalRequests: number;
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalTokens: number;
+  totalCost: number;
+  openservPrompts: number;
+  openservCost: number;
+}
+
+interface CategoryCostBreakdown {
+  category: string;
+  cost: number;
+  percentage: number;
+  requests: number;
+}
+
 export default function CloutCalculations() {
   const [pageStats, setPageStats] = useState<PageStats>({});
   const [siteStats, setSiteStats] = useState<ViewStats>({
@@ -22,6 +39,16 @@ export default function CloutCalculations() {
     unknown: 0,
     total: 0,
   });
+  const [apiCostStats, setApiCostStats] = useState<ApiCostStats>({
+    totalRequests: 0,
+    totalInputTokens: 0,
+    totalOutputTokens: 0,
+    totalTokens: 0,
+    totalCost: 0,
+    openservPrompts: 0,
+    openservCost: 0,
+  });
+  const [categoryCosts, setCategoryCosts] = useState<CategoryCostBreakdown[]>([]);
   const [currentPath, setCurrentPath] = useState<string>("");
   const [userPageViews, setUserPageViews] = useState<number>(1);
   const [userSiteViews, setUserSiteViews] = useState<number>(1);
@@ -51,19 +78,24 @@ export default function CloutCalculations() {
         setUserSiteViews(1);
       }
 
-      fetch("/api/views")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.allStats) {
-            setPageStats(data.allStats);
+      Promise.all([
+        fetch("/api/views").then((res) => res.json()),
+        fetch("/api/category-costs").then((res) => res.json())
+      ])
+        .then(([viewData, costData]) => {
+          if (viewData.allStats) {
+            setPageStats(viewData.allStats);
           }
-          if (data.siteStats) {
-            setSiteStats(data.siteStats);
+          if (viewData.siteStats) {
+            setSiteStats(viewData.siteStats);
+          }
+          if (costData.categoryBreakdown) {
+            setCategoryCosts(costData.categoryBreakdown);
           }
           setLoading(false);
         })
         .catch((err) => {
-          console.error("Failed to fetch view stats:", err);
+          console.error("Failed to fetch stats:", err);
           setLoading(false);
         });
     };
@@ -144,6 +176,53 @@ export default function CloutCalculations() {
               July 18th, 2025
               <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-100"></div>
             </div>
+          </div>
+        </div>
+
+        <div className="border-t border-zinc-200 dark:border-zinc-800 pt-3 mt-3">
+          <div className="text-xs font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300 mb-2">API Cost Tracking</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded px-2 py-1.5">
+              <div className="text-sky-600 dark:text-sky-400 font-bold">{apiCostStats.totalRequests}</div>
+              <div className="text-zinc-600 dark:text-zinc-400 text-[10px]">Requests</div>
+            </div>
+            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded px-2 py-1.5">
+              <div className="text-purple-600 dark:text-purple-400 font-bold">${apiCostStats.totalCost.toFixed(2)}</div>
+              <div className="text-zinc-600 dark:text-zinc-400 text-[10px]">Total Cost</div>
+            </div>
+            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded px-2 py-1.5">
+              <div className="text-orange-600 dark:text-orange-400 font-bold">{apiCostStats.openservPrompts}</div>
+              <div className="text-zinc-600 dark:text-zinc-400 text-[10px]">OpenServ</div>
+            </div>
+            <div className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded px-2 py-1.5">
+              <div className="text-rose-600 dark:text-rose-400 font-bold">${apiCostStats.openservCost.toFixed(2)}</div>
+              <div className="text-zinc-600 dark:text-zinc-400 text-[10px]">OpenServ Cost</div>
+            </div>
+          </div>
+          <div className="text-[10px] text-zinc-500 dark:text-zinc-500 mt-2">
+            Tokens: {apiCostStats.totalTokens.toLocaleString()} ({apiCostStats.totalInputTokens.toLocaleString()} in, {apiCostStats.totalOutputTokens.toLocaleString()} out)
+          </div>
+        </div>
+
+        <div className="border-t border-zinc-200 dark:border-zinc-800 pt-3 mt-3">
+          <div className="text-xs font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300 mb-3">Cost by Category</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+            {categoryCosts.length > 0 ? (
+              categoryCosts.map((cat) => (
+                <div key={cat.category} className="bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900/40 dark:to-zinc-900/20 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2.5 py-2 hover:shadow-md transition-shadow">
+                  <div className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 truncate">{cat.category}</div>
+                  <div className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">${cat.cost.toFixed(2)}</div>
+                  <div className="text-[9px] text-zinc-500 dark:text-zinc-400 mt-1">
+                    <div>{cat.percentage.toFixed(1)}% of total</div>
+                    <div>{cat.requests.toFixed(1)} req</div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center text-xs text-zinc-500 dark:text-zinc-400 py-4">
+                No category data yet
+              </div>
+            )}
           </div>
         </div>
       </div>
