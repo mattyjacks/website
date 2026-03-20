@@ -1073,16 +1073,18 @@ Create a summary that another AI can use to understand the context and continue 
             </div>
 
             {/* Sidebar */}
-            <div className={`absolute top-[60px] bottom-0 left-0 w-[55vw] min-w-[320px] max-w-[560px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
-              <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/50 dark:bg-black/20">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat Menu</h4>
-                  <button onClick={() => setShowSettings(!showSettings)} className="px-2 py-1 text-[11px] font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm" aria-label="Toggle chat settings">Settings</button>
-                  <button onClick={() => setShowSumUpMenu(!showSumUpMenu)} className="px-2 py-1 text-[11px] font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm" aria-label="Toggle sum up conversations">Sum Up</button>
+            <div className={`absolute top-[60px] bottom-0 left-0 w-[60vw] sm:w-[50vw] lg:w-[45vw] min-w-[340px] max-w-[700px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
+              <div className="p-5 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/50 dark:bg-black/20">
+                <div className="flex flex-col gap-2 flex-1">
+                  <h4 className="font-bold text-base text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat Menu</h4>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button onClick={() => setShowSettings(!showSettings)} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50" aria-label="Toggle chat settings">Settings</button>
+                    <button onClick={() => setShowSumUpMenu(!showSumUpMenu)} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50" aria-label="Toggle sum up conversations">Sum Up</button>
+                  </div>
                 </div>
-                <button onClick={() => setIsSidebarOpen(false)} className="p-1 text-zinc-500 hover:text-zinc-800 dark:hover:text-white"><X className="w-4 h-4" /></button>
+                <button onClick={() => setIsSidebarOpen(false)} className="p-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-white flex-shrink-0"><X className="w-5 h-5" /></button>
               </div>
-              <div className="flex-1 overflow-y-auto p-2 space-y-3 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
                 {showSumUpMenu ? (
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <h5 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Sum Up Conversations</h5>
@@ -1148,51 +1150,67 @@ Create a summary that another AI can use to understand the context and continue 
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-2xl bg-white/80 dark:bg-black/30 border border-emerald-200 dark:border-emerald-800 shadow-sm space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h5 className="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Settings</h5>
-                        <span className="text-[10px] font-bold text-emerald-500">Valley Net</span>
+                    <div className="p-4 rounded-2xl bg-white/80 dark:bg-black/30 border border-emerald-200 dark:border-emerald-800 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between pb-2 border-b border-emerald-200/50 dark:border-emerald-800/50">
+                        <h5 className="text-sm font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Settings</h5>
+                        <span className="text-xs font-bold text-emerald-500">Valley Net</span>
                       </div>
-                      <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
-                        <div className="flex flex-col">
-                          <span>Nickname</span>
-                          <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Your name in chat</span>
+                      
+                      <div className="space-y-3">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+                            Nickname
+                            <span className="block text-xs text-emerald-700/70 dark:text-emerald-300/70 font-normal mt-0.5">Your name in chat</span>
+                          </label>
+                          <input
+                            value={nickname}
+                            onChange={(e) => setNickname(e.target.value)}
+                            className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          />
                         </div>
-                        <input
-                          value={nickname}
-                          onChange={(e) => setNickname(e.target.value)}
-                          className="text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-2 py-1"
-                        />
-                      </label>
-                      <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
-                        <div className="flex flex-col">
-                          <span>Model</span>
-                          <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Choose AI engine</span>
+
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+                            Model
+                            <span className="block text-xs text-emerald-700/70 dark:text-emerald-300/70 font-normal mt-0.5">Choose AI engine</span>
+                          </label>
+                          <select
+                            value={selectedModel}
+                            onChange={(e) => setSelectedModel(e.target.value)}
+                            className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          >
+                            <option value="gpt-5.4-mini-2026-03-17">GPT-5.4 Mini (primary)</option>
+                            <option value="gpt-5-mini-2025-08-07">GPT-5 Mini</option>
+                            <option value="gpt-4o-mini">GPT-4o Mini</option>
+                          </select>
                         </div>
-                        <select
-                          value={selectedModel}
-                          onChange={(e) => setSelectedModel(e.target.value)}
-                          className="text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-2 py-1"
-                        >
-                          <option value="gpt-5.4-mini-2026-03-17">GPT-5.4 Mini (primary)</option>
-                          <option value="gpt-5-mini-2025-08-07">GPT-5 Mini</option>
-                          <option value="gpt-4o-mini">GPT-4o Mini</option>
-                        </select>
-                      </label>
-                      <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
-                        <div className="flex flex-col">
-                          <span>Auto-scroll on replies</span>
-                          <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Keeps the newest message in view</span>
+
+                        <div className="flex items-start gap-3 p-3 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-lg">
+                          <input 
+                            type="checkbox" 
+                            checked={autoScrollEnabled} 
+                            onChange={(e) => setAutoScrollEnabled(e.target.checked)} 
+                            className="h-5 w-5 mt-0.5 flex-shrink-0 cursor-pointer"
+                          />
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Auto-scroll on replies</span>
+                            <span className="text-xs text-emerald-700/70 dark:text-emerald-300/70">Keeps the newest message in view</span>
+                          </div>
                         </div>
-                        <input type="checkbox" checked={autoScrollEnabled} onChange={(e) => setAutoScrollEnabled(e.target.checked)} className="h-4 w-4" />
-                      </label>
-                      <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
-                        <div className="flex flex-col">
-                          <span>Console debug logs</span>
-                          <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Show backend debug trail in DevTools</span>
+
+                        <div className="flex items-start gap-3 p-3 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-lg">
+                          <input 
+                            type="checkbox" 
+                            checked={consoleDebugEnabled} 
+                            onChange={(e) => setConsoleDebugEnabled(e.target.checked)} 
+                            className="h-5 w-5 mt-0.5 flex-shrink-0 cursor-pointer"
+                          />
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Console debug logs</span>
+                            <span className="text-xs text-emerald-700/70 dark:text-emerald-300/70">Show backend debug trail in DevTools</span>
+                          </div>
                         </div>
-                        <input type="checkbox" checked={consoleDebugEnabled} onChange={(e) => setConsoleDebugEnabled(e.target.checked)} className="h-4 w-4" />
-                      </label>
+                      </div>
                     </div>
                   </div>
                 )}
