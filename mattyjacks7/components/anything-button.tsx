@@ -259,6 +259,8 @@ export default function AnythingButton() {
   const [isDragActive, setIsDragActive] = useState(false);
   const [currentPlaceholder, setCurrentPlaceholder] = useState("");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [isMagicShaking, setIsMagicShaking] = useState(false);
+  const [isRegenRotating, setIsRegenRotating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
@@ -575,6 +577,8 @@ Deep inquiry deserves nourishment: ${food}`
   const [rewardCycleKey, setRewardCycleKey] = useState(0);
 
   const applyMagicPrompt = () => {
+    setIsMagicShaking(true);
+    setTimeout(() => setIsMagicShaking(false), 600);
     const foodReward = getRandomFoodEmojis(Math.floor(Math.random() * 4) + 6);
     
     if (!input.trim()) {
@@ -597,7 +601,9 @@ Deep inquiry deserves nourishment: ${food}`
   };
 
   const regenShortPrompt = () => {
-    if (!SHORT_PROMPTS.length) return;
+    if (!SHORT_PROMPTS.length || isRegenRotating) return;
+    setIsRegenRotating(true);
+    setTimeout(() => setIsRegenRotating(false), 1000);
     let idx = Math.floor(Math.random() * SHORT_PROMPTS.length);
     if (idx === lastShortIdx && SHORT_PROMPTS.length > 1) idx = (idx + 1) % SHORT_PROMPTS.length;
     setLastShortIdx(idx);
@@ -1587,22 +1593,35 @@ Create a summary that another AI can use to understand the context and continue 
               <div className="mt-2 flex justify-end gap-2">
                 <button
                   type="button"
+                  onClick={handleClearInput}
+                  disabled={input.length === 0}
+                  className="inline-flex items-center justify-center text-[12px] font-semibold text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 rounded-full px-2 py-1 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Clear input"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <motion.button
+                  type="button"
                   onClick={applyMagicPrompt}
-                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-full px-3 py-1 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-                  title="Insert a magic prompt"
+                  animate={isMagicShaking ? { rotate: [-5, 5, -5, 5, -5, 5, 0] } : { rotate: 0 }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                  className="inline-flex items-center justify-center text-4xl font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-full w-10 h-10 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                  title="Magic prompt - tap to shake!"
                 >
                   <span role="img" aria-label="magic wand">🪄</span>
-                  Magic Prompt
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   type="button"
                   onClick={regenShortPrompt}
-                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800 rounded-full px-3 py-1 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors"
+                  disabled={isRegenRotating}
+                  animate={isRegenRotating ? { rotate: 360 } : { rotate: 0 }}
+                  transition={{ duration: 1, ease: "linear" }}
+                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800 rounded-full px-3 py-1 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Regenerate a random short prompt"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   Regen
-                </button>
+                </motion.button>
                 <button
                   type="button"
                   onClick={addFoodReward}
