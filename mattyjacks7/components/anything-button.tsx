@@ -628,9 +628,9 @@ Create a summary that another AI can use to understand the context and continue 
     <>
       {/* Floating launcher with torus border (hidden while chat is open) */}
       {!isOpen && (
-        <div className="fixed right-0 pointer-events-none flex items-end justify-end p-2" style={{ zIndex: 120, width: threeSize, height: threeSize, bottom: -threeSize * 0.15 }}>
+        <div className="fixed right-0 pointer-events-none flex items-end justify-end p-2" style={{ zIndex: 120, width: threeSize * 2, height: threeSize * 2, bottom: -20 }}>
           <div className="relative flex items-center justify-center w-full h-full">
-            <ThreeBorderBack size={threeSize} />
+            <ThreeBorderBack size={threeSize * 2} />
             <motion.button
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -639,7 +639,7 @@ Create a summary that another AI can use to understand the context and continue 
               onClick={() => setIsOpen(true)}
               className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300 focus:outline-none outline-none pointer-events-auto cursor-pointer"
               aria-label="Toggle Valley Net AI Chat"
-              style={{ zIndex: 5, width: threeSize * 0.6, height: threeSize * 0.6 }}
+              style={{ zIndex: 5, width: threeSize * 1.2, height: threeSize * 1.2 }}
             >
               <motion.div
                 key="open"
@@ -662,11 +662,11 @@ Create a summary that another AI can use to understand the context and continue 
                     priority
                   />
                 </motion.div>
-                <ThreeBorderFront size={threeSize * 0.6} />
+                <ThreeBorderFront size={threeSize * 1.2} />
               </motion.div>
               <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />
             </motion.button>
-            <ThreeBorderFront size={threeSize} />
+            <ThreeBorderFront size={threeSize * 2} />
           </div>
         </div>
       )}
@@ -889,7 +889,7 @@ Create a summary that another AI can use to understand the context and continue 
               )}
               <div className="flex justify-between items-center mt-3 px-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
-                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : "Ready"}
+                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : `Ready (${messages.length}/50)`}
                 </span>
               </div>
             </div>
