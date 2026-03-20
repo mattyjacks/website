@@ -484,6 +484,7 @@ function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
 export async function POST(request: NextRequest) {
   const clientIp = getClientIp(request);
   let isAdmin = process.env.NODE_ENV === 'development';
+  const DEBUG = isAdmin;
   
   try {
     const supabase = await createClient();
@@ -517,6 +518,14 @@ export async function POST(request: NextRequest) {
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
         { error: getErrorResponse("AI service not configured", isAdmin) },
+        { status: 503 }
+      );
+    }
+
+    if (process.env.OPENAI_API_KEY.length < 20) {
+      if (DEBUG) console.error("[CHAT] Invalid OPENAI_API_KEY length");
+      return NextResponse.json(
+        { error: getErrorResponse("AI service misconfigured", isAdmin) },
         { status: 503 }
       );
     }
@@ -603,8 +612,9 @@ export async function POST(request: NextRequest) {
 
     const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;
-      for (let attempt = 0; attempt < 5; attempt++) {
+      for (let attempt = 0; attempt < 7; attempt++) {
         try {
+          if (DEBUG && attempt > 0) console.log(`[CHAT] Attempt ${attempt + 1}/7 for ${primaryModel}`);
           return await openai.chat.completions.create({
             model: primaryModel,
             messages: chatMessages,
@@ -617,16 +627,20 @@ export async function POST(request: NextRequest) {
           lastError = err;
           const rawMsg = err instanceof Error ? err.message : "Unknown error";
           const msg = rawMsg.slice(0, 200).toLowerCase();
+          if (DEBUG) console.error(`[CHAT] Attempt ${attempt + 1} error: ${rawMsg.slice(0, 100)}`);
           const transient = msg.includes("rate_limit") || msg.includes("timeout") || msg.includes("fetch failed") || msg.includes("temporarily") || msg.includes("overloaded") || msg.includes("model") || msg.includes("server error") || msg.includes("503") || msg.includes("bad gateway") || msg.includes("gateway timeout");
-          if (!transient || attempt === 4) break;
+          if (!transient || attempt === 6) break;
           const jitter = Math.floor(Math.random() * 120);
-          const backoff = 400 + attempt * 260 + jitter;
+          const backoff = Math.pow(2, attempt) * 300 + jitter;
+          if (DEBUG) console.log(`[CHAT] Backoff ${backoff}ms before retry`);
           await new Promise((res) => setTimeout(res, backoff));
         }
       }
 
       const rawMsg = lastError instanceof Error ? lastError.message : "Unknown error";
       const msg = rawMsg.slice(0, 200).toLowerCase();
+
+      if (DEBUG) console.error(`[CHAT] Final error after retries: ${rawMsg.slice(0, 150)}`);
 
       const authOrModel = msg.includes("authentication") || msg.includes("api key") || msg.includes("no api key") || msg.includes("model");
 
@@ -638,6 +652,7 @@ export async function POST(request: NextRequest) {
       }
       if (authOrModel || msg.includes("timeout") || msg.includes("fetch failed")) {
         // Try fallback model once
+        if (DEBUG) console.log(`[CHAT] Trying fallback model: ${fallbackModel}`);
         try {
           const alt = await openai.chat.completions.create({
             model: fallbackModel,
@@ -647,8 +662,10 @@ export async function POST(request: NextRequest) {
             max_tokens: 2000,
             temperature: 0.8,
           });
+          if (DEBUG) console.log(`[CHAT] Fallback model succeeded`);
           return alt;
         } catch (altErr) {
+          if (DEBUG) console.error(`[CHAT] Fallback model also failed: ${altErr instanceof Error ? altErr.message.slice(0, 100) : String(altErr)}`);
           lastError = altErr;
         }
         return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
