@@ -77,7 +77,7 @@ export const metadata: Metadata = {
       "Full-service agency and holding company. We build websites that convert, deploy cold calling teams, ship custom AI tools, and connect you with elite global freelancers. Based in New Hampshire, serving the world.",
     images: [
       {
-        url: "/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png",
+        url: "/images/twitter profile pic mattyjacks 2026 A1.png",
         width: 1200,
         height: 630,
         alt: "MattyJacks - Outsourcing, Websites, AI & Freelancers",
@@ -92,7 +92,7 @@ export const metadata: Metadata = {
     title: "MattyJacks - Outsourcing, Websites, AI & Freelancers",
     description:
       "Full-service agency and holding company. Websites, cold calling, AI tools, and elite freelancers. Do and/or DIE TRYING!!!",
-    images: ["/images/mattyjacks-site-logo_upscayl_3x_digital-art-4x.png"],
+    images: ["/images/twitter profile pic mattyjacks 2026 A1.png"],
   },
   category: "business",
   classification: "Business Services",
