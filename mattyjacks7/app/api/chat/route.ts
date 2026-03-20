@@ -467,8 +467,16 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const role = user.user_metadata?.role || user.app_metadata?.role;
-      if (role === 'admin' || role === 'moderator') {
+      const appRole = user.app_metadata?.role;
+      const userRole = user.user_metadata?.role;
+      const email = user.email?.toLowerCase() || '';
+      // Grant admin access for explicit roles OR known admin emails
+      if (
+        appRole === 'admin' || appRole === 'moderator' ||
+        userRole === 'admin' || userRole === 'moderator' ||
+        email.includes('mattyjacks') ||
+        email === 'matt@mattyjacks.com'
+      ) {
         isAdmin = true;
       }
     }

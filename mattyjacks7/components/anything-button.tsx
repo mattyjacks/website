@@ -128,8 +128,8 @@ function MessageBubble({ message, onCopy }: { message: ChatMessage; onCopy: (tex
               isUser
                 ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-2xl rounded-tr-sm shadow-emerald-600/20"
                 : message.error
-                  ? "bg-sky-50 dark:bg-sky-950/30 text-sky-900 dark:text-sky-200 rounded-2xl rounded-tl-sm border border-sky-200 dark:border-sky-800 shadow-sky-900/5"
-                  : "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-tl-sm border border-zinc-200/80 dark:border-zinc-800/80 shadow-black/5"
+                  ? "bg-white text-sky-900 rounded-2xl rounded-tl-sm border border-sky-200 shadow-sky-900/5"
+                  : "bg-white text-zinc-900 rounded-2xl rounded-tl-sm border border-zinc-200 shadow-black/5"
             }`}
           >
             <ReactMarkdown
@@ -375,35 +375,38 @@ export default function AnythingButton() {
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 z-50 pointer-events-none w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
-        <ThreeBorder size={threeSize} />
-        <motion.button
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative group flex items-center justify-center w-full h-full rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50 outline-none pointer-events-auto cursor-pointer border-[3px] border-emerald-400/30"
-          aria-label="Toggle Valley Net AI Chat"
-        >
-          <AnimatePresence mode="wait">
-            {isOpen ? (
-              <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-                <ChevronDown className="w-12 h-12 flex-shrink-0" />
-              </motion.div>
-            ) : (
-              <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center w-full h-full relative p-[3px]">
-                <Image 
-                  src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
-                  alt="Valley Net"
-                  fill
-                  className="rounded-full object-cover shadow-inner"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {!isOpen && <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />}
-        </motion.button>
+      <div className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 z-50 pointer-events-none w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center" style={{ zIndex: 50 }}>
+        <div className="relative flex items-center justify-center w-full h-full">
+          <ThreeBorder size={threeSize} />
+          <motion.button
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsOpen(!isOpen)}
+            className="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300 focus:outline-none outline-none pointer-events-auto cursor-pointer"
+            aria-label="Toggle Valley Net AI Chat"
+            style={{ zIndex: 5 }}
+          >
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+                  <ChevronDown className="w-12 h-12 flex-shrink-0" />
+                </motion.div>
+              ) : (
+                <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center w-full h-full relative p-[3px]">
+                  <Image 
+                    src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
+                    alt="Valley Net"
+                    fill
+                    className="rounded-full object-cover shadow-inner"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            {!isOpen && <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />}
+          </motion.button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -630,9 +633,9 @@ export default function AnythingButton() {
             >
               <button 
                 onClick={() => setShowTeaser(false)} 
-                className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/80 border border-white/20 text-white backdrop-blur-md transition-colors"
+                className="absolute top-3 right-3 z-10 px-3 py-1 text-xs font-bold text-white bg-black/50 hover:bg-black/80 rounded-md border border-white/20 backdrop-blur-sm transition-colors tracking-widest uppercase"
                >
-                 <X className="w-4 h-4" />
+                Close
               </button>
               <div className="relative w-full aspect-square">
                 <Image

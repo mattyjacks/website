@@ -8,60 +8,67 @@ export function ThreeBorder({ size = 160 }: { size?: number }) {
 
   useEffect(() => {
     if (!mountRef.current) return;
-    
-    // Setup Scene
+
+    // Clear any existing canvas from previous render
+    while (mountRef.current.firstChild) {
+      mountRef.current.removeChild(mountRef.current.firstChild);
+    }
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.z = 4.8;
+    camera.position.z = 5.5;
 
-    // WebGL Renderer
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(size, size);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
     mountRef.current.appendChild(renderer.domElement);
 
-    // Beautiful glowing metallic Torus Geometry
-    const geometry = new THREE.TorusGeometry(1.6, 0.12, 32, 100);
-    const material = new THREE.MeshPhysicalMaterial({ 
-      color: 0x10b981, 
+    // Torus sized to just outside the circular button area
+    const geometry = new THREE.TorusGeometry(1.75, 0.18, 48, 120);
+    const material = new THREE.MeshPhysicalMaterial({
+      color: 0x10b981,
       emissive: 0x064e3b,
-      metalness: 0.9,
-      roughness: 0.15,
+      emissiveIntensity: 0.4,
+      metalness: 0.95,
+      roughness: 0.1,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
+      clearcoatRoughness: 0.05,
     });
     const torus = new THREE.Mesh(geometry, material);
     scene.add(torus);
 
-    // Advanced 3D Lighting setup for deep shadow effects
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
-    
-    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 2);
-    directionalLight1.position.set(5, 5, 5);
-    scene.add(directionalLight1);
 
-    const directionalLight2 = new THREE.DirectionalLight(0x10b981, 3);
-    directionalLight2.position.set(-5, -5, -5);
-    scene.add(directionalLight2);
+    const key = new THREE.DirectionalLight(0xffffff, 2.5);
+    key.position.set(4, 6, 6);
+    scene.add(key);
 
-    // Animation Loop
-    let animationFrameId: number;
-    let time = 0;
+    const fill = new THREE.DirectionalLight(0x10b981, 4);
+    fill.position.set(-4, -4, -4);
+    scene.add(fill);
+
+    const rim = new THREE.DirectionalLight(0x00ffaa, 1.5);
+    rim.position.set(0, 5, -6);
+    scene.add(rim);
+
+    let animId: number;
+    let t = 0;
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      time += 0.01;
-      // Provide a slow, elegant 3D gyroscopic rotation
-      torus.rotation.x = Math.sin(time * 0.5) * 0.3;
-      torus.rotation.y += 0.01;
-      torus.rotation.z = Math.cos(time * 0.3) * 0.2;
+      animId = requestAnimationFrame(animate);
+      t += 0.008;
+      torus.rotation.x = Math.sin(t * 0.6) * 0.35;
+      torus.rotation.y += 0.012;
+      torus.rotation.z = Math.cos(t * 0.4) * 0.2;
       renderer.render(scene, camera);
     };
     animate();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      if (mountRef.current && mountRef.current.contains(renderer.domElement)) {
+      cancelAnimationFrame(animId);
+      if (mountRef.current?.contains(renderer.domElement)) {
         mountRef.current.removeChild(renderer.domElement);
       }
       geometry.dispose();
@@ -71,10 +78,18 @@ export function ThreeBorder({ size = 160 }: { size?: number }) {
   }, [size]);
 
   return (
-    <div 
-      ref={mountRef} 
-      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none drop-shadow-[0_15px_25px_rgba(0,0,0,0.7)] flex items-center justify-center z-[-1]" 
-      style={{ width: size, height: size }} 
+    <div
+      ref={mountRef}
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        width: size,
+        height: size,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        zIndex: 10,
+        filter: "drop-shadow(0 0 16px rgba(16,185,129,0.7))",
+      }}
     />
   );
 }
