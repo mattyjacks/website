@@ -366,6 +366,12 @@ Create a summary that another AI can use to understand the context and continue 
       setCloudError(null);
       try {
         const res = await fetch('/api/cloud-sessions');
+        if (res.status === 404) {
+          // Cloud endpoint not deployed; treat as no cloud history without error
+          setCloudSessions([]);
+          setCloudLoading(false);
+          return;
+        }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (cancelled) return;
@@ -621,7 +627,7 @@ Create a summary that another AI can use to understand the context and continue 
   return (
     <>
       {/* Floating launcher with torus border */}
-      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 pointer-events-none flex items-center justify-center" style={{ zIndex: 120, width: threeSize, height: threeSize }}>
+      <div className="fixed bottom-0 right-0 pointer-events-none flex items-end justify-end p-2" style={{ zIndex: 120, width: threeSize, height: threeSize }}>
         <div className="relative flex items-center justify-center w-full h-full">
           <ThreeBorderBack size={threeSize} />
           <motion.button
@@ -640,13 +646,28 @@ Create a summary that another AI can use to understand the context and continue 
                   <ChevronDown className="w-10 h-10 flex-shrink-0" />
                 </motion.div>
               ) : (
-                <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center w-full h-full relative p-[3px]">
-                  <Image 
-                    src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
-                    alt="Valley Net"
-                    fill
-                    className="rounded-full object-cover"
-                  />
+                <motion.div
+                  key="open"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  className="flex items-center justify-center w-full h-full relative"
+                >
+                  <motion.div
+                    className="relative w-full h-full"
+                    animate={{ rotate: [-2, 2, -2], y: [0, -3, 0] }}
+                    transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Image
+                      src="/images/valley%20net%20CUTOUT%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
+                      alt="Valley Net"
+                      fill
+                      sizes="140px"
+                      className="object-contain object-bottom"
+                      priority
+                    />
+                  </motion.div>
+                  <ThreeBorderFront size={threeSize * 0.6} />
                 </motion.div>
               )}
             </AnimatePresence>
