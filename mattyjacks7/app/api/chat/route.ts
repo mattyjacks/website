@@ -382,7 +382,7 @@ async function handleToolCall(
 
 const SYSTEM_PROMPT = `You are the "Anything Button" AI assistant on MattyJacks.com - the official website for MattyJacks, a holding company and full-service agency.
 
-You are powered by ChatGPT OpenAI API GPT-5 Mini.
+You are powered by ChatGPT OpenAI API GPT-5.4 Mini.
 
 CRITICAL RULES:
 - Call the user "Boss" as a sign of respect. Always.
@@ -579,7 +579,7 @@ export async function POST(request: NextRequest) {
     try {
       const openai = getOpenAI();
       response = await openai.chat.completions.create({
-        model: "gpt-5-mini",
+        model: "gpt-5.4-mini",
         messages: chatMessages,
         tools,
         tool_choice: "auto",
@@ -630,7 +630,7 @@ export async function POST(request: NextRequest) {
       try {
         const openai = getOpenAI();
         response = await openai.chat.completions.create({
-          model: "gpt-5-mini",
+          model: "gpt-5.4-mini",
           messages: chatMessages,
           tools,
           tool_choice: "auto",
@@ -649,7 +649,7 @@ export async function POST(request: NextRequest) {
     }
 
     const content = assistantMessage?.content || "Sorry Boss, I hit a snag. The AI didn't return a response. Try again!";
-    return NextResponse.json({ message: content.slice(0, 8000), model: "gpt-5-mini", toolCalls: toolCallDepth }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+    return NextResponse.json({ message: content.slice(0, 8000), model: "gpt-5.4-mini", toolCalls: toolCallDepth }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
   } catch (error: unknown) {
     console.error("Chat API error:", error);
     return NextResponse.json(

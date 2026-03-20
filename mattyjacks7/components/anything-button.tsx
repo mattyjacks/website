@@ -199,17 +199,18 @@ export default function AnythingButton() {
 
   const [showTeaser, setShowTeaser] = useState(false);
   const [currentTeaser, setCurrentTeaser] = useState("");
-  const [threeSize, setThreeSize] = useState(180);
+  const [threeSize, setThreeSize] = useState(140);
   const [chatBounds, setChatBounds] = useState<{x:number;y:number;width:number;height:number} | null>(null);
   const [chatReady, setChatReady] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     const calcThreeSize = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const base = Math.min(vw, vh);
-      // On mobile, nearly full width with a small margin. Desktop slightly smaller.
-      return vw < 640 ? Math.max(140, Math.min(base - 20, 360)) : Math.max(180, Math.min(base * 0.45, 340));
+      // Smaller footprint: favor lower-right corner
+      return vw < 640 ? Math.max(110, Math.min(base * 0.30, 200)) : Math.max(120, Math.min(base * 0.25, 220));
     };
     setThreeSize(calcThreeSize());
     const handleResize = () => setThreeSize(calcThreeSize());
@@ -409,7 +410,7 @@ export default function AnythingButton() {
   return (
     <>
       {/* Floating launcher with torus border */}
-      <div className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 pointer-events-none flex items-center justify-center" style={{ zIndex: 50, width: threeSize, height: threeSize }}>
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 pointer-events-none flex items-center justify-center" style={{ zIndex: 50, width: threeSize, height: threeSize }}>
         <div className="relative flex items-center justify-center w-full h-full">
           <ThreeBorderBack size={threeSize} />
           <motion.button
@@ -469,12 +470,9 @@ export default function AnythingButton() {
               <div className="flex flex-col flex-1 min-w-0 pointer-events-none select-none">
                 <div className="flex items-center justify-center gap-2">
                   <button 
-                    onClick={() => {
-                      setCurrentTeaser(TEASER_PHRASES[Math.floor(Math.random() * TEASER_PHRASES.length)]);
-                      setShowTeaser(true);
-                    }}
-                    className="w-7 h-7 relative shrink-0 rounded-[6px] overflow-hidden shadow-sm border border-black/10 hover:scale-110 hover:shadow-md transition-all pointer-events-auto"
-                    aria-label="View Profile"
+                    onClick={() => setShowImageModal(true)}
+                    className="w-7 h-7 relative shrink-0 rounded-[6px] overflow-hidden shadow-sm border border-black/10 hover:scale-110 hover:shadow-md transition-all pointer-events-auto cursor-pointer"
+                    aria-label="View Valley Net v23.2"
                   >
                     <Image 
                       src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
@@ -620,6 +618,47 @@ export default function AnythingButton() {
                 </div>
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Full-size image modal */}
+      <AnimatePresence>
+        {showImageModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setShowImageModal(false)}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-full max-h-full"
+            >
+              <button
+                onClick={() => setShowImageModal(false)}
+                className="absolute -top-10 right-0 text-white hover:text-zinc-300 transition-colors p-2 z-50"
+                aria-label="Close image"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <div className="relative w-full max-w-screen max-h-[90vh]">
+                <Image
+                  src="/images/valley%20net%20v23.2%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
+                  alt="Valley Net v23.2"
+                  width={1024}
+                  height={1024}
+                  className="w-full h-auto max-h-[90vh] object-contain"
+                  priority
+                />
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
