@@ -613,84 +613,57 @@ export async function POST(request: NextRequest) {
 
     const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;
-      for (let attempt = 0; attempt < 7; attempt++) {
-        try {
-          if (DEBUG && attempt > 0) console.log(`[CHAT] Attempt ${attempt + 1}/7 for ${primaryModel}`);
-          return await openai.chat.completions.create({
-            model: primaryModel,
-            messages: chatMessages,
-            tools,
-            tool_choice: "auto",
-            max_tokens: 2000,
-            temperature: 0.8,
-          });
-        } catch (err) {
-          lastError = err;
-          const rawMsg = err instanceof Error ? err.message : "Unknown error";
-          const msg = rawMsg.slice(0, 200).toLowerCase();
-          if (DEBUG) console.error(`[CHAT] Attempt ${attempt + 1} error: ${rawMsg.slice(0, 100)}`);
-          const transient = msg.includes("rate_limit") || msg.includes("timeout") || msg.includes("fetch failed") || msg.includes("temporarily") || msg.includes("overloaded") || msg.includes("model") || msg.includes("server error") || msg.includes("503") || msg.includes("bad gateway") || msg.includes("gateway timeout");
-          if (!transient || attempt === 6) break;
-          const jitter = Math.floor(Math.random() * 120);
-          const backoff = Math.pow(2, attempt) * 300 + jitter;
-          if (DEBUG) console.log(`[CHAT] Backoff ${backoff}ms before retry`);
-          await new Promise((res) => setTimeout(res, backoff));
-        }
+
+      // Try primary model once
+      try {
+        if (DEBUG) console.log(`[CHAT] Trying primary model: ${primaryModel}`);
+        return await openai.chat.completions.create({
+          model: primaryModel,
+          messages: chatMessages,
+          tools,
+          tool_choice: "auto",
+          max_tokens: 2000,
+          temperature: 0.8,
+        });
+      } catch (err) {
+        lastError = err;
+        if (DEBUG) console.error(`[CHAT] Primary model failed: ${err instanceof Error ? err.message.slice(0, 100) : String(err)}`);
       }
 
-      const rawMsg = lastError instanceof Error ? lastError.message : "Unknown error";
-      const msg = rawMsg.slice(0, 200).toLowerCase();
-
-      if (DEBUG) console.error(`[CHAT] Final error after retries: ${rawMsg.slice(0, 150)}`);
-
-      const authOrModel = msg.includes("authentication") || msg.includes("api key") || msg.includes("no api key") || msg.includes("model");
-
-      if (msg.includes("rate_limit")) {
-        return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 429 });
-      }
-      if (msg.includes("invalid_request")) {
-        return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 400 });
-      }
-      if (authOrModel || msg.includes("timeout") || msg.includes("fetch failed")) {
-        // Try fallback model once
+      // Try fallback model once
+      try {
         if (DEBUG) console.log(`[CHAT] Trying fallback model: ${fallbackModel}`);
-        try {
-          const alt = await openai.chat.completions.create({
-            model: fallbackModel,
-            messages: chatMessages,
-            tools,
-            tool_choice: "auto",
-            max_tokens: 2000,
-            temperature: 0.8,
-          });
-          if (DEBUG) console.log(`[CHAT] Fallback model succeeded`);
-          return alt;
-        } catch (altErr) {
-          if (DEBUG) console.error(`[CHAT] Fallback model also failed: ${altErr instanceof Error ? altErr.message.slice(0, 100) : String(altErr)}`);
-          lastError = altErr;
-        }
-
-        // Try tertiary model (gpt-4o-mini) as last resort
-        if (DEBUG) console.log(`[CHAT] Trying tertiary model: ${tertiaryModel}`);
-        try {
-          const alt2 = await openai.chat.completions.create({
-            model: tertiaryModel,
-            messages: chatMessages,
-            tools,
-            tool_choice: "auto",
-            max_tokens: 2000,
-            temperature: 0.8,
-          });
-          if (DEBUG) console.log(`[CHAT] Tertiary model succeeded`);
-          return alt2;
-        } catch (alt2Err) {
-          if (DEBUG) console.error(`[CHAT] Tertiary model also failed: ${alt2Err instanceof Error ? alt2Err.message.slice(0, 100) : String(alt2Err)}`);
-          lastError = alt2Err;
-        }
-
-        return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
+        return await openai.chat.completions.create({
+          model: fallbackModel,
+          messages: chatMessages,
+          tools,
+          tool_choice: "auto",
+          max_tokens: 2000,
+          temperature: 0.8,
+        });
+      } catch (err) {
+        lastError = err;
+        if (DEBUG) console.error(`[CHAT] Fallback model failed: ${err instanceof Error ? err.message.slice(0, 100) : String(err)}`);
       }
-      // Final fallback: return friendly text instead of HTTP error to keep UX responsive
+
+      // Try tertiary model once
+      try {
+        if (DEBUG) console.log(`[CHAT] Trying tertiary model: ${tertiaryModel}`);
+        return await openai.chat.completions.create({
+          model: tertiaryModel,
+          messages: chatMessages,
+          tools,
+          tool_choice: "auto",
+          max_tokens: 2000,
+          temperature: 0.8,
+        });
+      } catch (err) {
+        lastError = err;
+        if (DEBUG) console.error(`[CHAT] Tertiary model failed: ${err instanceof Error ? err.message.slice(0, 100) : String(err)}`);
+      }
+
+      // All models failed
+      if (DEBUG) console.error(`[CHAT] All models exhausted. Final error: ${lastError instanceof Error ? lastError.message.slice(0, 150) : String(lastError)}`);
       return typeof lastError === "string" ? lastError : fallbackMessage;
     };
 
