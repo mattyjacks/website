@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw } from "lucide-react";
 import { motion, useDragControls, AnimatePresence } from "framer-motion";
 import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
-import { ThreeBorderBack, ThreeBorderFront, triggerWobble } from "./three-border";
+import { ThreeBorderBack, ThreeBorderFront, triggerWobble, setMorphTarget } from "./three-border";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -200,16 +200,38 @@ export default function AnythingButton() {
   const [showTeaser, setShowTeaser] = useState(false);
   const [currentTeaser, setCurrentTeaser] = useState("");
   const [threeSize, setThreeSize] = useState(160);
+  const [chatBounds, setChatBounds] = useState<{x:number;y:number;width:number;height:number} | null>(null);
+  const [chatReady, setChatReady] = useState(false);
 
   useEffect(() => {
     setThreeSize(window.innerWidth < 640 ? 150 : 180);
     const handleResize = () => setThreeSize(window.innerWidth < 640 ? 150 : 180);
     window.addEventListener('resize', handleResize);
+
+    // Calculate chat window bounds once on the client
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const isMobile = vw < 640;
+    const w = isMobile ? vw - 16 : Math.min(420, vw - 48);
+    const h = Math.min(Math.floor(vh * 0.80), 640);
+    const x = Math.max(0, vw - w - (isMobile ? 8 : 24));
+    const y = Math.max(60, vh - h - 24);
+    setChatBounds({ x, y, width: w, height: h });
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
     triggerWobble();
+    if (isOpen) {
+      setMorphTarget(1);
+      // Delay showing the chat window so the morph animation plays
+      const timer = setTimeout(() => setChatReady(true), 600);
+      return () => clearTimeout(timer);
+    } else {
+      setMorphTarget(0);
+      setChatReady(false);
+    }
   }, [isOpen]);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -338,6 +360,7 @@ export default function AnythingButton() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ messages: newMessages.map((m) => ({ role: m.role, content: m.content.slice(0, 5000) })) }),
         signal: controller.signal,
       });
@@ -419,25 +442,17 @@ export default function AnythingButton() {
       </div>
 
       <AnimatePresence>
-        {isOpen && (
+        {chatReady && chatBounds && (
           <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.95 }}
-            transition={{ type: "spring", bounce: 0.3, duration: 0.4 }}
-            className="fixed inset-0 z-50 pointer-events-none"
+            key="chat-window"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ position: 'fixed', inset: 0, zIndex: 60, pointerEvents: 'none' }}
           >
             <Rnd
-              default={(() => {
-                const vw = window.innerWidth;
-                const vh = window.innerHeight;
-                const isMobile = vw < 640;
-                const w = isMobile ? vw - 12 : Math.min(420, vw - 48);
-                const h = Math.min(vh * 0.82, 650);
-                const x = Math.max(0, vw - w - (isMobile ? 6 : 24));
-                const y = Math.max(0, vh - h - 24);
-                return { x, y, width: w, height: h };
-              })()}
+              default={chatBounds}
               minWidth={320}
               minHeight={400}
               bounds="window"
@@ -492,7 +507,7 @@ export default function AnythingButton() {
               <div className="hidden sm:flex items-center text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-50 border border-emerald-400/30">
                 Online
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-white font-bold text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-md transition-colors ml-1 whitespace-nowrap">
+              <button onClick={() => setIsOpen(false)} className="text-white font-bold text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-md transition-colors ml-1 whitespace-nowrap relative z-50">
                 Close Chat
               </button>
             </div>
