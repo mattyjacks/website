@@ -7,6 +7,7 @@ import { motion, useDragControls, AnimatePresence } from "framer-motion";
 import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
 import { SHORT_PROMPTS } from "./short-prompts";
 import { ThreeBorderBack, ThreeBorderFront, triggerWobble, setMorphTarget } from "./three-border";
+import { renameConversation, createRenameData, updateRenameDataOnOpen, markAsManuallyRenamed, shouldAttemptRename, type ConversationRenameData } from "@/lib/conversation-renamer";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -25,6 +26,7 @@ interface ChatSession {
   title: string;
   messages: ChatMessage[];
   updatedAt: number;
+  renameData?: ConversationRenameData;
 }
 
 interface CloudSessionMeta {
@@ -578,6 +580,20 @@ Deep inquiry deserves nourishment: ${food}`
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 
+  const updateSessionTitle = (sessionId: string, newTitle: string) => {
+    setSessions((prevSessions) =>
+      prevSessions.map((s) =>
+        s.id === sessionId
+          ? {
+              ...s,
+              title: newTitle,
+              renameData: markAsManuallyRenamed(s.renameData || createRenameData())
+            }
+          : s
+      )
+    );
+  };
+
   const generateRandomId = (): string => {
     return Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
   };
@@ -742,6 +758,63 @@ Create a summary that another AI can use to understand the context and continue 
     };
   }, []);
 
+  // Auto-rename conversations when sidebar opens
+  useEffect(() => {
+    if (!isSidebarOpen) return;
+
+    const autoRenameConversations = async () => {
+      setSessions((prevSessions) =>
+        prevSessions.map((session) => {
+          // Initialize renameData if it doesn't exist
+          if (!session.renameData) {
+            return {
+              ...session,
+              renameData: createRenameData()
+            };
+          }
+          return session;
+        })
+      );
+
+      // Rename eligible conversations
+      for (const session of sessions) {
+        if (!session.renameData || !shouldAttemptRename(session.renameData)) {
+          continue;
+        }
+
+        try {
+          const { newTitle, updated } = await renameConversation(
+            session.messages,
+            session.title,
+            session.renameData
+          );
+
+          if (updated && newTitle !== session.title) {
+            setSessions((prevSessions) =>
+              prevSessions.map((s) =>
+                s.id === session.id
+                  ? {
+                      ...s,
+                      title: newTitle,
+                      renameData: {
+                        ...s.renameData!,
+                        lastRenamedAt: Date.now(),
+                        wasManuallyRenamed: false
+                      }
+                    }
+                  : s
+              )
+            );
+          }
+        } catch (err) {
+          console.error(`Failed to rename conversation ${session.id}:`, err);
+        }
+      }
+    };
+
+    autoRenameConversations();
+  }, [isSidebarOpen]);
+
   useEffect(() => {
     if (!showImageModal) return;
     const interval = setInterval(() => {
@@ -817,6 +890,7 @@ Create a summary that another AI can use to understand the context and continue 
       title: "New Conversation",
       messages: [{ id: generateId(), role: "assistant", content: getRandomGreeting(), timestamp: Date.now() }],
       updatedAt: Date.now(),
+      renameData: createRenameData(),
     };
     setSessions((prev) => [newSession, ...prev]);
     setCurrentSessionId(newId);
