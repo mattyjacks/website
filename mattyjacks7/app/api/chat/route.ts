@@ -592,15 +592,18 @@ export async function POST(request: NextRequest) {
     const validRoles = new Set(["user", "assistant", "tool", "system"]);
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i] as Record<string, unknown>;
+      addLog(`[CHAT] Validating message ${i}: role=${msg?.role}, content_type=${typeof msg?.content}, content_length=${typeof msg?.content === 'string' ? msg.content.length : 'N/A'}`);
       if (typeof msg?.role !== "string" || !validRoles.has(msg.role)) {
+        addLog(`[CHAT] Message ${i} validation failed: invalid role "${msg?.role}"`);
         return NextResponse.json(
-          { error: getErrorResponse(`Message ${i}: invalid role`, isAdmin) },
+          { error: getErrorResponse(`Message ${i}: invalid role`, isAdmin), debugLogs },
           { status: 400 }
         );
       }
       if (typeof msg?.content !== "string" && msg.role !== "assistant") {
+        addLog(`[CHAT] Message ${i} validation failed: content is not string (type=${typeof msg?.content})`);
         return NextResponse.json(
-          { error: getErrorResponse(`Message ${i}: content must be string`, isAdmin) },
+          { error: getErrorResponse(`Message ${i}: content must be string`, isAdmin), debugLogs },
           { status: 400 }
         );
       }
@@ -619,9 +622,9 @@ export async function POST(request: NextRequest) {
 
     const fallbackMessage = "I'm having trouble reaching the AI right now, Boss. Please try again in a moment. If it keeps happening, wait 30 seconds and retry.";
 
-    const primaryModel = "gpt-5.4-mini-2026-03-17";
-    const fallbackModel = "gpt-5-mini-2025-08-07";
-    const tertiaryModel = "gpt-4o-mini";
+    const primaryModel = "gpt-4o-mini";
+    const fallbackModel = "gpt-4-turbo";
+    const tertiaryModel = "gpt-3.5-turbo";
 
     const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;

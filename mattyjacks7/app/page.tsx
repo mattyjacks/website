@@ -979,7 +979,14 @@ export default function Home() {
                 <div className="absolute top-3 right-3 z-20">
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-black/50 backdrop-blur-sm text-white/70 border border-white/10">Video Testimonial</span>
                 </div>
-<video className="w-full aspect-[9/16] object-cover max-h-[600px]" controls playsInline preload="metadata" aria-label="Video testimonial from Justin Hughes about working with MattyJacks">
+                <video 
+                  className="w-full h-auto block bg-black" 
+                  controls 
+                  playsInline 
+                  preload="auto"
+                  poster="/videos/matt-testimonial-justin-1-compressed.jpg"
+                  aria-label="Video testimonial from Justin Hughes about working with MattyJacks"
+                >
                   <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>

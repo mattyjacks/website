@@ -470,7 +470,7 @@ export default function AnythingButton() {
 
       {/* Chat window */}
       <AnimatePresence>
-        {chatReady && chatBounds && (
+        {isOpen && chatBounds && (
           <motion.div
             key="chat"
             initial={{ opacity: 0, y: 20 }}
