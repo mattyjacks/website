@@ -203,6 +203,7 @@ export default function AnythingButton() {
   const [chatBounds, setChatBounds] = useState<{x:number;y:number;width:number;height:number} | null>(null);
   const [chatReady, setChatReady] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [imageTeaserIndex, setImageTeaserIndex] = useState(0);
 
   useEffect(() => {
     const calcThreeSize = () => {
@@ -244,6 +245,14 @@ export default function AnythingButton() {
       setChatReady(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!showImageModal) return;
+    const interval = setInterval(() => {
+      setImageTeaserIndex((prev) => (prev + 1) % TEASER_PHRASES.length);
+    }, 4200);
+    return () => clearInterval(interval);
+  }, [showImageModal]);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -473,7 +482,10 @@ export default function AnythingButton() {
               <div className="flex flex-col flex-1 min-w-0 pointer-events-none select-none">
                 <div className="flex items-center justify-center gap-2">
                   <button 
-                    onClick={() => setShowImageModal(true)}
+                    onClick={() => {
+                      setImageTeaserIndex(Math.floor(Math.random() * TEASER_PHRASES.length));
+                      setShowImageModal(true);
+                    }}
                     className="w-7 h-7 relative shrink-0 rounded-[6px] overflow-hidden shadow-sm border border-black/10 hover:scale-110 hover:shadow-md transition-all pointer-events-auto cursor-pointer"
                     aria-label="View Valley Net v23.2"
                   >
@@ -660,6 +672,9 @@ export default function AnythingButton() {
                   className="w-full h-auto max-h-[90vh] object-contain"
                   priority
                 />
+              </div>
+              <div className="mt-4 text-center text-white text-sm sm:text-base font-semibold italic drop-shadow-lg px-4">
+                “{TEASER_PHRASES[imageTeaserIndex]}”
               </div>
             </motion.div>
           </motion.div>
