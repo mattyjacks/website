@@ -438,7 +438,7 @@ function mapUserError(err: unknown): string {
   const msg = raw.toLowerCase();
   if (msg.includes("rate") || msg.includes("limit")) return ERROR_VARIATIONS[0];
   if (msg.includes("timeout") || msg.includes("abort")) return ERROR_VARIATIONS[2];
-  if (msg.includes("model") || msg.includes("not found")) return "AI model is unavailable. Please try again soon, Boss.";
+  if (msg.includes("model") || msg.includes("not found")) return "AI model is waking up. Please try again in a few seconds, Boss.";
   if (msg.includes("authentication") || msg.includes("api key")) return "AI service auth issue. Please try again shortly, Boss.";
   return ERROR_VARIATIONS[4];
 }
@@ -566,34 +566,51 @@ export async function POST(request: NextRequest) {
     ];
 
     let response: OpenAI.Chat.Completions.ChatCompletion;
-    try {
-      const openai = getOpenAI();
-      response = await openai.chat.completions.create({
-        model: "gpt-5.4-mini",
-        messages: chatMessages,
-        tools,
-        tool_choice: "auto",
-        max_tokens: 2000,
-        temperature: 0.8,
-      });
-    } catch (err) {
-      const rawMsg = err instanceof Error ? err.message : "Unknown error";
+    const openai = getOpenAI();
+
+    const createCompletion = async () => {
+      let lastError: unknown = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          return await openai.chat.completions.create({
+            model: "gpt-5.4-mini",
+            messages: chatMessages,
+            tools,
+            tool_choice: "auto",
+            max_tokens: 2000,
+            temperature: 0.8,
+          });
+        } catch (err) {
+          lastError = err;
+          const rawMsg = err instanceof Error ? err.message : "Unknown error";
+          const msg = rawMsg.slice(0, 200).toLowerCase();
+          const transient = msg.includes("rate_limit") || msg.includes("timeout") || msg.includes("fetch failed") || msg.includes("temporarily") || msg.includes("overloaded") || msg.includes("model") || msg.includes("server error") || msg.includes("503") || msg.includes("bad gateway") || msg.includes("gateway timeout");
+          if (!transient || attempt === 1) break;
+          await new Promise((res) => setTimeout(res, 350));
+        }
+      }
+
+      const rawMsg = lastError instanceof Error ? lastError.message : "Unknown error";
       const msg = rawMsg.slice(0, 200).toLowerCase();
 
       if (msg.includes("rate_limit")) {
-        return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 429 });
+        return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 429 });
       }
       if (msg.includes("invalid_request")) {
-        return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 400 });
+        return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 400 });
       }
       if (msg.includes("authentication") || msg.includes("api key") || msg.includes("no api key")) {
-        return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 503 });
+        return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
       }
       if (msg.includes("timeout") || msg.includes("fetch failed")) {
-        return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 503 });
+        return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
       }
-      return NextResponse.json({ error: getErrorResponse(err, isAdmin) }, { status: 503 });
-    }
+      return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
+    };
+
+    const completionResult = await createCompletion();
+    if (completionResult instanceof NextResponse) return completionResult;
+    response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
 
     let assistantMessage = response.choices[0]?.message;
     if (!assistantMessage) {
@@ -618,15 +635,9 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        const openai = getOpenAI();
-        response = await openai.chat.completions.create({
-          model: "gpt-5.4-mini",
-          messages: chatMessages,
-          tools,
-          tool_choice: "auto",
-          max_tokens: 2000,
-          temperature: 0.8,
-        });
+        const completionResult = await createCompletion();
+        if (completionResult instanceof NextResponse) return completionResult;
+        response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
       } catch (err) {
         const rawMsg = err instanceof Error ? err.message : "Unknown error";
         const msg = rawMsg.slice(0, 200).toLowerCase();
