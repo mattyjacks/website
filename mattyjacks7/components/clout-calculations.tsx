@@ -61,8 +61,19 @@ export default function CloutCalculations() {
     const path = window.location.pathname || "/";
     setCurrentPath(path);
     
-    // Fetch view stats
-    const fetchStats = () => {
+    let isComponentMounted = true;
+    let pendingRequests = 0;
+    const MAX_PENDING_REQUESTS = 1;
+    
+    // Fetch view stats with timeout
+    const fetchStats = async () => {
+      // Prevent request pileup
+      if (pendingRequests >= MAX_PENDING_REQUESTS) {
+        return;
+      }
+
+      pendingRequests++;
+
       // Read local user stats
       try {
         const pageKey = `mj_views_${path}`;
@@ -78,11 +89,27 @@ export default function CloutCalculations() {
         setUserSiteViews(1);
       }
 
-      Promise.all([
-        fetch("/api/views").then((res) => res.json()),
-        fetch("/api/category-costs").then((res) => res.json())
-      ])
-        .then(([viewData, costData]) => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+        const [viewRes, costRes] = await Promise.all([
+          fetch("/api/views", { signal: controller.signal }),
+          fetch("/api/category-costs", { signal: controller.signal })
+        ]);
+
+        clearTimeout(timeoutId);
+
+        if (!viewRes.ok || !costRes.ok) {
+          throw new Error("API response not ok");
+        }
+
+        const [viewData, costData] = await Promise.all([
+          viewRes.json(),
+          costRes.json()
+        ]);
+
+        if (isComponentMounted) {
           if (viewData.allStats) {
             setPageStats(viewData.allStats);
           }
@@ -93,18 +120,26 @@ export default function CloutCalculations() {
             setCategoryCosts(costData.categoryBreakdown);
           }
           setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch stats:", err);
+        }
+      } catch (err) {
+        console.error("Failed to fetch stats:", err);
+        if (isComponentMounted) {
           setLoading(false);
-        });
+        }
+      } finally {
+        pendingRequests--;
+      }
     };
 
     fetchStats();
 
-    // Refresh stats every 2 seconds to show live updates
-    const interval = setInterval(fetchStats, 2000);
-    return () => clearInterval(interval);
+    // Refresh stats every 4.20 seconds to show live updates
+    const interval = setInterval(fetchStats, 4200);
+    
+    return () => {
+      isComponentMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const getDisplayPath = (path: string): string => {
@@ -159,7 +194,7 @@ export default function CloutCalculations() {
           <div className="relative group inline-flex items-center ml-1">
             <Info className="w-4 h-4 text-zinc-400 hover:text-emerald-500 cursor-help transition-colors" />
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[280px] bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 text-[11px] font-medium px-3 py-2 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none text-center">
-              March 19th in the year of our lord (Anno Domini) 2026
+              The holy day of March 19th in the year of our lord (Anno Domini) 2026
               <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-100"></div>
             </div>
           </div>
@@ -173,7 +208,7 @@ export default function CloutCalculations() {
           <div className="relative group inline-flex items-center ml-1">
             <Info className="w-4 h-4 text-zinc-400 hover:text-blue-500 cursor-help transition-colors" />
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[280px] bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 text-[11px] font-medium px-3 py-2 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none text-center">
-              July 18th, 2025
+              July 18th, 2025 - March 19th, 2026
               <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-100"></div>
             </div>
           </div>
