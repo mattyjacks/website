@@ -431,7 +431,7 @@ export default function RootLayout({
                     <div className="space-y-2">
                       <a
                         href="tel:+16039999420"
-                        className="block font-semibold text-zinc-900 dark:text-zinc-100 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                        className="block font-semibold text-zinc-900 dark:text-zinc-100 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                         aria-label="Call MattyJacks"
                       >
                         603 999 9420
@@ -441,7 +441,7 @@ export default function RootLayout({
                       </div>
                       <a
                         href="mailto:Matt@MattyJacks.com"
-                        className="block text-zinc-900 dark:text-zinc-100 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 underline decoration-red-500/30 hover:decoration-red-500 underline-offset-4"
+                        className="block text-zinc-900 dark:text-zinc-100 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200 underline decoration-sky-500/30 hover:decoration-sky-500 underline-offset-4"
                         aria-label="Email MattyJacks"
                       >
                         Matt@MattyJacks.com
@@ -457,7 +457,7 @@ export default function RootLayout({
                         <li>
                           <Link
                             href="/"
-                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                             aria-label="Go to Home page"
                           >
                             Home
@@ -466,7 +466,7 @@ export default function RootLayout({
                         <li>
                           <Link
                             href="/services"
-                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                             aria-label="Go to Services page"
                           >
                             Services
@@ -475,7 +475,7 @@ export default function RootLayout({
                         <li>
                           <Link
                             href="/merchants"
-                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                             aria-label="Go to Merchant Services page"
                           >
                             Merchant Services
@@ -484,7 +484,7 @@ export default function RootLayout({
                         <li>
                           <Link
                             href="/resumes"
-                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                             aria-label="Go to Resume Sites page"
                           >
                             Resume Sites
@@ -493,7 +493,7 @@ export default function RootLayout({
                         <li>
                           <Link
                             href="/leads"
-                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                             aria-label="Go to Leads page"
                           >
                             Leads
@@ -502,7 +502,7 @@ export default function RootLayout({
                         <li>
                           <Link
                             href="/contact"
-                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                             aria-label="Go to Contact page"
                           >
                             Contact
@@ -511,7 +511,7 @@ export default function RootLayout({
                         <li>
                           <Link
                             href="/whatsapp"
-                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                             aria-label="Go to WhatsApp page"
                           >
                             WhatsApp
@@ -520,7 +520,7 @@ export default function RootLayout({
                         <li>
                           <Link
                             href="/privacy"
-                            className="text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
                             aria-label="Go to Privacy Policy page"
                           >
                             Privacy Policy
@@ -538,7 +538,7 @@ export default function RootLayout({
                         href="https://x.com/MattyJacksX"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 font-medium"
+                        className="inline-flex items-center gap-2 text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200 font-medium"
                         aria-label="Follow MattyJacks on X"
                       >
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>

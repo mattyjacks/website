@@ -58,7 +58,7 @@ export default function CookieBanner() {
                 </p>
                 <Link
                   href="/privacy"
-                  className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 underline transition-colors"
+                  className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 underline transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -67,7 +67,7 @@ export default function CookieBanner() {
               {/* Right side: Accept button */}
               <button
                 onClick={handleAccept}
-                className="flex-shrink-0 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-lg hover:from-red-600 hover:to-red-500 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
+                className="flex-shrink-0 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-lg hover:from-blue-600 hover:to-sky-500 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
                 aria-label="Accept cookies"
               >
                 Delicious! 😄

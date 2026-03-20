@@ -33,7 +33,7 @@ export default function ResumesPage() {
       <div className="max-w-6xl mx-auto">
         <header ref={headerRef} className="max-w-3xl">
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            <span className="text-red-600">Resume</span>{" "}
+            <span className="text-blue-600">Resume</span>{" "}
             <span className="text-emerald-600">Sites</span>
           </h1>
           <p className="mt-3 text-zinc-600 dark:text-zinc-300">

@@ -24,7 +24,7 @@ export default function WhatsAppPage() {
         {/* Hero */}
         <div ref={headerRef}>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-          Welcome to the <span className="font-bold text-red-600 dark:text-red-500">hidden page!</span>
+          Welcome to the <span className="font-bold text-blue-600 dark:text-sky-500">hidden page!</span>
         </h1>
         <p className="mt-3 text-zinc-700 dark:text-zinc-300">
           This should only be shared with <span className="font-semibold">COOL PEOPLE</span>, not just anyone.
@@ -48,22 +48,22 @@ export default function WhatsAppPage() {
                 href={GROUP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-white font-semibold shadow-lg hover:shadow-red-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
+                className="group relative inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-white font-semibold shadow-lg hover:shadow-sky-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50"
               >
                 <span className="relative z-10">Join WhatsApp Group</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-500 to-sky-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
               <a
                 href={DIRECT_WA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center rounded-xl border-2 border-zinc-300 dark:border-zinc-700 px-5 py-2.5 font-semibold bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl hover:border-red-500 dark:hover:border-red-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
+                className="group inline-flex items-center justify-center rounded-xl border-2 border-zinc-300 dark:border-zinc-700 px-5 py-2.5 font-semibold bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl hover:border-sky-500 dark:hover:border-sky-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
               >
                 Message Matt Directly
               </a>
               <a
                 href="tel:+15106005735"
-                className="group inline-flex items-center justify-center rounded-xl border-2 border-zinc-300 dark:border-zinc-700 px-5 py-2.5 font-semibold bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl hover:border-red-500 dark:hover:border-red-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
+                className="group inline-flex items-center justify-center rounded-xl border-2 border-zinc-300 dark:border-zinc-700 px-5 py-2.5 font-semibold bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm shadow-lg hover:shadow-xl hover:border-sky-500 dark:hover:border-sky-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
               >
                 Call +1 (510) 600-5735
               </a>
@@ -76,31 +76,31 @@ export default function WhatsAppPage() {
           <h2 className="text-xl font-bold">Read the Rules</h2>
           <ul className="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
             <li className="flex items-start gap-2">
-              <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <X className="w-4 h-4 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
               <span>No calling without permission.</span>
             </li>
             <li className="flex items-start gap-2">
-              <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <X className="w-4 h-4 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
               <span>No spamming. Keep it professional.</span>
             </li>
             <li className="flex items-start gap-2">
-              <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <X className="w-4 h-4 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
               <span>Only promote with permission.</span>
             </li>
             <li className="flex items-start gap-2">
-              <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <X className="w-4 h-4 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
               <span>No scamming.</span>
             </li>
             <li className="flex items-start gap-2">
-              <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <X className="w-4 h-4 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
               <span>Mute yourself on calls.</span>
             </li>
             <li className="flex items-start gap-2">
-              <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <X className="w-4 h-4 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
               <span>You must be at least 18 years old to join this group.</span>
             </li>
             <li className="flex items-start gap-2">
-              <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <X className="w-4 h-4 text-blue-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
               <span>No buying or selling any kind of account, especially Upwork.</span>
             </li>
           </ul>
@@ -116,10 +116,10 @@ export default function WhatsAppPage() {
             <div className="mt-auto pt-4 flex justify-end">
               <Link
                 href="/contact"
-                className="group relative inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-zinc-900 to-zinc-800 text-white px-4 py-2 text-sm font-semibold shadow-lg hover:shadow-red-500/25 hover:shadow-xl dark:from-zinc-100 dark:to-white dark:text-zinc-900 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
+                className="group relative inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-zinc-900 to-zinc-800 text-white px-4 py-2 text-sm font-semibold shadow-lg hover:shadow-sky-500/25 hover:shadow-xl dark:from-zinc-100 dark:to-white dark:text-zinc-900 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50"
               >
                 <span className="relative z-10">Go to Contact</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-500 to-sky-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
             </div>
           </div>
@@ -133,11 +133,11 @@ export default function WhatsAppPage() {
                 href="https://x.com/MattyJacksX"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-4 py-2 text-sm text-white font-semibold shadow-lg hover:shadow-red-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
+                className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-4 py-2 text-sm text-white font-semibold shadow-lg hover:shadow-sky-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50"
               >
                 <FaXTwitter className="relative z-10 w-4 h-4" />
                 <span className="relative z-10">@MattyJacksX</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-500 to-sky-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function WhatsAppPage() {
           Prefer email? {" "}
           <a
             href="mailto:Matt@MattyJacks.com?subject=I%20want%20to%20work%20with%20MattyJacks"
-            className="underline decoration-emerald-500 hover:decoration-red-500 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-300"
+            className="underline decoration-emerald-500 hover:decoration-sky-500 hover:text-blue-700 dark:hover:text-sky-300 transition-colors duration-300"
           >
             Email Matt@MattyJacks.com
           </a>

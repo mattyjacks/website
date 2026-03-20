@@ -108,13 +108,13 @@ export default function Navigation() {
           <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-6 text-sm">
             
             <motion.div whileHover={{ scale: 1.05 }}>
-              <Link href="/services" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">
+              <Link href="/services" className="hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                 Services
               </Link>
             </motion.div>
             
             <motion.div whileHover={{ scale: 1.05 }}>
-              <Link href="/internship" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">
+              <Link href="/internship" className="hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                 Internship
               </Link>
             </motion.div>
@@ -122,7 +122,7 @@ export default function Navigation() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/contact"
-                className="shiny-hover-button rounded-md bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-red-500 transition-colors whitespace-nowrap"
+                className="shiny-hover-button rounded-md bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-sky-500 transition-colors whitespace-nowrap"
               >
                 Contact
               </Link>
@@ -135,7 +135,7 @@ export default function Navigation() {
             >
               <motion.button
                 whileHover={{ scale: 1.05 }}
-                className="hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-1 py-4"
+                className="hover:text-blue-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1 py-4"
                 onMouseDown={(e) => e.preventDefault()}
               >
                 More
@@ -147,13 +147,13 @@ export default function Navigation() {
               {isMoreDropdownOpen && (
                 <div className="absolute top-full right-0 mt-0 pt-3">
                   <div className="w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-2 z-[110]">
-                    <Link href="/leads" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                    <Link href="/leads" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                       Free Leads
                     </Link>
-                  <Link href="/resumes" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                  <Link href="/resumes" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                     Resume Sites
                   </Link>
-                  <Link href="/merchants" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                  <Link href="/merchants" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                     Merchant Accounts
                   </Link>
                   
@@ -175,7 +175,7 @@ export default function Navigation() {
             </div>
 
             <div className="hidden xl:flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs">
-              <Network className="w-3.5 h-3.5 text-red-500" />
+              <Network className="w-3.5 h-3.5 text-sky-500" />
               <span className="text-zinc-700 dark:text-zinc-300">
                 {controlPlane?.user.accessMode ? `GiveGigs: ${controlPlane.user.accessMode}` : "GiveGigs: syncing"}
               </span>
@@ -188,7 +188,7 @@ export default function Navigation() {
                 <ShieldX className="w-3.5 h-3.5 text-amber-500" />
               )}
               {controlPlane?.admin?.url ? (
-                <a href={controlPlane.admin.url} target="_blank" rel="noreferrer" className="ml-2 hover:text-red-600 dark:hover:text-red-400 transition-colors font-medium">
+                <a href={controlPlane.admin.url} target="_blank" rel="noreferrer" className="ml-2 hover:text-blue-600 dark:hover:text-sky-400 transition-colors font-medium">
                   Admin
                 </a>
               ) : null}
@@ -203,7 +203,7 @@ export default function Navigation() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/contact"
-                className="shiny-hover-button rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-500 transition-colors"
+                className="shiny-hover-button rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-500 transition-colors"
               >
                 Contact
               </Link>

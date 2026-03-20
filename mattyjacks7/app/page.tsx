@@ -231,7 +231,7 @@ export default function Home() {
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.08] text-zinc-900 dark:text-white">
                 We Build Companies.
                 <br />
-                <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-red-500 bg-clip-text text-transparent">We Deploy Talent.</span>
+                <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-sky-500 bg-clip-text text-transparent">We Deploy Talent.</span>
               </h1>
             </div>
             <div className="mt-6 space-y-3 px-2 text-center">
@@ -277,14 +277,14 @@ export default function Home() {
               </Link>
               <a
                 href="tel:+16039999420"
-                className="group inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-red-500 dark:hover:border-red-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
+                className="group inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-sky-500 dark:hover:border-sky-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
                 aria-label="Call MattyJacks at (603) 999-9420 - available 24/7"
               >
                 <svg className="mr-2 w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
                 Call Us
-                <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors hidden xs:inline">(603) 999-9420</span>
+                <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors hidden xs:inline">(603) 999-9420</span>
               </a>
             </div>
 
@@ -339,11 +339,11 @@ export default function Home() {
       <section id="about" className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
           {/* Gradient border wrapper */}
-          <div className="relative rounded-2xl p-[1px] bg-gradient-to-br from-emerald-500/30 via-zinc-300/20 to-red-500/30 dark:from-emerald-500/20 dark:via-zinc-700/20 dark:to-red-500/20 animate-border-glow">
+          <div className="relative rounded-2xl p-[1px] bg-gradient-to-br from-emerald-500/30 via-zinc-300/20 to-sky-500/30 dark:from-emerald-500/20 dark:via-zinc-700/20 dark:to-sky-500/20 animate-border-glow">
             <div className="rounded-2xl p-8 lg:p-12 bg-white dark:bg-zinc-950">
               <div ref={aboutRef} className="space-y-8">
                 <div className="max-w-3xl">
-                  <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Holding Company <span className="font-bold text-red-600 dark:text-red-500">&amp;</span> Agency</p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Holding Company <span className="font-bold text-blue-600 dark:text-sky-500">&amp;</span> Agency</p>
                   <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-300 bg-clip-text text-transparent">We build companies, deploy global talent, and ship technology that makes money.</h2>
                   <p className="mt-4 text-zinc-600 dark:text-zinc-300 leading-relaxed text-lg">MattyJacks operates as both a <strong className="text-zinc-900 dark:text-white">holding company</strong> for our portfolio of technology businesses and a <strong className="text-zinc-900 dark:text-white">full-service agency</strong> that deploys cost-effective global talent.</p>
                 </div>
@@ -361,16 +361,16 @@ export default function Home() {
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">We build, acquire, and operate technology companies. Our portfolio spans freelance marketplaces, creative software, and payment solutions.</p>
                     <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-emerald-400 to-emerald-600 opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
                   </div>
-                  <div className="group rounded-xl border border-red-200/60 dark:border-red-800/40 p-6 bg-gradient-to-br from-red-50/80 via-white to-red-50/40 dark:from-red-950/30 dark:via-zinc-950 dark:to-red-950/10 hover:shadow-xl hover:shadow-red-500/10 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-400 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="group rounded-xl border border-sky-200/60 dark:border-blue-800/40 p-6 bg-gradient-to-br from-sky-50/80 via-white to-sky-50/40 dark:from-blue-950/30 dark:via-zinc-950 dark:to-blue-950/10 hover:shadow-xl hover:shadow-sky-500/10 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-sky-400 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-md group-hover:scale-110 transition-transform duration-300">
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 shadow-md group-hover:scale-110 transition-transform duration-300">
                         <Globe className="w-5 h-5 text-white" />
                       </div>
                       <h3 className="font-bold text-zinc-900 dark:text-white text-lg">Outsourcing Agency</h3>
                     </div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">We deploy skilled remote workers worldwide: developers, designers, sales callers, VAs, and more. Cost-effective talent, coordinated for results.</p>
-                    <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-red-400 to-red-600 opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+                    <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-sky-400 to-blue-600 opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
                   </div>
                 </div>
 
@@ -399,7 +399,7 @@ export default function Home() {
                 <div className="flex items-center gap-4 pt-4">
                   <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/30 via-emerald-400/10 to-transparent"></div>
                   <p className="text-zinc-700 dark:text-zinc-200 font-semibold text-sm sm:text-base text-center max-w-md">We don&apos;t just outsource - we build entire ecosystems of technology and talent.</p>
-                  <div className="h-px flex-1 bg-gradient-to-l from-red-500/30 via-red-400/10 to-transparent"></div>
+                  <div className="h-px flex-1 bg-gradient-to-l from-sky-500/30 via-sky-400/10 to-transparent"></div>
                 </div>
               </div>
             </div>
@@ -413,7 +413,7 @@ export default function Home() {
           <div className="h-px flex-1 max-w-[200px] bg-gradient-to-r from-transparent to-emerald-500/20"></div>
           <div className="flex gap-1">
             <div className="w-1 h-1 rounded-full bg-emerald-500/30"></div>
-            <div className="w-1 h-1 rounded-full bg-red-500/30"></div>
+            <div className="w-1 h-1 rounded-full bg-sky-500/30"></div>
             <div className="w-1 h-1 rounded-full bg-emerald-500/30"></div>
           </div>
           <div className="h-px flex-1 max-w-[200px] bg-gradient-to-l from-transparent to-emerald-500/20"></div>
@@ -426,7 +426,7 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }}></div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-400 mb-2">Our <span className="font-bold text-red-400">Portfolio</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-400 mb-2">Our <span className="font-bold text-sky-400">Portfolio</span></p>
             <h2 className="text-3xl md:text-4xl font-bold text-white">Companies We Own &amp; Operate</h2>
             <p className="mt-3 text-zinc-400 max-w-2xl mx-auto">Each company in the MattyJacks portfolio is built to solve real problems. Together, they form a connected ecosystem powered by shared infrastructure.</p>
             {/* Ecosystem connection line */}
@@ -469,7 +469,7 @@ export default function Home() {
                 name: "MattyJacks Agency",
                 url: "/services",
                 description: "Full-service outsourcing agency deploying global talent for web development, sales, marketing, AI solutions, and virtual assistance.",
-                color: "from-red-500 to-red-700",
+                color: "from-sky-500 to-blue-700",
                 icon: Rocket,
                 status: "Live",
               },
@@ -536,7 +536,7 @@ export default function Home() {
       <section id="services" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-red-600 dark:text-red-500">Services</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-blue-600 dark:text-sky-500">Services</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">What can we do for you?</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">Four core pillars that drive revenue for our clients.</p>
             <div className="mt-6 flex justify-center">
@@ -577,13 +577,13 @@ export default function Home() {
               return (
                 <div
                   key={i}
-                  className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-red-500/10 hover:border-zinc-300 dark:hover:border-zinc-600 hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer overflow-hidden"
+                  className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-sky-500/10 hover:border-zinc-300 dark:hover:border-zinc-600 hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer overflow-hidden"
                 >
                   {/* Top accent line */}
                   <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${s.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                   {/* Bottom accent line */}
                   <div className={`absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r ${s.accent} opacity-0 group-hover:opacity-30 transition-opacity duration-500`}></div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-blue-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="relative z-10">
                     <div className="flex items-start justify-between mb-4">
                       <div className={`p-2.5 rounded-xl bg-gradient-to-br ${s.accent} shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}>
@@ -591,7 +591,7 @@ export default function Home() {
                       </div>
                       <span className="text-xs font-bold text-zinc-300 dark:text-zinc-700 group-hover:text-zinc-400 dark:group-hover:text-zinc-500 transition-colors">{String(i + 1).padStart(2, "0")}</span>
                     </div>
-                    <h3 className="font-bold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300 mb-2">{s.t}</h3>
+                    <h3 className="font-bold text-zinc-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-sky-300 transition-colors duration-300 mb-2">{s.t}</h3>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{s.d}</p>
                   </div>
                 </div>
@@ -606,7 +606,7 @@ export default function Home() {
       <section id="process" className="px-4 py-20 pb-40">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-red-600 dark:text-red-500">Process</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-blue-600 dark:text-sky-500">Process</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">How we work with you</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">From first call to measurable results in four focused steps.</p>
           </div>
@@ -622,7 +622,7 @@ export default function Home() {
                   { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle, color: "from-emerald-500 to-emerald-600" },
                   { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes - in plain English.", icon: Target, color: "from-blue-500 to-blue-600" },
                   { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap, color: "from-amber-500 to-amber-600" },
-                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-red-500 to-red-600" },
+                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-sky-500 to-blue-600" },
                 ].map((step, index) => (
                   <div key={index} className="group text-center relative">
                     {/* Step Number Circle */}
@@ -664,7 +664,7 @@ export default function Home() {
                   { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle, color: "from-emerald-500 to-emerald-600" },
                   { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes - in plain English.", icon: Target, color: "from-blue-500 to-blue-600" },
                   { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap, color: "from-amber-500 to-amber-600" },
-                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-red-500 to-red-600" },
+                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-sky-500 to-blue-600" },
                 ].map((step, index) => (
                   <div key={index} className="relative flex items-center gap-5">
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${step.color} text-white text-lg font-bold flex items-center justify-center shadow-lg flex-shrink-0 z-10 ring-4 ring-white dark:ring-zinc-950`}>
@@ -689,7 +689,7 @@ export default function Home() {
       <section className="px-4 py-20 bg-zinc-50 dark:bg-zinc-900/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Who We <span className="font-bold text-red-600 dark:text-red-500">Help</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Who We <span className="font-bold text-blue-600 dark:text-sky-500">Help</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Industries we serve</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Deep experience across verticals that need speed, quality, and results.</p>
           </div>
@@ -728,7 +728,7 @@ export default function Home() {
       <section className="px-4 py-20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">See Our <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">See Our <span className="font-bold text-blue-600 dark:text-sky-500">Work</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Case Studies</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Real projects. Real results. No fluff.</p>
           </div>
@@ -757,7 +757,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <a href="https://tristatehoney.com" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+              <a href="https://tristatehoney.com" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                 Visit TristateHoney.com <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </a>
             </div>
@@ -789,7 +789,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <a href="https://www.opority.com/" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+              <a href="https://www.opority.com/" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                 Visit Opority.com <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </a>
             </div>
@@ -802,7 +802,7 @@ export default function Home() {
             {/* Case Study 3: TikTok */}
             <div className="relative">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">03</div>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">03</div>
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">TikTok Algorithm Mastery</h3>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">Social Media - Growth Hacking</p>
@@ -819,14 +819,14 @@ export default function Home() {
                   { value: "3,000+", label: "Followers in 30 days" },
                   { value: "$0", label: "Marketing spend" },
                 ].map((s, i) => (
-                  <div key={i} className="group/stat px-5 py-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200/60 dark:border-red-800/40 hover:bg-red-100 dark:hover:bg-red-950/40 hover:border-red-300 dark:hover:border-red-700/60 transition-all duration-300 cursor-default">
-                    <div className="text-lg font-black text-red-600 dark:text-red-400 group-hover/stat:scale-105 transition-transform duration-300 origin-left">{s.value}</div>
+                  <div key={i} className="group/stat px-5 py-3 rounded-xl bg-sky-50 dark:bg-blue-950/20 border border-sky-200/60 dark:border-blue-800/40 hover:bg-sky-100 dark:hover:bg-blue-950/40 hover:border-sky-300 dark:hover:border-blue-700/60 transition-all duration-300 cursor-default">
+                    <div className="text-lg font-black text-blue-600 dark:text-sky-400 group-hover/stat:scale-105 transition-transform duration-300 origin-left">{s.value}</div>
                     <div className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wider font-semibold">{s.label}</div>
                   </div>
                 ))}
               </div>
 
-              <a href="https://www.tiktok.com/@eric_escobedo/video/7520191936905383169" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-red-600 dark:text-red-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              <a href="https://www.tiktok.com/@eric_escobedo/video/7520191936905383169" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-sky-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                 Watch the viral video on TikTok <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-0.5" />
               </a>
             </div>
@@ -912,7 +912,7 @@ export default function Home() {
       <section id="video-demos" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Watch Us <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Watch Us <span className="font-bold text-blue-600 dark:text-sky-500">Work</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Video Demos</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">See our process and results in action.</p>
           </div>
@@ -966,7 +966,7 @@ export default function Home() {
       <section id="testimonials" className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">What <span className="font-bold text-red-600 dark:text-red-500">Clients</span> Say</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">What <span className="font-bold text-blue-600 dark:text-sky-500">Clients</span> Say</p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Testimonials</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Real feedback from real clients. No scripts, no edits.</p>
           </div>
@@ -1022,7 +1022,7 @@ export default function Home() {
       <section id="updates" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Latest <span className="font-bold text-red-600 dark:text-red-500">Updates</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Latest <span className="font-bold text-blue-600 dark:text-sky-500">Updates</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Building in Public</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Follow along as we ship new features and improvements.</p>
           </div>
@@ -1071,7 +1071,7 @@ export default function Home() {
               </div>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight drop-shadow-lg">
                 <span className="text-white">Ready to </span>
-                <span className="text-red-400" style={{
+                <span className="text-sky-400" style={{
                   textShadow: '2px 2px 8px rgba(0,0,0,0.5)'
                 }}>Make Money?</span>
               </h2>

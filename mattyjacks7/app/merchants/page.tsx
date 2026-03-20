@@ -135,7 +135,7 @@ export default function MerchantsPage() {
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-500/10 dark:bg-red-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-sky-500/10 dark:bg-sky-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
@@ -156,10 +156,10 @@ export default function MerchantsPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 href="/contact"
-                className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-red-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
+                className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-sky-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50"
               >
                 <span className="relative z-10">Get Started Today</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-500 to-sky-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
               </Link>
               
@@ -187,7 +187,7 @@ export default function MerchantsPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">
-              Why Choose <span className="font-bold text-red-600 dark:text-red-500">Our Services</span>
+              Why Choose <span className="font-bold text-blue-600 dark:text-sky-500">Our Services</span>
             </p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
               Built for Your Success
@@ -267,7 +267,7 @@ export default function MerchantsPage() {
         <div className="max-w-7xl mx-auto">
           <div ref={industriesRef} className="text-center mb-12">
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">
-              We Specialize In <span className="font-bold text-red-600 dark:text-red-500">High-Risk</span>
+              We Specialize In <span className="font-bold text-blue-600 dark:text-sky-500">High-Risk</span>
             </p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent mb-4">
               High-Risk Industries We Serve
@@ -283,12 +283,12 @@ export default function MerchantsPage() {
               return (
                 <div
                   key={index}
-                  className="group flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 hover:border-red-300 dark:hover:border-red-500 hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                  className="group flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 hover:border-sky-300 dark:hover:border-sky-500 hover:shadow-lg hover:shadow-sky-500/10 hover:-translate-y-1 transition-all duration-200 cursor-pointer"
                 >
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-800/50 group-hover:scale-110 transition-all duration-200">
-                    <IconComponent className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-sky-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-sky-200 dark:group-hover:bg-blue-800/50 group-hover:scale-110 transition-all duration-200">
+                    <IconComponent className="w-5 h-5 text-blue-600 dark:text-sky-400" />
                   </div>
-                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-200">
+                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-blue-700 dark:group-hover:text-sky-300 transition-colors duration-200">
                     {industry.name}
                   </span>
                 </div>
@@ -302,7 +302,7 @@ export default function MerchantsPage() {
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 font-semibold transition-colors"
+              className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 font-semibold transition-colors"
             >
               Contact us to discuss your specific needs
               <ArrowRight className="w-4 h-4" />
@@ -316,7 +316,7 @@ export default function MerchantsPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">
-              Low-Risk <span className="font-bold text-red-600 dark:text-red-500">Solutions Too</span>
+              Low-Risk <span className="font-bold text-blue-600 dark:text-sky-500">Solutions Too</span>
             </p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent mb-4">
               Traditional Merchant Accounts
@@ -389,7 +389,7 @@ export default function MerchantsPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">
-              Complete <span className="font-bold text-red-600 dark:text-red-500">Payment Solutions</span>
+              Complete <span className="font-bold text-blue-600 dark:text-sky-500">Payment Solutions</span>
             </p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
               Everything You Need to Accept Payments
@@ -517,7 +517,7 @@ export default function MerchantsPage() {
               
               <a
                 href="tel:+16039999420"
-                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-red-600 hover:bg-red-500 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
+                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 hover:bg-sky-500 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50"
               >
                 <Phone className="mr-2 w-5 h-5" />
                 <span>603-999-9420</span>

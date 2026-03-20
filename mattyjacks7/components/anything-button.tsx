@@ -120,7 +120,7 @@ function MessageBubble({
           isUser
             ? "bg-emerald-600 text-white rounded-br-md"
             : message.error
-              ? "bg-red-50 dark:bg-red-950/30 text-red-900 dark:text-red-200 rounded-bl-md border border-red-200 dark:border-red-800"
+              ? "bg-sky-50 dark:bg-blue-950/30 text-blue-900 dark:text-sky-200 rounded-bl-md border border-sky-200 dark:border-blue-800"
               : "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-bl-md border border-zinc-200 dark:border-zinc-800"
         }`}
       >
@@ -381,7 +381,7 @@ export default function AnythingButton() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-red-500/30 hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-sky-500/30 hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
         aria-label={isOpen ? "Close Valley Net AI Chat" : "Open Valley Net AI Chat"}
         title={isOpen ? "Close chat (Esc)" : "Valley Net - Ask AI Anything"}
       >
@@ -460,7 +460,7 @@ export default function AnythingButton() {
                   </div>
                   <button
                     onClick={(e) => deleteSession(e, session.id)}
-                    className="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity p-1"
+                    className="opacity-0 group-hover:opacity-100 hover:text-sky-500 transition-opacity p-1"
                     title="Delete Conversation"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -518,7 +518,7 @@ export default function AnythingButton() {
           {/* Input Area */}
           <div className="px-3 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur z-20">
             {error && (
-              <div className="mb-2 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 px-3 py-2 rounded-lg border border-red-200/70 dark:border-red-800/70 shadow-sm">
+              <div className="mb-2 text-xs text-blue-700 dark:text-sky-300 bg-sky-50 dark:bg-blue-950/40 px-3 py-2 rounded-lg border border-sky-200/70 dark:border-blue-800/70 shadow-sm">
                 {sanitizeText(error.slice(0, 500))}
               </div>
             )}

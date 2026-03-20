@@ -17,7 +17,7 @@ export default function ServicesPage() {
         <div className="max-w-6xl mx-auto">
           <div ref={heroRef} className="text-center mb-16">
             <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-4">
-              What We <span className="font-bold text-red-600 dark:text-red-500">Offer</span>
+              What We <span className="font-bold text-blue-600 dark:text-sky-500">Offer</span>
             </p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
               Our Services
@@ -90,15 +90,15 @@ export default function ServicesPage() {
             </div>
 
             {/* Cold Calling Operations */}
-            <div className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 lg:p-12 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 lg:p-12 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-300 dark:hover:border-sky-500 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-blue-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="p-4 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-300">
+                  <div className="p-4 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-sky-200 dark:group-hover:bg-blue-800/50 transition-colors duration-300">
                     <Phone className="w-8 h-8 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300">
+                  <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-sky-300 transition-colors duration-300">
                     Cold Calling Operations
                   </h2>
                 </div>
@@ -136,15 +136,15 @@ export default function ServicesPage() {
             </div>
 
             {/* Copywriting & Marketing */}
-            <div className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 lg:p-12 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 lg:p-12 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-300 dark:hover:border-sky-500 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-blue-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="p-4 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-300">
+                  <div className="p-4 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-sky-200 dark:group-hover:bg-blue-800/50 transition-colors duration-300">
                     <PenTool className="w-8 h-8 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300">
+                  <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-sky-300 transition-colors duration-300">
                     Copywriting & Marketing
                   </h2>
                 </div>
@@ -169,9 +169,9 @@ export default function ServicesPage() {
                     ))}
                   </ul>
                   
-                  <div className="mt-6 p-4 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+                  <div className="mt-6 p-4 bg-sky-50 dark:bg-blue-950/30 rounded-lg border border-sky-200 dark:border-blue-800">
                     <p className="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                      <strong className="text-red-700 dark:text-red-400">Bottom Line:</strong> With us, you don&apos;t just get words—you get copy that builds profit.
+                      <strong className="text-blue-700 dark:text-sky-400">Bottom Line:</strong> With us, you don&apos;t just get words—you get copy that builds profit.
                     </p>
                   </div>
                 </div>
@@ -179,15 +179,15 @@ export default function ServicesPage() {
             </div>
 
             {/* Graphic Design */}
-            <div className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 lg:p-12 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 transition-all duration-300">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 lg:p-12 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-300 dark:hover:border-sky-500 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-blue-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="p-4 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50 transition-colors duration-300">
+                  <div className="p-4 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-sky-200 dark:group-hover:bg-blue-800/50 transition-colors duration-300">
                     <Palette className="w-8 h-8 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300">
+                  <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-sky-300 transition-colors duration-300">
                     Graphic Design
                   </h2>
                 </div>
@@ -234,7 +234,7 @@ export default function ServicesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-16 bg-gradient-to-br from-emerald-50/30 via-white to-red-50/30 dark:from-emerald-950/10 dark:via-zinc-900/10 dark:to-red-950/10">
+      <section className="px-4 py-16 bg-gradient-to-br from-emerald-50/30 via-white to-sky-50/30 dark:from-emerald-950/10 dark:via-zinc-900/10 dark:to-blue-950/10">
         <div className="max-w-4xl mx-auto">
           <div ref={ctaRef} className="text-center space-y-8">
             <div>
@@ -249,10 +249,10 @@ export default function ServicesPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 href="/contact"
-                className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-red-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl shadow-lg hover:shadow-sky-500/25 hover:shadow-xl transition-all duration-300 hover:scale-105"
               >
                 <span className="relative z-10">Get in Touch</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-500 to-sky-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <svg className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -260,7 +260,7 @@ export default function ServicesPage() {
               
               <a
                 href="tel:+16039999420"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-red-500 dark:hover:border-red-400 transition-all duration-300 hover:scale-105"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-sky-500 dark:hover:border-sky-400 transition-all duration-300 hover:scale-105"
               >
                 <Phone className="mr-2 w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 (603) 999-9420

@@ -115,12 +115,12 @@ export default function PrivacyPolicyPage() {
                   We use Google Analytics, a web analytics service provided by Google, Inc. (&quot;Google&quot;), to collect and analyze information about how visitors use our Service. Google Analytics uses cookies and similar technologies to track your interactions with our Service, including pages visited, time spent, and actions taken.
                 </p>
                 <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed mt-3">
-                  Google may use this data to contextualize and personalize ads within its advertising network. To learn more about Google&apos;s privacy practices, visit: <a href="https://policies.google.com/privacy" className="text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 underline">https://policies.google.com/privacy</a>
+                  Google may use this data to contextualize and personalize ads within its advertising network. To learn more about Google&apos;s privacy practices, visit: <a href="https://policies.google.com/privacy" className="text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 underline">https://policies.google.com/privacy</a>
                 </p>
 
                 <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mt-6 mb-3">Vercel Hosting</h3>
                 <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                  Our Service is hosted on Vercel, a cloud platform provider. Vercel may collect technical information such as your IP address, browser type, and system information for the purpose of providing hosting services and maintaining the security and performance of our website. For more information about Vercel&apos;s privacy practices, visit: <a href="https://vercel.com/legal/privacy-policy" className="text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 underline">https://vercel.com/legal/privacy-policy</a>
+                  Our Service is hosted on Vercel, a cloud platform provider. Vercel may collect technical information such as your IP address, browser type, and system information for the purpose of providing hosting services and maintaining the security and performance of our website. For more information about Vercel&apos;s privacy practices, visit: <a href="https://vercel.com/legal/privacy-policy" className="text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 underline">https://vercel.com/legal/privacy-policy</a>
                 </p>
 
                 <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mt-6 mb-3">Other Third-Party Services</h3>
@@ -318,10 +318,10 @@ export default function PrivacyPolicyPage() {
                 <div className="mt-4 space-y-2">
                   <p className="text-zinc-900 dark:text-zinc-100 font-semibold">MattyJacks</p>
                   <p className="text-zinc-600 dark:text-zinc-300">
-                    Email: <a href="mailto:Matt@MattyJacks.com" className="text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 underline">Matt@MattyJacks.com</a>
+                    Email: <a href="mailto:Matt@MattyJacks.com" className="text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 underline">Matt@MattyJacks.com</a>
                   </p>
                   <p className="text-zinc-600 dark:text-zinc-300">
-                    Phone: <a href="tel:+16039999420" className="text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 underline">603 999 9420</a>
+                    Phone: <a href="tel:+16039999420" className="text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 underline">603 999 9420</a>
                   </p>
                 </div>
               </div>
@@ -337,7 +337,7 @@ export default function PrivacyPolicyPage() {
           <div className="mt-10 text-center">
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 shadow-md hover:shadow-red-500/25 hover:shadow-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50"
+              className="inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 shadow-md hover:shadow-sky-500/25 hover:shadow-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50"
             >
               Return to Home
             </Link>
