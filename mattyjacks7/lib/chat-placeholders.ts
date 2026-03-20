@@ -107,12 +107,12 @@ export const CHAT_PLACEHOLDERS = [
   "Let's make it unforgettable.",
 ];
 
-export function getRandomPlaceholder(nickname: string = "Boss"): string {
+export function getRandomPlaceholder(nickname: string = "Master"): string {
   const placeholder = CHAT_PLACEHOLDERS[Math.floor(Math.random() * CHAT_PLACEHOLDERS.length)];
   return placeholder.replace(/\[nickname\]/g, nickname);
 }
 
-export function getPlaceholderByIndex(index: number, nickname: string = "Boss"): string {
+export function getPlaceholderByIndex(index: number, nickname: string = "Master"): string {
   const placeholder = CHAT_PLACEHOLDERS[index % CHAT_PLACEHOLDERS.length];
   return placeholder.replace(/\[nickname\]/g, nickname);
 }
