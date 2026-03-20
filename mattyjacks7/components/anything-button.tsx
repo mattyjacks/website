@@ -1166,7 +1166,89 @@ Create a summary that another AI can use to understand the context and continue 
     setCharCount(e.target.value.length);
     setError(null);
     e.target.style.height = 'auto';
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 96)}px`;
+  };
+
+  const getConversationStatus = () => {
+    const aiResponseCount = messages.filter(m => m.role === 'assistant').length;
+    const maxResponses = 69;
+    if (aiResponseCount === 0) return 'Newborn';
+    if (aiResponseCount <= 14) return 'Fresh';
+    if (aiResponseCount <= 28) return 'Okay';
+    if (aiResponseCount <= 48) return 'Tired';
+    if (aiResponseCount <= 68) return 'Exhausted';
+    if (aiResponseCount < maxResponses) return 'Dying';
+    return 'Dead';
+  };
+
+  const getStatusColor = () => {
+    const status = getConversationStatus();
+    switch (status) {
+      case 'Newborn': return 'text-pink-600 dark:text-pink-400';
+      case 'Fresh': return 'text-emerald-600 dark:text-emerald-400';
+      case 'Okay': return 'text-sky-600 dark:text-sky-400';
+      case 'Tired': return 'text-yellow-600 dark:text-yellow-400';
+      case 'Exhausted': return 'text-orange-600 dark:text-orange-400';
+      case 'Dying': return 'text-red-600 dark:text-red-400';
+      case 'Dead': return 'text-red-700 dark:text-red-500';
+      default: return 'text-zinc-700 dark:text-zinc-100';
+    }
+  };
+
+  const getCounterColor = () => {
+    const aiResponseCount = messages.filter(m => m.role === 'assistant').length;
+    const maxResponses = 69;
+    const percentage = aiResponseCount / maxResponses;
+    if (percentage < 0.3) return 'text-emerald-600 dark:text-emerald-400';
+    if (percentage < 0.5) return 'text-sky-600 dark:text-sky-400';
+    if (percentage < 0.7) return 'text-yellow-600 dark:text-yellow-400';
+    if (percentage < 0.85) return 'text-orange-600 dark:text-orange-400';
+    if (percentage < 1) return 'text-red-600 dark:text-red-400';
+    return 'text-red-700 dark:text-red-500';
+  };
+
+  const downloadSummary = async (sessionId: string, format: 'markdown' | 'text') => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return;
+
+    const conversationText = session.messages
+      .map(m => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`)
+      .join('\n\n');
+    
+    const filename = `${session.title}-summary.${format === 'markdown' ? 'md' : 'txt'}`;
+    const element = document.createElement('a');
+    element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(conversationText)}`);
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const copySummaryToClipboard = async (sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return;
+
+    const conversationText = session.messages
+      .map(m => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`)
+      .join('\n\n');
+    
+    await navigator.clipboard.writeText(conversationText);
+    alert('Conversation copied to clipboard!');
+  };
+
+  const startNewChatWithSummary = async (sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return;
+
+    const conversationText = session.messages
+      .map(m => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`)
+      .join('\n\n');
+    
+    createNewSession();
+    setInput(`Here's a summary of my previous conversation:\n\n${conversationText}\n\n`);
+    setShowSumUpMenu(false);
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -1281,15 +1363,27 @@ Create a summary that another AI can use to understand the context and continue 
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
                 {showSumUpMenu ? (
-                  <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                    <h5 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Sum Up Conversations</h5>
-                    <div className="space-y-1">
-                      {sessions.map((session) => (
-                        <button key={session.id} onClick={() => { setSelectedSumUpSession(session.id); setShowSumUpConfirm(true); }} className="w-full text-left flex items-center justify-between px-3 py-2 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 text-sm text-zinc-700 dark:text-zinc-300 transition-colors">
-                          <span className="truncate">{session.title}</span>
-                          <span className="text-[10px] text-zinc-500">({session.messages.length})</span>
-                        </button>
-                      ))}
+                  <div className="p-4 rounded-2xl bg-white/70 dark:bg-black/30 border border-purple-200 dark:border-purple-800 shadow-sm space-y-3">
+                    <h5 className="text-xs font-bold uppercase tracking-widest text-purple-700 dark:text-purple-300">Sum Up Conversations</h5>
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                      {sessions.length === 0 ? (
+                        <div className="text-xs text-zinc-500 py-2">No conversations to sum up.</div>
+                      ) : (
+                        sessions.map((session) => (
+                          <div key={session.id} className="p-3 rounded-lg bg-purple-50/50 dark:bg-purple-900/20 border border-purple-200/50 dark:border-purple-800/50 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">{session.title}</span>
+                              <span className="text-[10px] text-zinc-500">({session.messages.length} msgs)</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <button onClick={() => downloadSummary(session.id, 'markdown')} className="px-2 py-1.5 text-[11px] font-bold rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors">📄 Markdown</button>
+                              <button onClick={() => downloadSummary(session.id, 'text')} className="px-2 py-1.5 text-[11px] font-bold rounded bg-slate-600 text-white hover:bg-slate-700 transition-colors">📝 Text</button>
+                              <button onClick={() => copySummaryToClipboard(session.id)} className="px-2 py-1.5 text-[11px] font-bold rounded bg-green-600 text-white hover:bg-green-700 transition-colors">📋 Copy</button>
+                              <button onClick={() => startNewChatWithSummary(session.id)} className="px-2 py-1.5 text-[11px] font-bold rounded bg-purple-600 text-white hover:bg-purple-700 transition-colors">✨ New Chat</button>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -1634,20 +1728,35 @@ Create a summary that another AI can use to understand the context and continue 
               </div>
 
               <div className="flex justify-between items-center mt-3 px-1">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-700 dark:text-zinc-100">
-                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : `Ready (${messages.length}/50)`}
+                <span className={`text-[10px] font-bold tracking-widest uppercase ${getStatusColor()}`}>
+                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : getConversationStatus()}
                 </span>
                 <div className="flex items-center gap-2">
-                  {charCount > 4000 && (
-                    <div className="w-16 h-1 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
-                      <div className={`h-full ${charCount > 4800 ? 'bg-sky-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min((charCount / 5000) * 100, 100)}%` }} />
-                    </div>
-                  )}
+                  <span className={`text-[10px] font-bold tracking-wider ${getCounterColor()}`}>
+                    {messages.filter(m => m.role === 'assistant').length}/69
+                  </span>
                   <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-100 tracking-wider">
                     Powered by God
                   </span>
                 </div>
               </div>
+
+              {getConversationStatus() === 'Dead' && (
+                <div className="px-4 py-3 border-t border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold text-red-700 dark:text-red-300 uppercase tracking-widest">
+                      💀 Revive Valley Net with Sum Up
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => { setShowSumUpMenu(true); setIsSidebarOpen(true); }}
+                    className="w-full px-3 py-2 text-xs font-bold rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
+                  >
+                    Sum Up & Revive
+                  </button>
+                </div>
+              )}
+
               <div className="px-4 py-2 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
                 <span className="text-[9px] font-mono text-zinc-500 dark:text-zinc-400 tracking-widest">
                   -+OUTPUT_NOT_100%_TRUE+-
