@@ -412,9 +412,9 @@ export default function AnythingButton() {
           >
             <Rnd
               default={{
-                x: typeof window !== 'undefined' ? window.innerWidth - Math.min(window.innerWidth * 0.94, 420) - (window.innerWidth < 640 ? 12 : 24) : 0,
+                x: typeof window !== 'undefined' ? document.documentElement.clientWidth - Math.min(document.documentElement.clientWidth * 0.94, 420) - (document.documentElement.clientWidth < 640 ? 12 : 24) : 0,
                 y: typeof window !== 'undefined' ? window.innerHeight - Math.min(window.innerHeight * 0.75, 650) - 96 : 0,
-                width: typeof window !== 'undefined' ? Math.min(window.innerWidth * 0.94, 420) : 420,
+                width: typeof window !== 'undefined' ? Math.min(document.documentElement.clientWidth * 0.94, 420) : 420,
                 height: typeof window !== 'undefined' ? Math.min(window.innerHeight * 0.75, 650) : 650,
               }}
               minWidth={320}
