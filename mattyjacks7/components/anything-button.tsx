@@ -8,10 +8,13 @@ import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
 import { SHORT_PROMPTS } from "./short-prompts";
 import { ThreeBorderBack, ThreeBorderFront, triggerWobble, setMorphTarget } from "./three-border";
 import { renameConversation, createRenameData, updateRenameDataOnOpen, markAsManuallyRenamed, shouldAttemptRename, type ConversationRenameData } from "@/lib/conversation-renamer";
+import { processImageFiles, handlePasteEvent, handleDropEvent, type UploadedImage } from "@/lib/image-upload-handler";
+import { ImageGallery } from "./image-preview";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Upload } from "lucide-react";
 
 interface ChatMessage {
   id: string;
@@ -19,6 +22,7 @@ interface ChatMessage {
   content: string;
   timestamp: number;
   error?: boolean;
+  images?: UploadedImage[];
 }
 
 interface ChatSession {
@@ -136,7 +140,21 @@ function MessageBubble({ message, onCopy }: { message: ChatMessage; onCopy: (tex
       className={`flex w-full ${isUser ? "justify-end" : "justify-start"} group mb-5`}
     >
       <div className={`flex w-full gap-3 ${isUser ? "flex-row-reverse" : "flex-row"} max-w-[95%] sm:max-w-[85%]`}>
-        <div className="relative group/bubble flex flex-col min-w-0 max-w-full">
+        <div className="relative group/bubble flex flex-col min-w-0 max-w-full gap-2">
+          {message.images && message.images.length > 0 && (
+            <div className={`flex flex-wrap gap-2 ${isUser ? "justify-end" : "justify-start"}`}>
+              {message.images.map((img) => (
+                <div key={img.id} className="relative group/img rounded-xl overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-sm max-w-[200px]">
+                  <img
+                    src={img.base64}
+                    alt={img.fileName}
+                    className="w-full h-auto rounded-xl"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
           <div
             className={`px-4 py-3 sm:px-5 sm:py-4 text-[15px] leading-[1.6] overflow-hidden break-words transition-all shadow-sm ${
               isUser
@@ -235,6 +253,10 @@ export default function AnythingButton() {
   const [cloudSessions, setCloudSessions] = useState<CloudSessionMeta[]>([]);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState<string | null>(null);
+
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
 
@@ -594,6 +616,60 @@ Deep inquiry deserves nourishment: ${food}`
     );
   };
 
+  const handleImageUpload = async (files: FileList | File[]) => {
+    const images = await processImageFiles(files);
+    if (images.length > 0) {
+      setUploadedImages((prev) => [...prev, ...images]);
+    }
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      await handleImageUpload(e.target.files);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files) {
+      await handleImageUpload(e.dataTransfer.files);
+    }
+  };
+
+  const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const images = await handlePasteEvent(e as any);
+    if (images.length > 0) {
+      e.preventDefault();
+      setUploadedImages((prev) => [...prev, ...images]);
+    }
+  };
+
+  const removeImage = (id: string) => {
+    setUploadedImages((prev) => prev.filter((img) => img.id !== id));
+  };
+
   const generateRandomId = (): string => {
     return Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
   };
@@ -939,20 +1015,27 @@ Create a summary that another AI can use to understand the context and continue 
 
   const sendMessage = useCallback(async (textOverride?: string) => {
     const textToSend = (textOverride || input).trim();
-    if (!textToSend || isLoading || !currentSessionId) return;
+    if ((!textToSend && uploadedImages.length === 0) || isLoading || !currentSessionId) return;
 
     setError(null);
     const userMessageId = generateId();
-    const userMessage: ChatMessage = { id: userMessageId, role: "user", content: textToSend, timestamp: Date.now() };
+    const userMessage: ChatMessage = { 
+      id: userMessageId, 
+      role: "user", 
+      content: textToSend || (uploadedImages.length > 0 ? `[Sent ${uploadedImages.length} image(s)]` : ""), 
+      timestamp: Date.now(),
+      images: uploadedImages.length > 0 ? uploadedImages : undefined
+    };
 
     const newMessages = [...messages, userMessage];
     const isFirstUserMsg = messages.filter(m => m.role === "user").length === 0;
-    const newTitle = isFirstUserMsg ? textToSend.slice(0, 30) + (textToSend.length > 30 ? "..." : "") : undefined;
+    const newTitle = isFirstUserMsg ? textToSend.slice(0, 30) + (textToSend.length > 30 ? "..." : "") || `Images (${uploadedImages.length})` : undefined;
 
     updateCurrentSession(newMessages, newTitle);
     if (!textOverride) {
       setInput("");
       setCharCount(0);
+      setUploadedImages([]);
       if (inputRef.current) inputRef.current.style.height = 'auto'; // Reset height
     }
     
@@ -1336,20 +1419,61 @@ Create a summary that another AI can use to understand the context and continue 
               </div>
             </div>
             {/* Input */}
-            <div className="p-4 border-t border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-xl shrink-0 z-20">
-              <div className="relative flex items-end gap-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 focus-within:border-emerald-500 dark:focus-within:border-emerald-500/50 rounded-2xl shadow-sm transition-colors p-1 pl-3 pr-1.5">
+            <div 
+              className="p-4 border-t border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-xl shrink-0 z-20"
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              {uploadedImages.length > 0 && (
+                <div className="mb-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
+                  <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-2">Attached Images ({uploadedImages.length})</p>
+                  <div className="flex flex-wrap gap-2">
+                    {uploadedImages.map((img) => (
+                      <div key={img.id} className="relative group">
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-sm">
+                          <img
+                            src={img.base64}
+                            alt={img.fileName}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <button
+                          onClick={() => removeImage(img.id)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                          aria-label="Remove image"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className={`relative flex items-end gap-2 bg-white dark:bg-zinc-950 border-2 rounded-2xl shadow-sm transition-all p-1 pl-3 pr-1.5 ${isDragActive ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20' : 'border-zinc-300 dark:border-zinc-800 focus-within:border-emerald-500 dark:focus-within:border-emerald-500/50'}`}>
                 <textarea
                   ref={inputRef}
                   value={input}
                   onChange={handleInput}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask me anything..."
+                  onPaste={handlePaste}
+                  placeholder="Ask me anything... (paste images, drag-drop, or use upload button)"
                   rows={1}
                   disabled={isLoading}
                   className="w-full resize-none py-3.5 bg-transparent text-[15px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder-text-zinc-600 focus:outline-none custom-scrollbar"
                   style={{ maxHeight: "200px" }}
                 />
                 <div className="flex gap-1 pb-1.5 pl-1 shrink-0">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isLoading}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Upload images (supports drag-drop and paste)"
+                  >
+                    <Upload className="w-5 h-5" />
+                  </button>
                   {isLoading ? (
                     <button
                       onClick={stopGeneration}
@@ -1361,7 +1485,7 @@ Create a summary that another AI can use to understand the context and continue 
                   ) : (
                     <button
                       onClick={() => sendMessage()}
-                      disabled={!input.trim()}
+                      disabled={!input.trim() && uploadedImages.length === 0}
                       className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-600 text-white disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 transition-colors group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                       title="Send message (Enter to send, Shift+Enter for new line)"
                     >
@@ -1370,6 +1494,25 @@ Create a summary that another AI can use to understand the context and continue 
                   )}
                 </div>
               </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                aria-label="Upload images"
+              />
+
+              {isDragActive && (
+                <div className="absolute inset-0 bg-emerald-500/10 border-2 border-dashed border-emerald-500 rounded-2xl flex items-center justify-center pointer-events-none">
+                  <div className="text-center">
+                    <Upload className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+                    <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Drop images here</p>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-2 flex justify-end gap-2">
                 <button
