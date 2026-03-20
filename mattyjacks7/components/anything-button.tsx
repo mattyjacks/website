@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check } from "lucide-react";
+import { motion, useDragControls } from "framer-motion";
 
 interface ChatMessage {
   id: string;
@@ -159,6 +160,8 @@ export default function AnythingButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const dragControls = useDragControls();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -394,12 +397,20 @@ export default function AnythingButton() {
       </button>
 
       {isOpen && (
-        <div
-          ref={containerRef}
-          className="fixed bottom-24 right-3 sm:right-6 z-50 w-[94vw] sm:w-[92vw] max-w-[440px] h-[74vh] sm:h-[75vh] max-h-[640px] flex flex-col rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 shadow-xl shadow-black/15 backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300 relative"
+        <motion.div
+          drag
+          dragControls={dragControls}
+          dragListener={false}
+          dragMomentum={false}
+          ref={containerRef as React.LegacyRef<HTMLDivElement>}
+          style={{ resize: "both" }}
+          className="fixed bottom-24 right-3 sm:right-6 z-50 w-[94vw] sm:w-[92vw] max-w-[440px] min-w-[320px] h-[74vh] sm:h-[75vh] max-h-[85vh] min-h-[400px] flex flex-col rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 shadow-xl shadow-black/15 backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300"
         >
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-500 z-20">
+          <div 
+            onPointerDown={(e) => dragControls.start(e)}
+            className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-500 z-20 cursor-move"
+          >
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="text-white/90 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/15"
@@ -571,7 +582,7 @@ export default function AnythingButton() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </>
   );
