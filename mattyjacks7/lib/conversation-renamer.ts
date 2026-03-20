@@ -1,33 +1,11 @@
 // Conversation Auto-Renamer - Uses gpt-5.4-nano to rename conversations
 // Renames once per minute unless manually renamed by user since last open
 
-import OpenAI from "openai";
-
 export interface ConversationRenameData {
   lastRenamedAt: number;
   lastOpenedAt: number;
   wasManuallyRenamed: boolean;
 }
-
-function getOpenAI() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is missing");
-  }
-  return new OpenAI({ apiKey });
-}
-
-const RENAME_SYSTEM_PROMPT = `You are a conversation title generator. Your job is to create a concise, descriptive title for a conversation based on its messages.
-
-Rules:
-- Title should be 3-7 words maximum
-- Be specific and descriptive
-- Use present tense when possible
-- No quotes or special characters
-- Make it memorable and clear
-- Avoid generic titles like "Chat" or "Conversation"
-
-Respond with ONLY the title text, nothing else.`;
 
 export async function renameConversation(
   messages: Array<{ role: string; content: string }>,
@@ -54,32 +32,19 @@ export async function renameConversation(
   }
 
   try {
-    const openai = getOpenAI();
-
-    // Create a summary of the conversation for the AI to title
-    const conversationSummary = messages
-      .slice(-10) // Use last 10 messages for context
-      .map((m) => `${m.role}: ${m.content.slice(0, 100)}`)
-      .join("\n");
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-5.4-nano",
-      messages: [
-        { role: "system", content: RENAME_SYSTEM_PROMPT },
-        { role: "user", content: `Conversation:\n${conversationSummary}` }
-      ],
-      max_tokens: 20,
-      temperature: 0.7
+    const response = await fetch("/api/rename-conversation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages, currentTitle })
     });
 
-    const newTitle = (response.choices[0]?.message?.content || "").trim();
-
-    // Validate the title
-    if (newTitle && newTitle.length > 0 && newTitle.length < 100) {
-      return { newTitle, updated: true };
+    if (!response.ok) {
+      console.error("Failed to rename conversation:", response.statusText);
+      return { newTitle: currentTitle, updated: false };
     }
 
-    return { newTitle: currentTitle, updated: false };
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Conversation rename error:", error);
     return { newTitle: currentTitle, updated: false };

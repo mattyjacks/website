@@ -1287,7 +1287,7 @@ Create a summary that another AI can use to understand the context and continue 
     <>
       {/* Floating launcher with torus border (hidden while chat is open) */}
       {!isOpen && (
-        <div className="fixed right-0 flex items-end justify-end p-2" style={{ zIndex: 40, width: threeSize * 2, height: threeSize * 2, bottom: -20, pointerEvents: 'auto' }}>
+        <div className="fixed right-0 flex items-end justify-end p-2 pointer-events-none" style={{ zIndex: 40, width: threeSize * 2, height: threeSize * 2, bottom: -20 }}>
           <div className="relative flex items-center justify-center w-full h-full">
             <ThreeBorderBack size={threeSize * 2} />
             <motion.button
