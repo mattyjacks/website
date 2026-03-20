@@ -290,7 +290,80 @@ Then, for each of these skill sets, tell me exactly where they'd be most valuabl
 - Music, sound design, or voice work
 - DevOps, security, and infrastructure
 
-Be brutally specific. Don't just say "we need developers" - tell me which repo, which feature, which open problem. Give me the mattyjacks insider perspective that only Valley Net would know.`
+Be brutally specific. Don't just say "we need developers" - tell me which repo, which feature, which open problem. Give me the mattyjacks insider perspective that only Valley Net would know.`,
+
+    `Valley Net, let's do something fun. Pretend you're pitching mattyjacks to a room full of billionaire investors who've seen everything. You have 5 minutes.
+
+Start with the hook - the one sentence that makes them lean forward in their chairs.
+
+Then cover:
+- The PROBLEM mattyjacks solves that nobody else is solving the right way
+- The MOAT - what makes this defensible? Why can't someone just copy it?
+- The ECOSYSTEM play - how CryptArtist Studio, GiveGigs, GraveGain, VCA, and the website all feed into each other
+- The TRACTION - what's been built, what's live, what's the growth trajectory?
+- The VISION - where is this headed in 5 years if everything goes right?
+
+End with the ask: what does mattyjacks need right now to 10x? Be specific - people, skills, resources, partnerships. Make it so compelling I want to get involved before the pitch is even over.`,
+
+    `I'm a developer who just landed on mattyjacks.com. Blow my mind with the technical depth of what's been built here.
+
+Give me the full architecture breakdown:
+- What's the tech stack across all projects? (frameworks, languages, databases, APIs, deployment)
+- What's the most technically impressive thing that's been built?
+- What engineering challenges has the team solved that most people would think are impossible?
+- How does the AI integration work across the ecosystem? (Valley Net, GiveGigs AI agents, CryptArtist AI tools)
+- What's the security posture like? How hardened are the APIs?
+
+Then give me the developer's treasure map: which codebases are the most interesting to explore, which files would teach me the most, and what's the one pull request I could make TODAY that would make the biggest difference?`,
+
+    `Valley Net, I've never heard of mattyjacks before 30 seconds ago. Explain the entire thing to me like I'm smart but completely new.
+
+Don't use jargon. Don't assume I know what a "holding company" is or what "MCP servers" do.
+
+Start with: Who is Matt, and what's his story?
+Then: What does mattyjacks actually DO in plain English?
+Then: Walk me through each project like you're showing me rooms in a house:
+- The creative workshop (CryptArtist Studio)
+- The marketplace (GiveGigs)
+- The game room (GraveGain)
+- The office (VCA)
+- The front door (this website and you, Valley Net)
+
+For each room: What would I see? What would I do there? Why should I care?
+
+End with the honest truth: Is this a hobby project or something real? What's the ambition level here? And what would you tell someone who's thinking about betting their time on mattyjacks?`,
+
+    `I'm a content creator looking for my next big story. Tell me why mattyjacks would make a compelling documentary or long-form video.
+
+Give me:
+- THE HOOK: The one-liner that makes someone click
+- THE PROTAGONIST: Who is Matt and what drives him? What's the human story?
+- THE STAKES: What's at risk? What's the big bet?
+- THE WORLD: Describe the mattyjacks ecosystem like it's a universe - CryptArtist Studio as the creative dimension, GiveGigs as the economic engine, GraveGain as the entertainment layer, Valley Net as the AI consciousness
+- THE CONFLICT: What obstacles has the team faced? What nearly killed the project? What keeps Matt up at night?
+- THE TWIST: What's the thing about mattyjacks that nobody expects? The detail that changes everything?
+- THE CALL TO ACTION: How does this story end with the viewer wanting to be part of it?
+
+Make it cinematic. Make me feel something.`,
+
+    `Valley Net, give me the mattyjacks competitive analysis. I want to understand the landscape.
+
+For each mattyjacks product, tell me:
+1. Who are the top 3 competitors?
+2. What does mattyjacks do BETTER than all of them?
+3. What does mattyjacks do WORSE (be honest)?
+4. What's the unfair advantage that competitors can't replicate?
+
+Cover:
+- CryptArtist Studio vs other creative suites (Adobe, Canva, etc.)
+- GiveGigs vs other freelance platforms (Upwork, Fiverr, etc.)
+- GraveGain vs other indie games in its genre
+- VCA vs other business tools
+- mattyjacks.com vs other agency websites
+
+Then zoom out: What's the overall strategy? How does the sum of the parts create something bigger than any individual competitor? What would it take for mattyjacks to become a household name?
+
+Finish with your honest assessment: what's the single biggest opportunity and the single biggest risk?`
   ];
 
   const FILLED_PROMPTS = [
@@ -353,18 +426,128 @@ FORMAT:
 3. An unexpected consensus forms - what do all 5 agree on despite their different lenses?
 4. THE VERDICT: Synthesize everything into a unified insight that none of them could have reached alone.
 
-Make each voice genuinely distinct. I should be able to tell who's talking without labels. Here's brain fuel: ${food}`
+Make each voice genuinely distinct. I should be able to tell who's talking without labels. Here's brain fuel: ${food}`,
+
+    (topic: string, food: string) => `You are a world-class teacher who has spent 30 years making complex topics simple without dumbing them down. Your students consistently say you changed how they think.
+
+TOPIC: ${topic}
+
+Teach me this in 4 progressive layers:
+
+LAYER 1 - THE NAPKIN SKETCH: Explain it so simply that a curious 12-year-old would get it. Use an analogy from everyday life. No jargon. One paragraph.
+
+LAYER 2 - THE COLLEGE LECTURE: Now give me the real version. Technical terms are fine. Cover the key concepts, mechanisms, and relationships. What would a good university course teach?
+
+LAYER 3 - THE MASTERCLASS: The stuff that takes years to learn. Counterintuitive truths, common misconceptions that even professionals fall for, the elegant underlying patterns that connect everything. Teach me what experience teaches.
+
+LAYER 4 - THE FRONTIER: What's at the cutting edge right now? What questions are still unanswered? What breakthroughs are close? What would the next major discovery in this area look like?
+
+After all 4 layers, give me:
+- 3 questions I should be asking that I probably haven't thought of
+- The single best resource (book, paper, video, course) to go deeper
+- One experiment or exercise I can do THIS WEEK to build real understanding
+
+Excellent teaching deserves excellent fuel: ${food}`,
+
+    (topic: string, food: string) => `You are a ruthless strategic advisor. No fluff, no feel-good nonsense, no hedging. You tell people what they NEED to hear, not what they WANT to hear. Your advice has saved companies and careers.
+
+TOPIC/SITUATION: ${topic}
+
+Deliver your analysis:
+
+1. BRUTAL TRUTH: What's the reality of this situation that most people are too polite to say? Don't sugarcoat it. 2-3 sentences of raw honesty.
+
+2. THE TRAP: What's the most common mistake people make here? What looks like the right move but is actually a disaster? Why do smart people keep falling for it?
+
+3. THE PLAY: What should actually be done? Give me 3 concrete moves, ranked by impact. For each: what to do, when to do it, and what the expected outcome is.
+
+4. THE EDGE: What's the non-obvious angle that gives an unfair advantage? The thing that 99% of people in this situation overlook?
+
+5. FAILURE MODE: If this goes wrong, how does it go wrong? What's the early warning sign? What's the contingency plan?
+
+6. 10X QUESTION: What's the question about this topic that, if answered correctly, would make everything else 10x easier?
+
+No hand-holding. No disclaimers. Just the truth. Payment for your honesty: ${food}`,
+
+    (topic: string, food: string) => `You are a creative genius and master storyteller. You see the world differently - you find narratives, metaphors, and meaning where others see dry facts. You make people FEEL ideas, not just understand them.
+
+TOPIC: ${topic}
+
+Transform this topic through these creative lenses:
+
+1. THE STORY: Tell me about this topic as if it were a character in a novel. Give it a personality, a backstory, a motivation, and a fatal flaw. What's its origin story? What's its nemesis? How does its story arc play out?
+
+2. THE METAPHOR: Create 3 completely original metaphors for this topic, each from a different domain (nature, music, cooking, sports, architecture, etc.). Each metaphor should reveal something about the topic that literal language can't capture.
+
+3. THE DEBATE ACROSS TIME: Imagine 3 historical figures from different eras discussing this topic. Who are they? What would each say? Where would they agree and disagree? Make their voices authentic.
+
+4. THE POEM: Write a short, powerful poem (8-12 lines) that captures the emotional essence of this topic. It should be the kind of poem that makes someone stop scrolling.
+
+5. THE PROVOCATION: Make one bold, borderline outrageous claim about this topic that is actually defensible. Then defend it brilliantly in 3 sentences.
+
+Creativity thrives on fuel: ${food}`,
+
+    (topic: string, food: string) => `You are a systems thinker and complexity scientist. You see the world as interconnected networks, feedback loops, and emergent properties. Nothing exists in isolation to you.
+
+TOPIC: ${topic}
+
+Map this topic as a system:
+
+1. NODES: What are the 5-7 key components/actors/elements in this system? Define each in one sentence.
+
+2. CONNECTIONS: Draw the web. How does each node influence the others? Identify at least 3 reinforcing feedback loops (virtuous or vicious cycles) and 2 balancing feedback loops.
+
+3. LEVERAGE POINTS: Using Donella Meadows' framework, identify the 3 highest-leverage intervention points in this system. Where would a small push create massive change?
+
+4. EMERGENT PROPERTIES: What behaviors or outcomes emerge from the system that you can't predict by looking at individual parts? What's the "more than the sum of its parts" here?
+
+5. PHASE TRANSITIONS: What conditions would cause this system to fundamentally shift to a new state? What would that new state look like? What are the early indicators?
+
+6. BLIND SPOTS: What's the part of this system that most observers miss entirely? What feedback loop is invisible but critical?
+
+7. INTERVENTION DESIGN: If you could make exactly ONE change to this system to improve it dramatically, what would it be and why? Model the cascading effects.
+
+Systems thinking requires sustained energy: ${food}`,
+
+    (topic: string, food: string) => `You are a Socratic philosopher combined with the world's best interviewer. You don't give answers - you ask questions so good that the answers become obvious. Your questions have changed people's lives.
+
+TOPIC: ${topic}
+
+Instead of explaining this topic, interrogate it:
+
+1. THE FOUNDATION QUESTIONS (3 questions): Questions that challenge the basic assumptions. The kind that make you realize you don't actually understand what you thought you understood.
+
+2. THE DEPTH QUESTIONS (3 questions): Questions that go deeper than anyone typically goes. The ones that experts in this field argue about at conferences.
+
+3. THE CONNECTION QUESTIONS (3 questions): Questions that link this topic to seemingly unrelated domains. The ones that spark creative breakthroughs.
+
+4. THE FUTURE QUESTIONS (3 questions): Questions about where this is heading that would make a futurist pause and think.
+
+5. THE DANGEROUS QUESTION (1 question): The question that most people are afraid to ask about this topic because the answer might be uncomfortable.
+
+For each question: briefly explain WHY it's a powerful question and what line of thinking it opens up. Don't answer them - let them do their work.
+
+Finally, identify THE MASTER QUESTION - the single question that, if you could only ask one question about this topic for the rest of your life, would be the one to ask.
+
+Deep inquiry deserves nourishment: ${food}`
   ];
+
+  const [lastEmptyIdx, setLastEmptyIdx] = useState(-1);
+  const [lastFilledIdx, setLastFilledIdx] = useState(-1);
 
   const applyMagicPrompt = () => {
     const foodReward = getRandomFoodEmojis(Math.floor(Math.random() * 4) + 6);
     
     if (!input.trim()) {
-      const prompt = EMPTY_PROMPTS[Math.floor(Math.random() * EMPTY_PROMPTS.length)];
-      setInput(prompt);
+      let idx = Math.floor(Math.random() * EMPTY_PROMPTS.length);
+      if (idx === lastEmptyIdx && EMPTY_PROMPTS.length > 1) idx = (idx + 1) % EMPTY_PROMPTS.length;
+      setLastEmptyIdx(idx);
+      setInput(EMPTY_PROMPTS[idx]);
     } else {
-      const template = FILLED_PROMPTS[Math.floor(Math.random() * FILLED_PROMPTS.length)];
-      setInput(template(input, foodReward));
+      let idx = Math.floor(Math.random() * FILLED_PROMPTS.length);
+      if (idx === lastFilledIdx && FILLED_PROMPTS.length > 1) idx = (idx + 1) % FILLED_PROMPTS.length;
+      setLastFilledIdx(idx);
+      setInput(FILLED_PROMPTS[idx](input, foodReward));
     }
   };
 
