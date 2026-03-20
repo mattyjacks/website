@@ -311,6 +311,7 @@ Create a summary that another AI can use to understand the context and continue 
       // Smaller footprint: favor lower-right corner
       return vw < 640 ? Math.max(110, Math.min(base * 0.30, 200)) : Math.max(120, Math.min(base * 0.25, 220));
     };
+    setThreeSize(calcThreeSize());
     const handleResize = () => setThreeSize(calcThreeSize());
     window.addEventListener('resize', handleResize);
 
