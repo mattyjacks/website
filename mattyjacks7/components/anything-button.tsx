@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
+import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check } from "lucide-react";
 
 interface ChatMessage {
   id: string;
@@ -9,6 +10,13 @@ interface ChatMessage {
   content: string;
   timestamp: number;
   error?: boolean;
+}
+
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  updatedAt: number;
 }
 
 const GREETING_VARIANTS = [
@@ -37,18 +45,10 @@ function formatTime(timestamp: number): string {
 }
 
 function sanitizeText(text: string): string {
+  if (typeof document === 'undefined') return text;
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
-}
-
-function isValidUrl(urlString: string): boolean {
-  try {
-    const url = new URL(urlString);
-    return ['http:', 'https:'].includes(url.protocol);
-  } catch {
-    return false;
-  }
 }
 
 function renderMarkdown(text: string): React.ReactNode {
@@ -138,14 +138,7 @@ function MessageBubble({
               title="Copy message"
               aria-label="Copy message"
             >
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
+              <Copy className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -157,16 +150,86 @@ function MessageBubble({
 export default function AnythingButton() {
   const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [hasGreeted, setHasGreeted] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [messageCount, setMessageCount] = useState(0);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const STORAGE_KEY = "valley_net_chat_sessions";
+
+  // Load sessions on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed: ChatSession[] = JSON.parse(stored);
+        setSessions(parsed);
+        if (parsed.length > 0) {
+          setCurrentSessionId(parsed[0].id);
+        }
+      } else {
+        createNewSession();
+      }
+    } catch {
+      createNewSession();
+    }
+  }, []);
+
+  // Save sessions whenever they change
+  useEffect(() => {
+    if (sessions.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    } else if (isOpen) {
+      createNewSession();
+    }
+  }, [sessions, isOpen]);
+
+  const currentSession = sessions.find((s) => s.id === currentSessionId);
+  const messages = currentSession?.messages || [];
+
+  const createNewSession = () => {
+    const newId = generateId();
+    const newSession: ChatSession = {
+      id: newId,
+      title: "New Conversation",
+      messages: [
+        {
+          id: generateId(),
+          role: "assistant",
+          content: getRandomGreeting(),
+          timestamp: Date.now(),
+        },
+      ],
+      updatedAt: Date.now(),
+    };
+    setSessions((prev) => [newSession, ...prev]);
+    setCurrentSessionId(newId);
+    setIsSidebarOpen(false);
+    setError(null);
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  };
+
+  const deleteSession = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setSessions((prev) => {
+      const next = prev.filter((s) => s.id !== id);
+      if (currentSessionId === id) {
+        setCurrentSessionId(next.length > 0 ? next[0].id : null);
+      }
+      return next;
+    });
+  };
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -177,42 +240,18 @@ export default function AnythingButton() {
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
-    if (isOpen && !hasGreeted) {
-      const greetingId = generateId();
-      setMessages([
-        {
-          id: greetingId,
-          role: "assistant",
-          content: getRandomGreeting(),
-          timestamp: Date.now(),
-        },
-      ]);
-      setHasGreeted(true);
-    }
-  }, [isOpen, hasGreeted]);
-
-  useEffect(() => {
-    if (isOpen) {
+    if (isOpen && currentSessionId) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isOpen]);
+  }, [isOpen, currentSessionId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
-
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        setMessages([]);
-        setMessageCount(0);
-        setHasGreeted(false);
-      }
-
       if (e.key === "Escape") {
         setIsOpen(false);
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
@@ -228,9 +267,25 @@ export default function AnythingButton() {
     });
   }, []);
 
+  const updateCurrentSession = (updatedMessages: ChatMessage[], newTitle?: string) => {
+    setSessions((prev) =>
+      prev.map((s) => {
+        if (s.id === currentSessionId) {
+          return {
+            ...s,
+            messages: updatedMessages,
+            title: newTitle || s.title,
+            updatedAt: Date.now(),
+          };
+        }
+        return s;
+      })
+    );
+  };
+
   const sendMessage = useCallback(async () => {
     const trimmed = input.trim();
-    if (!trimmed || trimmed.length > 5000 || isLoading) return;
+    if (!trimmed || trimmed.length > 5000 || isLoading || !currentSessionId) return;
 
     setError(null);
     const userMessageId = generateId();
@@ -242,10 +297,14 @@ export default function AnythingButton() {
     };
 
     const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    
+    // Auto-generate title if it's the first real user message
+    const isFirstUserMsg = messages.filter(m => m.role === "user").length === 0;
+    const newTitle = isFirstUserMsg ? trimmed.slice(0, 30) + (trimmed.length > 30 ? "..." : "") : undefined;
+
+    updateCurrentSession(newMessages, newTitle);
     setInput("");
     setIsLoading(true);
-    setMessageCount((prev) => prev + 1);
 
     try {
       const controller = new AbortController();
@@ -276,9 +335,10 @@ export default function AnythingButton() {
       if (!data || typeof data.message !== 'string') {
         throw new Error('Invalid response format');
       }
+      
       const assistantMessageId = generateId();
-      setMessages((prev) => [
-        ...prev,
+      updateCurrentSession([
+        ...newMessages,
         {
           id: assistantMessageId,
           role: "assistant",
@@ -286,7 +346,6 @@ export default function AnythingButton() {
           timestamp: Date.now(),
         },
       ]);
-      setMessageCount((prev) => prev + 1);
     } catch (err) {
       const errorMessage =
         err instanceof Error && err.name === "AbortError"
@@ -296,11 +355,10 @@ export default function AnythingButton() {
             : "Something went wrong. Give it another shot, Boss!";
 
       setError(errorMessage);
-      const errorMessageId = generateId();
-      setMessages((prev) => [
-        ...prev,
+      updateCurrentSession([
+        ...newMessages,
         {
-          id: errorMessageId,
+          id: generateId(),
           role: "assistant",
           content: errorMessage,
           timestamp: Date.now(),
@@ -310,7 +368,7 @@ export default function AnythingButton() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages]);
+  }, [input, isLoading, messages, currentSessionId]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -319,20 +377,8 @@ export default function AnythingButton() {
     }
   };
 
-  const handleClearChat = useCallback(() => {
-    if (window.confirm("Clear all messages? This cannot be undone.")) {
-      setMessages([]);
-      setMessageCount(0);
-      setHasGreeted(false);
-      setError(null);
-    }
-  }, []);
-
-  const canClear = messages.length > 1;
-
   return (
     <>
-      {/* Floating Valley Net Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-red-500/30 hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
@@ -340,99 +386,95 @@ export default function AnythingButton() {
         title={isOpen ? "Close chat (Esc)" : "Valley Net - Ask AI Anything"}
       >
         <span className="text-2xl sm:text-3xl leading-none select-none">
-          {isOpen ? (
-            <svg
-              className="w-7 h-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          ) : (
-            "👱🏻‍♀️"
-          )}
+          {isOpen ? <X className="w-7 h-7" /> : "👱🏻‍♀️"}
         </span>
         {!isOpen && (
           <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />
         )}
       </button>
 
-      {/* Chat Popup */}
       {isOpen && (
         <div
           ref={containerRef}
-          className="fixed bottom-24 right-3 sm:right-6 z-50 w-[94vw] sm:w-[92vw] max-w-[440px] h-[74vh] sm:h-[75vh] max-h-[640px] flex flex-col rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 shadow-2xl shadow-black/15 backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300"
+          className="fixed bottom-24 right-3 sm:right-6 z-50 w-[94vw] sm:w-[92vw] max-w-[440px] h-[74vh] sm:h-[75vh] max-h-[640px] flex flex-col rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 shadow-xl shadow-black/15 backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300 relative"
         >
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-500">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-500 z-20">
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="text-white/90 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/15"
+              aria-label="Toggle Sessions Sidebar"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-white text-2xl sm:text-3xl" aria-hidden="true">👱🏻‍♀️</span>
               <div className="min-w-0">
                 <h3 className="text-white font-semibold text-base sm:text-lg leading-tight truncate">
                   Valley Net 💘
                 </h3>
-                <p className="text-emerald-100 text-[11px] leading-tight truncate">
-                  GPT-5 Mini + GiveGigs AI
-                </p>
               </div>
             </div>
             <div className="hidden sm:flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/15 text-white border border-white/20 whitespace-nowrap">
               Ready to help
             </div>
             <div className="flex items-center gap-1">
-              {canClear && (
-                <button
-                  onClick={handleClearChat}
-                  className="text-white/90 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/15"
-                  title="Clear chat (Ctrl+K)"
-                  aria-label="Clear chat history"
-                >
-                  <svg
-                    className="w-4.5 h-4.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </button>
-              )}
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-white/90 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/15"
                 aria-label="Close chat"
-                title="Close (Esc)"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
 
+          {/* Sidebar Drawer */}
+          <div 
+            className={`absolute top-[60px] bottom-0 left-0 w-64 bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 z-10 transition-transform duration-300 flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+          >
+            <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
+              <button
+                onClick={createNewSession}
+                className="flex items-center gap-2 w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
+              >
+                <Plus className="w-4 h-4" /> New Chat
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+              {sessions.map((session) => (
+                <div
+                  key={session.id}
+                  onClick={() => {
+                    setCurrentSessionId(session.id);
+                    setIsSidebarOpen(false);
+                  }}
+                  className={`group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-sm transition-colors ${
+                    currentSessionId === session.id 
+                      ? "bg-zinc-200 dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 font-medium" 
+                      : "hover:bg-zinc-100 dark:hover:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <MessageSquare className="w-4 h-4 opacity-70 flex-shrink-0" />
+                    <span className="truncate">{session.title}</span>
+                  </div>
+                  <button
+                    onClick={(e) => deleteSession(e, session.id)}
+                    className="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity p-1"
+                    title="Delete Conversation"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scroll-smooth bg-gradient-to-b from-white via-white to-emerald-50/40 dark:from-zinc-950 dark:via-zinc-950 dark:to-emerald-950/15">
+          <div 
+            className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth bg-gradient-to-b from-white via-white to-emerald-50/40 dark:from-zinc-950 dark:via-zinc-950 dark:to-emerald-950/15 min-h-0 overscroll-contain touch-pan-y"
+            onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
+          >
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full text-center">
                 <div className="text-zinc-400 dark:text-zinc-600">
@@ -463,9 +505,9 @@ export default function AnythingButton() {
             )}
 
             {copiedId && (
-              <div className="flex justify-center">
-                <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 rounded-full">
-                  Copied to clipboard!
+              <div className="flex justify-center flex-shrink-0">
+                <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 rounded-full flex items-center gap-1.5 my-1">
+                  <Check className="w-3 h-3" /> Copied to clipboard!
                 </div>
               </div>
             )}
@@ -474,7 +516,7 @@ export default function AnythingButton() {
           </div>
 
           {/* Input Area */}
-          <div className="px-3 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur">
+          <div className="px-3 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur z-20">
             {error && (
               <div className="mb-2 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 px-3 py-2 rounded-lg border border-red-200/70 dark:border-red-800/70 shadow-sm">
                 {sanitizeText(error.slice(0, 500))}
@@ -500,7 +542,7 @@ export default function AnythingButton() {
               <button
                 onClick={sendMessage}
                 disabled={isLoading || !input.trim()}
-                className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 cursor-pointer"
                 aria-label="Send message"
                 title="Send (Enter)"
               >
@@ -519,9 +561,15 @@ export default function AnythingButton() {
                 </svg>
               </button>
             </div>
-            <p className="mt-1.5 text-[10px] text-zinc-500 dark:text-zinc-600 text-center">
-              Powered by GPT-5 Mini + GiveGigs AI • {Math.min(messageCount, 999)} messages
-            </p>
+            
+            {/* Formatted clean footer */}
+            <div className="mt-2.5 flex justify-center">
+              <div className="px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 flex flex-col items-center">
+                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 bg-clip-text">
+                  Powered by <strong className="text-zinc-700 dark:text-zinc-300">GPT-5 Mini + GiveGigs AI</strong>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       )}

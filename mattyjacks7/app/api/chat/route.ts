@@ -528,15 +528,8 @@ export async function POST(request: NextRequest) {
     let response: OpenAI.Chat.Completions.ChatCompletion;
     try {
       const msgLen = chatMessages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
-      if (msgLen > 100000) {
-        return NextResponse.json(
-          { error: "Conversation too long. Start a new chat." },
-          { status: 400 }
-        );
-      }
-
       response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-5-mini",
         messages: chatMessages,
         tools,
         tool_choice: "auto",
@@ -629,7 +622,7 @@ export async function POST(request: NextRequest) {
 
       try {
         response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
+          model: "gpt-5-mini",
           messages: chatMessages,
           tools,
           tool_choice: "auto",

@@ -18,6 +18,20 @@ export default function ViewTracker() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ path }),
     }).catch((err) => console.error("View tracking failed:", err));
+
+    try {
+      // Local storage tracking for the "You" column in Clout Calculations
+      const pageKey = `mj_views_${path}`;
+      const siteKey = `mj_views_total`;
+      
+      const pageCount = parseInt(localStorage.getItem(pageKey) || "0", 10) + 1;
+      localStorage.setItem(pageKey, pageCount.toString());
+      
+      const totalCount = parseInt(localStorage.getItem(siteKey) || "0", 10) + 1;
+      localStorage.setItem(siteKey, totalCount.toString());
+    } catch {
+      // Ignore localStorage errors (e.g. privacy mode)
+    }
   }, []);
 
   return null; // This component doesn't render anything

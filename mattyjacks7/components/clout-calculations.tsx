@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Info } from "lucide-react";
 
 interface ViewStats {
   humans: number;
@@ -22,6 +23,8 @@ export default function CloutCalculations() {
     total: 0,
   });
   const [currentPath, setCurrentPath] = useState<string>("");
+  const [userPageViews, setUserPageViews] = useState<number>(1);
+  const [userSiteViews, setUserSiteViews] = useState<number>(1);
   const [loading, setLoading] = useState(true);
 
   // Static GA4 number - update manually as needed
@@ -33,6 +36,21 @@ export default function CloutCalculations() {
     
     // Fetch view stats
     const fetchStats = () => {
+      // Read local user stats
+      try {
+        const pageKey = `mj_views_${path}`;
+        const siteKey = `mj_views_total`;
+        const localPage = parseInt(localStorage.getItem(pageKey) || "0", 10);
+        const localSite = parseInt(localStorage.getItem(siteKey) || "0", 10);
+        // Display at least 1 if the program is working (meaning they are currently on the page)
+        setUserPageViews(Math.max(1, localPage));
+        setUserSiteViews(Math.max(1, localSite));
+      } catch {
+        // Fallback if localStorage is disabled
+        setUserPageViews(1);
+        setUserSiteViews(1);
+      }
+
       fetch("/api/views")
         .then((res) => res.json())
         .then((data) => {
@@ -75,100 +93,134 @@ export default function CloutCalculations() {
 
   if (loading) {
     return (
-      <div className="mt-8 px-4 py-6 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Loading clout calculations...
-        </p>
+      <div className="mt-10 px-6 py-8 bg-zinc-50 dark:bg-zinc-900/40 rounded-xl border border-zinc-200 dark:border-zinc-800/60 shadow-sm animate-pulse">
+        <div className="h-5 w-48 bg-zinc-200 dark:bg-zinc-800 rounded mb-6"></div>
+        <div className="h-10 w-full bg-zinc-200 dark:bg-zinc-800 rounded mb-4"></div>
+        <div className="h-48 w-full bg-zinc-200 dark:bg-zinc-800 rounded"></div>
       </div>
     );
   }
 
   return (
-    <div className="mt-8 px-4 py-6 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
-      <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 mb-4">
-        Clout Calculations (Popularity)
-      </h3>
-
-      <div className="mb-4 px-3 py-2 rounded-md bg-emerald-100/60 dark:bg-emerald-900/30 border border-emerald-200/60 dark:border-emerald-800/40 text-sm font-semibold text-emerald-800 dark:text-emerald-200">
-        This page has <span className="text-emerald-600 dark:text-emerald-300 font-bold">{cloutPercentage}%</span> of total clout.
-      </div>
-
-      <div className="space-y-3 text-xs text-zinc-600 dark:text-zinc-400 mb-4">
-        <div>
-          <span className="font-semibold">Website Visits Since 3/19/2026 AD</span> = {siteStats.total} (Self-Reported)
+    <div className="mt-10 px-4 sm:px-6 py-8 bg-white dark:bg-zinc-950/40 rounded-2xl border border-zinc-200 dark:border-zinc-800/60 shadow-xl shadow-black/5 overflow-hidden relative">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 via-emerald-600 to-emerald-400"></div>
+      
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+          Clout Calculations
+          <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-[10px] text-emerald-700 dark:text-emerald-400 uppercase tracking-widest border border-emerald-200 dark:border-emerald-800/50">
+            Live
+          </span>
+        </h3>
+        
+        <div className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 text-sm font-medium text-emerald-800 dark:text-emerald-300 shadow-sm">
+          This page holds <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{cloutPercentage}%</span> of total clout
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto mb-4">
-        <table className="w-full text-xs border-collapse">
-          <thead>
-            <tr className="border-b border-zinc-300 dark:border-zinc-700">
-              <th className="text-left py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                Page
-              </th>
-              <th className="text-right py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                Humans
-              </th>
-              <th className="text-right py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                Bots
-              </th>
-              <th className="text-right py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                Unknown
-              </th>
-              <th className="text-right py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                Total
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Current page row */}
-            <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-emerald-50/50 dark:bg-emerald-950/20">
-              <td className="py-2 px-2 text-zinc-900 dark:text-zinc-100 font-medium">
-                {getDisplayPath(currentPath)}
-              </td>
-              <td className="text-right py-2 px-2 text-zinc-900 dark:text-zinc-100">
-                {currentPageStats.humans}
-              </td>
-              <td className="text-right py-2 px-2 text-zinc-900 dark:text-zinc-100">
-                {currentPageStats.bots}
-              </td>
-              <td className="text-right py-2 px-2 text-zinc-900 dark:text-zinc-100">
-                {currentPageStats.unknown}
-              </td>
-              <td className="text-right py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                {currentPageStats.total}
-              </td>
-            </tr>
+      <div className="flex flex-col gap-3 text-sm text-zinc-600 dark:text-zinc-400 mb-6">
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-zinc-800 dark:text-zinc-200">Website Visits Since 3/19/2026 AD:</span> 
+          <span className="font-mono bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-800">{siteStats.total}</span>
+          <span className="text-xs text-zinc-500">(Self-Reported)</span>
+          
+          <div className="relative group inline-flex items-center ml-1">
+            <Info className="w-4 h-4 text-zinc-400 hover:text-emerald-500 cursor-help transition-colors" />
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[280px] bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 text-[11px] font-medium px-3 py-2 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none text-center">
+              March 19th in the year of our lord (Anno Domini) 2026
+              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-100"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-zinc-800 dark:text-zinc-200">Total Humans Visited:</span> 
+          <span className="font-mono bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-800">{GA4_TOTAL_HUMANS}</span>
+          <span className="text-xs text-zinc-500">(Google Analytics)</span>
 
-            {/* Entire site row */}
-            <tr className="bg-blue-50/50 dark:bg-blue-950/20">
-              <td className="py-2 px-2 text-zinc-900 dark:text-zinc-100 font-semibold">
-                Entire Site
-              </td>
-              <td className="text-right py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                {siteStats.humans}
-              </td>
-              <td className="text-right py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                {siteStats.bots}
-              </td>
-              <td className="text-right py-2 px-2 font-semibold text-zinc-900 dark:text-zinc-100">
-                {siteStats.unknown}
-              </td>
-              <td className="text-right py-2 px-2 font-bold text-zinc-900 dark:text-zinc-100">
-                {siteStats.total}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          <div className="relative group inline-flex items-center ml-1">
+            <Info className="w-4 h-4 text-zinc-400 hover:text-blue-500 cursor-help transition-colors" />
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[280px] bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 text-[11px] font-medium px-3 py-2 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 pointer-events-none text-center">
+              July 18th, 2025
+              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-zinc-900 dark:border-t-zinc-100"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* GA4 total */}
-      <div className="text-xs text-zinc-600 dark:text-zinc-400">
-        <span className="font-semibold">
-          Total Humans Visited by 3/19/2026 AD
-        </span>{" "}
-        = {GA4_TOTAL_HUMANS} (Google Analytics)
+      {/* Table border radius wrapper */}
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm bg-white dark:bg-zinc-950">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left border-collapse whitespace-nowrap">
+            <thead>
+              <tr className="bg-zinc-50 dark:bg-zinc-900/60 border-b border-zinc-200 dark:border-zinc-800">
+                <th className="py-3 px-4 font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider text-xs">
+                  Page
+                </th>
+                <th className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400 text-right uppercase tracking-wider text-xs bg-emerald-50/50 dark:bg-emerald-900/10">
+                  You
+                </th>
+                <th className="py-3 px-4 font-semibold text-zinc-600 dark:text-zinc-400 text-right uppercase tracking-wider text-xs">
+                  Humans
+                </th>
+                <th className="py-3 px-4 font-semibold text-zinc-600 dark:text-zinc-400 text-right uppercase tracking-wider text-xs">
+                  Bots
+                </th>
+                <th className="py-3 px-4 font-semibold text-zinc-600 dark:text-zinc-400 text-right uppercase tracking-wider text-xs">
+                  Unknown
+                </th>
+                <th className="py-3 px-4 font-bold text-zinc-900 dark:text-zinc-100 text-right uppercase tracking-wider text-xs">
+                  Total
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+              {/* Current page row */}
+              <tr className="bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900/40 transition-colors">
+                <td className="py-3 px-4 text-zinc-900 dark:text-zinc-100 font-medium">
+                  {getDisplayPath(currentPath)}
+                </td>
+                <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-bold text-right bg-emerald-50/30 dark:bg-emerald-900/10">
+                  {userPageViews}
+                </td>
+                <td className="py-3 px-4 text-zinc-700 dark:text-zinc-300 text-right font-mono">
+                  {currentPageStats.humans}
+                </td>
+                <td className="py-3 px-4 text-zinc-700 dark:text-zinc-300 text-right font-mono">
+                  {currentPageStats.bots}
+                </td>
+                <td className="py-3 px-4 text-zinc-700 dark:text-zinc-300 text-right font-mono">
+                  {currentPageStats.unknown}
+                </td>
+                <td className="py-3 px-4 font-bold text-zinc-900 dark:text-zinc-100 text-right font-mono text-[15px]">
+                  {currentPageStats.total}
+                </td>
+              </tr>
+
+              {/* Entire site row */}
+              <tr className="bg-zinc-50 dark:bg-zinc-900/60 border-t-2 border-zinc-200 dark:border-zinc-800">
+                <td className="py-3 px-4 text-zinc-900 dark:text-zinc-100 font-bold">
+                  Entire Site
+                </td>
+                <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-bold text-right bg-emerald-50/50 dark:bg-emerald-900/20">
+                  {userSiteViews}
+                </td>
+                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200 text-right font-mono">
+                  {siteStats.humans}
+                </td>
+                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200 text-right font-mono">
+                  {siteStats.bots}
+                </td>
+                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200 text-right font-mono">
+                  {siteStats.unknown}
+                </td>
+                <td className="py-3 px-4 font-extrabold text-zinc-900 dark:text-zinc-100 text-right font-mono text-[15px]">
+                  {siteStats.total}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
