@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw } from "lucide-react";
 import { motion, useDragControls, AnimatePresence } from "framer-motion";
 import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
+import { ThreeBorder } from "./three-border";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -198,6 +199,14 @@ export default function AnythingButton() {
 
   const [showTeaser, setShowTeaser] = useState(false);
   const [currentTeaser, setCurrentTeaser] = useState("");
+  const [threeSize, setThreeSize] = useState(160);
+
+  useEffect(() => {
+    setThreeSize(window.innerWidth < 640 ? 150 : 180);
+    const handleResize = () => setThreeSize(window.innerWidth < 640 ? 150 : 180);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const dragControls = useDragControls();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -366,40 +375,36 @@ export default function AnythingButton() {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #52525b; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #10b981; }
-      `}} />
-
-      <motion.button
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_8px_30px_rgb(16,185,129,0.3)] hover:shadow-[0_8px_40px_rgb(16,185,129,0.4)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50 outline-none"
-        aria-label="Toggle Valley Net AI Chat"
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-              <ChevronDown className="w-8 h-8 flex-shrink-0" />
-            </motion.div>
-          ) : (
-            <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center w-full h-full relative p-[2px]">
-              <Image 
-                src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
-                alt="Valley Net"
-                fill
-                className="rounded-full object-cover shadow-inner"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {!isOpen && <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />}
-      </motion.button>
+      <div className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 z-50 pointer-events-none w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
+        <ThreeBorder size={threeSize} />
+        <motion.button
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative group flex items-center justify-center w-full h-full rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50 outline-none pointer-events-auto cursor-pointer border-[3px] border-emerald-400/30"
+          aria-label="Toggle Valley Net AI Chat"
+        >
+          <AnimatePresence mode="wait">
+            {isOpen ? (
+              <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+                <ChevronDown className="w-12 h-12 flex-shrink-0" />
+              </motion.div>
+            ) : (
+              <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center w-full h-full relative p-[3px]">
+                <Image 
+                  src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
+                  alt="Valley Net"
+                  fill
+                  className="rounded-full object-cover shadow-inner"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {!isOpen && <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />}
+        </motion.button>
+      </div>
 
       <AnimatePresence>
         {isOpen && (

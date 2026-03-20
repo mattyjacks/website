@@ -461,7 +461,7 @@ function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
 
 export async function POST(request: NextRequest) {
   const clientIp = getClientIp(request);
-  let isAdmin = false;
+  let isAdmin = process.env.NODE_ENV === 'development';
   
   try {
     const supabase = await createClient();
