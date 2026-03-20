@@ -984,7 +984,6 @@ export default function Home() {
                   controls 
                   playsInline 
                   preload="auto"
-                  poster="/videos/matt-testimonial-justin-1-compressed.jpg"
                   aria-label="Video testimonial from Justin Hughes about working with MattyJacks"
                 >
                   <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
