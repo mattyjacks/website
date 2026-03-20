@@ -894,60 +894,7 @@ Create a summary that another AI can use to understand the context and continue 
     };
   }, []);
 
-  // Auto-rename conversations when messages change or sidebar opens
-  useEffect(() => {
-    const autoRenameConversations = async () => {
-      setSessions((prevSessions) =>
-        prevSessions.map((session) => {
-          // Initialize renameData if it doesn't exist
-          if (!session.renameData) {
-            return {
-              ...session,
-              renameData: createRenameData()
-            };
-          }
-          return session;
-        })
-      );
-
-      // Rename eligible conversations
-      for (const session of sessions) {
-        if (!session.renameData || !shouldAttemptRename(session.renameData)) {
-          continue;
-        }
-
-        try {
-          const { newTitle, updated } = await renameConversation(
-            session.messages,
-            session.title,
-            session.renameData
-          );
-
-          if (updated && newTitle !== session.title) {
-            setSessions((prevSessions) =>
-              prevSessions.map((s) =>
-                s.id === session.id
-                  ? {
-                      ...s,
-                      title: newTitle,
-                      renameData: {
-                        ...s.renameData!,
-                        lastRenamedAt: Date.now(),
-                        wasManuallyRenamed: false
-                      }
-                    }
-                  : s
-              )
-            );
-          }
-        } catch (err) {
-          console.error(`Failed to rename conversation ${session.id}:`, err);
-        }
-      }
-    };
-
-    autoRenameConversations();
-  }, [sessions, isSidebarOpen]);
+  // Auto-rename is handled via /api/rename-conversation only when explicitly triggered
 
   useEffect(() => {
     if (!showImageModal) return;

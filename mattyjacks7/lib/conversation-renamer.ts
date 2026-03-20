@@ -12,21 +12,16 @@ export async function renameConversation(
   currentTitle: string,
   renameData: ConversationRenameData | null
 ): Promise<{ newTitle: string; updated: boolean }> {
-  // Check if we should rename
-  if (renameData) {
-    const now = Date.now();
-    const timeSinceLastRename = now - renameData.lastRenamedAt;
-    const oneMinute = 60 * 1000;
+  // Automatic renaming disabled to prevent resource exhaustion
+  // Return current title without attempting to rename
+  return { newTitle: currentTitle, updated: false };
+}
 
-    // Don't rename if:
-    // 1. Less than 1 minute has passed since last rename
-    // 2. User manually renamed it since last open
-    if (timeSinceLastRename < oneMinute && renameData.wasManuallyRenamed) {
-      return { newTitle: currentTitle, updated: false };
-    }
-  }
-
-  // Don't rename if no messages
+export async function manuallyRenameConversation(
+  messages: Array<{ role: string; content: string }>,
+  currentTitle: string
+): Promise<{ newTitle: string; updated: boolean }> {
+  // Manual rename - only called when user explicitly requests it
   if (messages.length === 0) {
     return { newTitle: currentTitle, updated: false };
   }
