@@ -536,7 +536,7 @@ export async function POST(request: NextRequest) {
       }
 
       response = await openai.chat.completions.create({
-        model: "gpt-5-mini",
+        model: "gpt-4o-mini",
         messages: chatMessages,
         tools,
         tool_choice: "auto",
@@ -629,7 +629,7 @@ export async function POST(request: NextRequest) {
 
       try {
         response = await openai.chat.completions.create({
-          model: "gpt-5-mini",
+          model: "gpt-4o-mini",
           messages: chatMessages,
           tools,
           tool_choice: "auto",

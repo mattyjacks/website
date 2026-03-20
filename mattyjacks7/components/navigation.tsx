@@ -145,10 +145,11 @@ export default function Navigation() {
               </motion.button>
               
               {isMoreDropdownOpen && (
-                <div className="absolute top-[3rem] right-0 mt-2 w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-2 z-[110]">
-                  <Link href="/leads" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors">
-                    Free Leads
-                  </Link>
+                <div className="absolute top-full right-0 mt-0 pt-3">
+                  <div className="w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-2 z-[110]">
+                    <Link href="/leads" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                      Free Leads
+                    </Link>
                   <Link href="/resumes" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                     Resume Sites
                   </Link>
@@ -168,6 +169,7 @@ export default function Navigation() {
                   <a href="https://x.com/MattyJacksX" target="_blank" rel="noreferrer" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-sky-500 transition-colors">
                     Follow on X
                   </a>
+                </div>
                 </div>
               )}
             </div>
