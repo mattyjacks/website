@@ -596,14 +596,17 @@ export async function POST(request: NextRequest) {
     let response: OpenAI.Chat.Completions.ChatCompletion;
     const openai = getOpenAI();
 
-    const fallbackMessage = "I'm having trouble reaching the AI right now, Boss. Please try again in a moment.";
+    const fallbackMessage = "I'm having trouble reaching the AI right now, Boss. Please try again in a moment. If it keeps happening, wait 30 seconds and retry.";
+
+    const primaryModel = "gpt-5.4-mini-2026-03-17";
+    const fallbackModel = "gpt-5-mini-2025-08-07";
 
     const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;
-      for (let attempt = 0; attempt < 3; attempt++) {
+      for (let attempt = 0; attempt < 5; attempt++) {
         try {
           return await openai.chat.completions.create({
-            model: "gpt-5.4-mini",
+            model: primaryModel,
             messages: chatMessages,
             tools,
             tool_choice: "auto",
@@ -615,8 +618,9 @@ export async function POST(request: NextRequest) {
           const rawMsg = err instanceof Error ? err.message : "Unknown error";
           const msg = rawMsg.slice(0, 200).toLowerCase();
           const transient = msg.includes("rate_limit") || msg.includes("timeout") || msg.includes("fetch failed") || msg.includes("temporarily") || msg.includes("overloaded") || msg.includes("model") || msg.includes("server error") || msg.includes("503") || msg.includes("bad gateway") || msg.includes("gateway timeout");
-          if (!transient || attempt === 2) break;
-          const backoff = 350 + attempt * 200;
+          if (!transient || attempt === 4) break;
+          const jitter = Math.floor(Math.random() * 120);
+          const backoff = 400 + attempt * 260 + jitter;
           await new Promise((res) => setTimeout(res, backoff));
         }
       }
@@ -624,16 +628,29 @@ export async function POST(request: NextRequest) {
       const rawMsg = lastError instanceof Error ? lastError.message : "Unknown error";
       const msg = rawMsg.slice(0, 200).toLowerCase();
 
+      const authOrModel = msg.includes("authentication") || msg.includes("api key") || msg.includes("no api key") || msg.includes("model");
+
       if (msg.includes("rate_limit")) {
         return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 429 });
       }
       if (msg.includes("invalid_request")) {
         return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 400 });
       }
-      if (msg.includes("authentication") || msg.includes("api key") || msg.includes("no api key")) {
-        return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
-      }
-      if (msg.includes("timeout") || msg.includes("fetch failed")) {
+      if (authOrModel || msg.includes("timeout") || msg.includes("fetch failed")) {
+        // Try fallback model once
+        try {
+          const alt = await openai.chat.completions.create({
+            model: fallbackModel,
+            messages: chatMessages,
+            tools,
+            tool_choice: "auto",
+            max_tokens: 2000,
+            temperature: 0.8,
+          });
+          return alt;
+        } catch (altErr) {
+          lastError = altErr;
+        }
         return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
       }
       // Final fallback: return friendly text instead of HTTP error to keep UX responsive
