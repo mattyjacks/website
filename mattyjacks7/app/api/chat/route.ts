@@ -649,7 +649,7 @@ export async function POST(request: NextRequest) {
 
     const rawMessages = parsed?.messages;
     const requestedModelRaw = parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>).model : undefined;
-    const nickname = typeof (parsed as Record<string, unknown>)?.nickname === 'string' ? (parsed as Record<string, unknown>).nickname : 'Boss';
+    const nickname = typeof (parsed as Record<string, unknown>)?.nickname === 'string' ? (parsed as Record<string, unknown>).nickname : 'Master';
     if (!rawMessages || !Array.isArray(rawMessages) || rawMessages.length === 0) {
       addLog(`[CHAT] Messages missing or empty. parsed keys: ${Object.keys(parsed || {}).join(',')}, messages type: ${typeof rawMessages}`);
       return NextResponse.json(

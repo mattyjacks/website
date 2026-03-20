@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
-import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw } from "lucide-react";
+import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw, MoreVertical } from "lucide-react";
 import { motion, useDragControls, AnimatePresence } from "framer-motion";
 import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
 import { SHORT_PROMPTS } from "./short-prompts";
@@ -230,7 +230,8 @@ export default function AnythingButton() {
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [charCount, setCharCount] = useState(0);
 
-  const [nickname, setNickname] = useState("Boss");
+  const [nickname, setNickname] = useState("Master");
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [magicPrompt, setMagicPrompt] = useState("");
 
   const [showSettings, setShowSettings] = useState(false);
@@ -1000,14 +1001,43 @@ Create a summary that another AI can use to understand the context and continue 
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   };
 
-  const deleteSession = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    setSessions((prev) => {
-      const next = prev.filter((s) => s.id !== id);
-      if (currentSessionId === id) setCurrentSessionId(next.length > 0 ? next[0].id : null);
-      if (next.length === 0) setTimeout(() => createNewSession(), 0);
-      return next;
-    });
+  const deleteSession = (id: string) => {
+    if (confirm('Delete this conversation? This cannot be undone.')) {
+      setSessions((prev) => {
+        const next = prev.filter((s) => s.id !== id);
+        if (currentSessionId === id) setCurrentSessionId(next.length > 0 ? next[0].id : null);
+        if (next.length === 0) setTimeout(() => createNewSession(), 0);
+        return next;
+      });
+    }
+  };
+
+  const renameSessionAuto = async (id: string) => {
+    const session = sessions.find(s => s.id === id);
+    if (!session || session.messages.length === 0) return;
+    try {
+      const { newTitle } = await fetch('/api/rename-conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: session.messages, currentTitle: session.title })
+      }).then(r => r.json());
+      if (newTitle && newTitle !== session.title) {
+        setSessions(prev => prev.map(s => s.id === id ? { ...s, title: newTitle } : s));
+      }
+    } catch (err) {
+      console.error('Auto-rename failed:', err instanceof Error ? err.message : 'Unknown error');
+    }
+  };
+
+  const sumUpSession = (id: string) => {
+    const session = sessions.find(s => s.id === id);
+    if (!session || session.messages.length === 0) return;
+    const conversationText = session.messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
+    createNewSession();
+    setTimeout(() => {
+      setInput(`Here's a summary of my previous conversation:\n\n${conversationText}\n\n`);
+      if (inputRef.current) inputRef.current.focus();
+    }, 100);
   };
 
   useEffect(() => {
@@ -1390,16 +1420,26 @@ Create a summary that another AI can use to understand the context and continue 
                           <div className="text-xs text-zinc-500 py-2">No local conversations yet.</div>
                         )}
                         {sessions.map((session) => (
-                          <div key={session.id} onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); }} className={`group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-all ${currentSessionId === session.id ? "bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold" : "hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-transparent font-medium"}`}>
-                            <div className="flex items-center gap-2 truncate">
+                          <div key={session.id} className={`group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-all ${currentSessionId === session.id ? "bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold" : "hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-transparent font-medium"}`}>
+                            <div className="flex items-center gap-2 truncate flex-1" onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); }}>
                               <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentSessionId === session.id ? 'text-emerald-500' : 'opacity-60'}`} />
                               <span className="truncate">{session.title}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-[11px] text-zinc-400">{session.messages.length}</span>
-                              <button onClick={(e) => deleteSession(e, session.id)} className="opacity-0 group-hover:opacity-100 hover:text-sky-600 transition-opacity p-1 bg-zinc-200/50 dark:bg-zinc-800 rounded-md" title="Delete Session">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                              <div className="relative">
+                                <button onClick={() => setOpenMenuId(openMenuId === session.id ? null : session.id)} className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-md transition-colors" title="More options">
+                                  <MoreVertical className="w-3.5 h-3.5" />
+                                </button>
+                                {openMenuId === session.id && (
+                                  <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-50 py-1">
+                                    <button onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); setOpenMenuId(null); }} className="w-full text-left px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">Go To</button>
+                                    <button onClick={() => { renameSessionAuto(session.id); }} className="w-full text-left px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">Rename Auto</button>
+                                    <button onClick={() => { sumUpSession(session.id); }} className="w-full text-left px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">Sum Up</button>
+                                    <button onClick={() => { deleteSession(session.id); }} className="w-full text-left px-3 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Delete</button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))}
