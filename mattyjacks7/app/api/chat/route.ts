@@ -693,7 +693,8 @@ export async function POST(request: NextRequest) {
           messages: chatMessages,
           tools,
           tool_choice: "auto",
-          max_tokens: 2000,
+          // Newer OpenAI models expect max_completion_tokens instead of max_tokens
+          max_completion_tokens: 2000,
           temperature: 0.8,
         });
         addLog(`[CHAT] Model ${modelName} succeeded in ${Date.now() - modelStart}ms`);
