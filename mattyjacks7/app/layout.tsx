@@ -552,8 +552,8 @@ export default function RootLayout({
                   </div>
                 </div>
                 
-                {/* Clout Calculations */}
-                <CloutCalculations />
+                {/* Clout Calculations - TEMPORARILY DISABLED FOR DEBUGGING */}
+                {/* <CloutCalculations /> */}
               </div>
             </footer>          </div>
           <AnythingButton />
