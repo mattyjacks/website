@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw } from "lucide-react";
 import { motion, useDragControls, AnimatePresence } from "framer-motion";
 import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
-import { ThreeBorder } from "./three-border";
+import { ThreeBorderBack, ThreeBorderFront } from "./three-border";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -375,23 +375,26 @@ export default function AnythingButton() {
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 z-50 pointer-events-none w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center" style={{ zIndex: 50 }}>
+      <div className="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 pointer-events-none flex items-center justify-center" style={{ zIndex: 50, width: threeSize, height: threeSize }}>
         <div className="relative flex items-center justify-center w-full h-full">
-          <ThreeBorder size={threeSize} />
+          {/* Layer 1: Ring behind the image */}
+          <ThreeBorderBack size={threeSize} />
+
+          {/* Layer 2: The image button */}
           <motion.button
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(!isOpen)}
-            className="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300 focus:outline-none outline-none pointer-events-auto cursor-pointer"
+            className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300 focus:outline-none outline-none pointer-events-auto cursor-pointer"
             aria-label="Toggle Valley Net AI Chat"
-            style={{ zIndex: 5 }}
+            style={{ zIndex: 5, width: threeSize * 0.6, height: threeSize * 0.6 }}
           >
             <AnimatePresence mode="wait">
               {isOpen ? (
                 <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-                  <ChevronDown className="w-12 h-12 flex-shrink-0" />
+                  <ChevronDown className="w-10 h-10 flex-shrink-0" />
                 </motion.div>
               ) : (
                 <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center w-full h-full relative p-[3px]">
@@ -399,13 +402,16 @@ export default function AnythingButton() {
                     src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
                     alt="Valley Net"
                     fill
-                    className="rounded-full object-cover shadow-inner"
+                    className="rounded-full object-cover"
                   />
                 </motion.div>
               )}
             </AnimatePresence>
             {!isOpen && <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />}
           </motion.button>
+
+          {/* Layer 3: Ring in front of the image (clipped to front arc only) */}
+          <ThreeBorderFront size={threeSize} />
         </div>
       </div>
 
