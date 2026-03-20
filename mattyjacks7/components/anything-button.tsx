@@ -240,6 +240,8 @@ export default function AnythingButton() {
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const [consoleDebugEnabled, setConsoleDebugEnabled] = useState(true);
   const [selectedModel, setSelectedModel] = useState("gpt-5.4-mini-2026-03-17");
+  const [chatMode, setChatMode] = useState<'good' | 'wicked'>('good');
+  const [wickedModel, setWickedModel] = useState('random');
 
   const [threeSize, setThreeSize] = useState(0);
   const [chatBounds, setChatBounds] = useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -1144,7 +1146,9 @@ Create a summary that another AI can use to understand the context and continue 
         credentials: "include",
         body: JSON.stringify({ 
           model: selectedModel, 
-          nickname: nickname, 
+          nickname: nickname,
+          mode: chatMode,
+          wickedModel: wickedModel,
           messages: messagesToSend.map((m) => {
             // Only send images for the current user message, strip from history to reduce payload
             const isCurrentMessage = m.id === userMessageId;
@@ -1397,6 +1401,9 @@ Create a summary that another AI can use to understand the context and continue 
                     />
                   </button>
                   <h3 className="text-white font-bold tracking-wide text-base whitespace-nowrap">Valley Net <span className="text-[14px]">💘</span></h3>
+                  {chatMode === 'wicked' && (
+                    <span className="ml-1 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-rose-600 text-white rounded-md animate-pulse">Wicked</span>
+                  )}
                 </div>
               </div>
 
@@ -1531,19 +1538,62 @@ Create a summary that another AI can use to understand the context and continue 
 
                         <div className="flex flex-col gap-2">
                           <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                            Model
-                            <span className="block text-xs text-emerald-700/70 dark:text-emerald-300/70 font-normal mt-0.5">Choose AI engine</span>
+                            Mode
+                            <span className="block text-xs text-emerald-700/70 dark:text-emerald-300/70 font-normal mt-0.5">Choose personality mode</span>
                           </label>
-                          <select
-                            value={selectedModel}
-                            onChange={(e) => setSelectedModel(e.target.value)}
-                            className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                          >
-                            <option value="gpt-5.4-mini-2026-03-17">GPT-5.4 Mini (primary)</option>
-                            <option value="gpt-5-mini-2025-08-07">GPT-5 Mini</option>
-                            <option value="gpt-4o-mini">GPT-4o Mini</option>
-                          </select>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setChatMode('good')}
+                              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all ${chatMode === 'good' ? 'bg-emerald-500 text-white shadow-md' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-400'}`}
+                            >
+                              Good Mode
+                            </button>
+                            <button
+                              onClick={() => setChatMode('wicked')}
+                              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all ${chatMode === 'wicked' ? 'bg-rose-600 text-white shadow-md' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:border-rose-400'}`}
+                            >
+                              Wicked Mode
+                            </button>
+                          </div>
                         </div>
+
+                        {chatMode === 'good' ? (
+                          <div className="flex flex-col gap-2">
+                            <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+                              Model
+                              <span className="block text-xs text-emerald-700/70 dark:text-emerald-300/70 font-normal mt-0.5">Choose AI engine</span>
+                            </label>
+                            <select
+                              value={selectedModel}
+                              onChange={(e) => setSelectedModel(e.target.value)}
+                              className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            >
+                              <option value="gpt-5.4-mini-2026-03-17">GPT-5.4 Mini (primary)</option>
+                              <option value="gpt-5-mini-2025-08-07">GPT-5 Mini</option>
+                              <option value="gpt-4o-mini">GPT-4o Mini</option>
+                            </select>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col gap-2">
+                            <label className="text-sm font-semibold text-rose-700 dark:text-rose-300">
+                              Wicked Model
+                              <span className="block text-xs text-rose-700/70 dark:text-rose-300/70 font-normal mt-0.5">Uncensored AI via OpenRouter</span>
+                            </label>
+                            <select
+                              value={wickedModel}
+                              onChange={(e) => setWickedModel(e.target.value)}
+                              className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-rose-300 dark:border-rose-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                            >
+                              <option value="random">Random (surprise me)</option>
+                              <option value="cognitivecomputations/dolphin3.0-r1-mistral-24b">Dolphin 3.0 R1 (reasoning)</option>
+                              <option value="cognitivecomputations/dolphin3.0-mistral-24b">Dolphin 3.0 (general)</option>
+                              <option value="cognitivecomputations/dolphin-mistral-24b-venice-edition:free">Venice Uncensored (free)</option>
+                            </select>
+                            <div className="p-2.5 rounded-lg bg-rose-50/60 dark:bg-rose-900/20 border border-rose-200/60 dark:border-rose-800/50">
+                              <p className="text-[11px] text-rose-700 dark:text-rose-300 font-medium leading-relaxed">Wicked Mode uses uncensored open-source models. No content filters. No refusals. Use responsibly.</p>
+                            </div>
+                          </div>
+                        )}
 
                         <div className="flex items-start gap-3 p-3 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-lg">
                           <input 
@@ -1581,8 +1631,6 @@ Create a summary that another AI can use to understand the context and continue 
             <div 
               ref={scrollAreaRef}
               onScroll={handleScroll}
-              onWheel={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
               className="flex-1 overflow-y-auto px-4 sm:px-5 py-6 space-y-2 bg-zinc-50/50 dark:bg-zinc-950/30 custom-scrollbar scroll-smooth relative select-text"
               onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
             >
@@ -1825,11 +1873,34 @@ Create a summary that another AI can use to understand the context and continue 
                 </span>
                 <div className="flex items-center gap-2">
                   <span className={`text-[10px] font-bold tracking-wider ${getCounterColor()}`}>
-                    {messages.filter(m => m.role === 'assistant').length}/69
+                    {`${getConversationStatus().toUpperCase()} ${messages.filter(m => m.role === 'assistant').length}/69`}
                   </span>
                   <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-100 tracking-wider">
                     Powered by God
                   </span>
+                </div>
+              </div>
+
+              {/* Bottom bar quick toggle */}
+              <div className="mt-2 px-1 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-[10px] font-bold tracking-wider">
+                  <span className={`px-2 py-1 rounded-full ${chatMode === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200'}`}>
+                    {chatMode === 'good' ? 'Good Mode' : 'Wicked Mode'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setChatMode('good')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-full border transition-colors ${chatMode === 'good' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700 hover:border-emerald-400'}`}
+                  >
+                    Good
+                  </button>
+                  <button
+                    onClick={() => setChatMode('wicked')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-full border transition-colors ${chatMode === 'wicked' ? 'bg-rose-600 text-white border-rose-600' : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700 hover:border-rose-400'}`}
+                  >
+                    Wicked
+                  </button>
                 </div>
               </div>
 
