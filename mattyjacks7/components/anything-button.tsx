@@ -621,7 +621,7 @@ Create a summary that another AI can use to understand the context and continue 
   return (
     <>
       {/* Floating launcher with torus border */}
-      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 pointer-events-none flex items-center justify-center" style={{ zIndex: 50, width: threeSize, height: threeSize }}>
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 pointer-events-none flex items-center justify-center" style={{ zIndex: 120, width: threeSize, height: threeSize }}>
         <div className="relative flex items-center justify-center w-full h-full">
           <ThreeBorderBack size={threeSize} />
           <motion.button
@@ -915,7 +915,7 @@ Create a summary that another AI can use to understand the context and continue 
               </div>
 
               <div className="flex justify-between items-center mt-3 px-1">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-700 dark:text-zinc-100">
                   {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : `Ready (${messages.length}/50)`}
                 </span>
                 <div className="flex items-center gap-2">
@@ -924,8 +924,8 @@ Create a summary that another AI can use to understand the context and continue 
                       <div className={`h-full ${charCount > 4800 ? 'bg-sky-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min((charCount / 5000) * 100, 100)}%` }} />
                     </div>
                   )}
-                  <span className="text-[10px] font-bold text-zinc-400 tracking-wider">
-                    Powered by Valley Net
+                  <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-100 tracking-wider">
+                    Powered by God
                   </span>
                 </div>
               </div>
