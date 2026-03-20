@@ -9,6 +9,22 @@ import { selectRelevantContext, isOpenservQuery } from "@/lib/openserv-rag";
 import { categorizePrompt } from "@/lib/prompt-categorizer";
 import { trackCategorizedCost } from "@/lib/category-cost-tracker";
 
+// Model pricing (per 1M tokens)
+const MODEL_PRICING = {
+  'gpt-5.4-mini': { input: 0.75, output: 4.50 },
+  'gpt-5.4-nano': { input: 0.20, output: 1.25 },
+  'gpt-4o-mini': { input: 0.15, output: 0.60 }, // fallback
+} as const;
+
+function getModelPricing(model: string): { input: number; output: number } {
+  for (const [key, pricing] of Object.entries(MODEL_PRICING)) {
+    if (model.includes(key)) {
+      return pricing;
+    }
+  }
+  return MODEL_PRICING['gpt-4o-mini']; // default fallback
+}
+
 function getOpenAI() {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -851,8 +867,10 @@ export async function POST(request: NextRequest) {
     
     // Categorize prompt and track categorized costs
     const categorization = await categorizePrompt(userPromptText);
-    const inputCost = (inputTokens / 1000) * 0.075; // gpt-5.4-mini pricing
-    const outputCost = (outputTokens / 1000) * 0.3;
+    // Get pricing for the model used
+    const pricing = getModelPricing(response.model);
+    const inputCost = (inputTokens / 1000000) * pricing.input;
+    const outputCost = (outputTokens / 1000000) * pricing.output;
     const totalCost = inputCost + outputCost;
     await trackCategorizedCost(categorization, inputTokens, outputTokens, totalCost);
     

@@ -4,7 +4,6 @@ import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import Script from "next/script";
 import Navigation from "../components/navigation";
-import SmoothScroll from "../components/smooth-scroll";
 import ViewTracker from "../components/view-tracker";
 import CloutCalculations from "../components/clout-calculations";
 import AnythingButton from "../components/anything-button";
@@ -414,7 +413,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SmoothScroll>
           <div className="min-h-screen flex flex-col">
             {/* Header / Navigation */}
             <Navigation />
@@ -559,7 +557,6 @@ export default function RootLayout({
               </div>
             </footer>          </div>
           <AnythingButton />
-          </SmoothScroll>
         </ThemeProvider>
       </body>
     </html>
