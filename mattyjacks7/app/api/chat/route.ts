@@ -20,19 +20,19 @@ const MODEL_PRICING = {
 
 // Wicked Mode - uncensored models via OpenRouter
 const WICKED_MODELS = {
-  'dolphin-r1': {
-    id: 'cognitivecomputations/dolphin3.0-r1-mistral-24b',
-    name: 'Dolphin 3.0 R1',
-    description: 'Reasoning-trained uncensored model',
+  'dolphin-mixtral': {
+    id: 'cognitivecomputations/dolphin-mixtral-8x22b',
+    name: 'Dolphin Mixtral 8x22B',
+    description: 'Uncensored MOE mixtral variant',
   },
-  'dolphin-3': {
-    id: 'cognitivecomputations/dolphin3.0-mistral-24b',
-    name: 'Dolphin 3.0',
-    description: 'General purpose uncensored model',
+  'dolphin-llama3': {
+    id: 'cognitivecomputations/dolphin-llama-3-70b',
+    name: 'Dolphin Llama 3 70B',
+    description: 'Uncensored Llama3-based model',
   },
-  'venice': {
+  'venice-free': {
     id: 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
-    name: 'Venice Uncensored',
+    name: 'Venice Uncensored (free)',
     description: 'Free uncensored Venice edition',
   },
 } as const;
