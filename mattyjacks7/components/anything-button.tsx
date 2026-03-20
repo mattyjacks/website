@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw } from "lucide-react";
 import { motion, useDragControls, AnimatePresence } from "framer-motion";
 import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
+import { SHORT_PROMPTS } from "./short-prompts";
 import { ThreeBorderBack, ThreeBorderFront, triggerWobble, setMorphTarget } from "./three-border";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
@@ -47,6 +48,10 @@ const SUGGESTIONS = [
 
 function getRandomGreeting() {
   return GREETING_VARIANTS[Math.floor(Math.random() * GREETING_VARIANTS.length)];
+}
+
+function getRandomShortPrompt() {
+  return SHORT_PROMPTS[Math.floor(Math.random() * SHORT_PROMPTS.length)];
 }
 
 function generateId() {
@@ -534,6 +539,7 @@ Deep inquiry deserves nourishment: ${food}`
 
   const [lastEmptyIdx, setLastEmptyIdx] = useState(-1);
   const [lastFilledIdx, setLastFilledIdx] = useState(-1);
+  const [lastShortIdx, setLastShortIdx] = useState(-1);
 
   const applyMagicPrompt = () => {
     const foodReward = getRandomFoodEmojis(Math.floor(Math.random() * 4) + 6);
@@ -554,6 +560,15 @@ Deep inquiry deserves nourishment: ${food}`
   const addFoodReward = () => {
     const randomFood = FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)];
     setInput(prev => prev + randomFood);
+  };
+
+  const regenShortPrompt = () => {
+    if (!SHORT_PROMPTS.length) return;
+    let idx = Math.floor(Math.random() * SHORT_PROMPTS.length);
+    if (idx === lastShortIdx && SHORT_PROMPTS.length > 1) idx = (idx + 1) % SHORT_PROMPTS.length;
+    setLastShortIdx(idx);
+    setInput(SHORT_PROMPTS[idx]);
+    setTimeout(() => inputRef.current?.focus(), 50);
   };
 
   const generateRandomId = (): string => {
@@ -786,6 +801,7 @@ Create a summary that another AI can use to understand the context and continue 
     setCurrentSessionId(newId);
     setIsSidebarOpen(false);
     setError(null);
+    setInput(getRandomShortPrompt());
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   };
 
@@ -1251,6 +1267,15 @@ Create a summary that another AI can use to understand the context and continue 
                 >
                   <span role="img" aria-label="magic wand">🪄</span>
                   Magic Prompt
+                </button>
+                <button
+                  type="button"
+                  onClick={regenShortPrompt}
+                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800 rounded-full px-3 py-1 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors"
+                  title="Regenerate a random short prompt"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Regen
                 </button>
                 <button
                   type="button"
