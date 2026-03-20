@@ -609,6 +609,7 @@ export async function POST(request: NextRequest) {
 
     const primaryModel = "gpt-5.4-mini-2026-03-17";
     const fallbackModel = "gpt-5-mini-2025-08-07";
+    const tertiaryModel = "gpt-4o-mini";
 
     const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;
@@ -668,6 +669,25 @@ export async function POST(request: NextRequest) {
           if (DEBUG) console.error(`[CHAT] Fallback model also failed: ${altErr instanceof Error ? altErr.message.slice(0, 100) : String(altErr)}`);
           lastError = altErr;
         }
+
+        // Try tertiary model (gpt-4o-mini) as last resort
+        if (DEBUG) console.log(`[CHAT] Trying tertiary model: ${tertiaryModel}`);
+        try {
+          const alt2 = await openai.chat.completions.create({
+            model: tertiaryModel,
+            messages: chatMessages,
+            tools,
+            tool_choice: "auto",
+            max_tokens: 2000,
+            temperature: 0.8,
+          });
+          if (DEBUG) console.log(`[CHAT] Tertiary model succeeded`);
+          return alt2;
+        } catch (alt2Err) {
+          if (DEBUG) console.error(`[CHAT] Tertiary model also failed: ${alt2Err instanceof Error ? alt2Err.message.slice(0, 100) : String(alt2Err)}`);
+          lastError = alt2Err;
+        }
+
         return NextResponse.json({ error: getErrorResponse(lastError, isAdmin) }, { status: 503 });
       }
       // Final fallback: return friendly text instead of HTTP error to keep UX responsive
