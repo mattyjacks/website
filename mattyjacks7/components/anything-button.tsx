@@ -261,7 +261,9 @@ export default function AnythingButton() {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [isMagicShaking, setIsMagicShaking] = useState(false);
   const [isRegenRotating, setIsRegenRotating] = useState(false);
+  const [particles, setParticles] = useState<Array<{id: string; x: number; y: number; color: string; life: number}>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const magicWandRef = useRef<HTMLButtonElement>(null);
 
   const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
 
@@ -576,8 +578,36 @@ Deep inquiry deserves nourishment: ${food}`
   const [currentRewardEmoji, setCurrentRewardEmoji] = useState(getRandomFoodEmoji());
   const [rewardCycleKey, setRewardCycleKey] = useState(0);
 
+  const SPARKLE_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#A9DFBF'];
+
+  const generateSparkles = () => {
+    if (!magicWandRef.current) return;
+    const rect = magicWandRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const newParticles = Array.from({ length: 12 }).map((_, i) => ({
+      id: `${Date.now()}-${i}`,
+      x: centerX,
+      y: centerY,
+      color: SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)],
+      life: 1
+    }));
+    
+    setParticles(prev => [...prev, ...newParticles]);
+    
+    const animationInterval = setInterval(() => {
+      setParticles(prev => {
+        const updated = prev.map(p => ({ ...p, life: p.life - 0.05 })).filter(p => p.life > 0);
+        if (updated.length === 0) clearInterval(animationInterval);
+        return updated;
+      });
+    }, 30);
+  };
+
   const applyMagicPrompt = () => {
     setIsMagicShaking(true);
+    generateSparkles();
     setTimeout(() => setIsMagicShaking(false), 600);
     const foodReward = getRandomFoodEmojis(Math.floor(Math.random() * 4) + 6);
     
@@ -1094,7 +1124,11 @@ Create a summary that another AI can use to understand the context and continue 
         body: JSON.stringify({ 
           model: selectedModel, 
           nickname: nickname, 
-          messages: newMessages.map((m) => ({ role: m.role, content: m.content.slice(0, 5000) })) 
+          messages: newMessages.map((m) => ({ 
+            role: m.role, 
+            content: m.content.slice(0, 5000),
+            images: m.images || []
+          })) 
         }),
         signal: controller.signal,
       });
@@ -1606,14 +1640,6 @@ Create a summary that another AI can use to understand the context and continue 
                   >
                     <Upload className="w-5 h-5" />
                   </button>
-                  <button
-                    onClick={handleClearInput}
-                    disabled={isLoading || input.length === 0}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-900/50 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Clear input"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
                   {isLoading ? (
                     <button
                       onClick={stopGeneration}
@@ -1625,7 +1651,7 @@ Create a summary that another AI can use to understand the context and continue 
                   ) : (
                     <button
                       onClick={() => sendMessage()}
-                      disabled={!input.trim() && uploadedImages.length === 0}
+                      disabled={input.trim().length === 0 && uploadedImages.length === 0}
                       className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-600 text-white disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 transition-colors group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                       title="Send message (Enter to send, Shift+Enter for new line)"
                     >
@@ -1684,6 +1710,29 @@ Create a summary that another AI can use to understand the context and continue 
                 </div>
               )}
 
+              {particles.map((particle) => (
+                <motion.div
+                  key={particle.id}
+                  initial={{ x: particle.x, y: particle.y, opacity: 1, scale: 1 }}
+                  animate={{
+                    x: particle.x + (Math.random() - 0.5) * 200,
+                    y: particle.y - Math.random() * 150,
+                    opacity: 0,
+                    scale: 0
+                  }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="fixed pointer-events-none"
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: particle.color,
+                    boxShadow: `0 0 8px ${particle.color}`,
+                    zIndex: 40
+                  }}
+                />
+              ))}
+
               <div className="mt-2 flex justify-end gap-2">
                 <button
                   type="button"
@@ -1695,10 +1744,12 @@ Create a summary that another AI can use to understand the context and continue 
                   <X className="w-4 h-4" />
                 </button>
                 <motion.button
+                  ref={magicWandRef}
                   type="button"
                   onClick={applyMagicPrompt}
                   animate={isMagicShaking ? { rotate: [-5, 5, -5, 5, -5, 5, 0] } : { rotate: 0 }}
                   transition={{ duration: 0.6, ease: "easeInOut" }}
+                  style={{ originX: 0, originY: 1 }}
                   className="inline-flex items-center justify-center text-4xl font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-full w-10 h-10 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
                   title="Magic prompt - tap to shake!"
                 >
