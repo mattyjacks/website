@@ -616,8 +616,8 @@ export async function POST(request: NextRequest) {
 
       // Try primary model once
       try {
-        if (DEBUG) console.log(`[CHAT] Trying primary model: ${primaryModel}`);
-        return await openai.chat.completions.create({
+        console.log(`[CHAT] Trying primary model: ${primaryModel}`);
+        const result = await openai.chat.completions.create({
           model: primaryModel,
           messages: chatMessages,
           tools,
@@ -625,15 +625,17 @@ export async function POST(request: NextRequest) {
           max_tokens: 2000,
           temperature: 0.8,
         });
+        console.log(`[CHAT] Primary model succeeded`);
+        return result;
       } catch (err) {
         lastError = err;
-        if (DEBUG) console.error(`[CHAT] Primary model failed: ${err instanceof Error ? err.message.slice(0, 100) : String(err)}`);
+        console.error(`[CHAT] Primary model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
       }
 
       // Try fallback model once
       try {
-        if (DEBUG) console.log(`[CHAT] Trying fallback model: ${fallbackModel}`);
-        return await openai.chat.completions.create({
+        console.log(`[CHAT] Trying fallback model: ${fallbackModel}`);
+        const result = await openai.chat.completions.create({
           model: fallbackModel,
           messages: chatMessages,
           tools,
@@ -641,15 +643,17 @@ export async function POST(request: NextRequest) {
           max_tokens: 2000,
           temperature: 0.8,
         });
+        console.log(`[CHAT] Fallback model succeeded`);
+        return result;
       } catch (err) {
         lastError = err;
-        if (DEBUG) console.error(`[CHAT] Fallback model failed: ${err instanceof Error ? err.message.slice(0, 100) : String(err)}`);
+        console.error(`[CHAT] Fallback model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
       }
 
       // Try tertiary model once
       try {
-        if (DEBUG) console.log(`[CHAT] Trying tertiary model: ${tertiaryModel}`);
-        return await openai.chat.completions.create({
+        console.log(`[CHAT] Trying tertiary model: ${tertiaryModel}`);
+        const result = await openai.chat.completions.create({
           model: tertiaryModel,
           messages: chatMessages,
           tools,
@@ -657,14 +661,17 @@ export async function POST(request: NextRequest) {
           max_tokens: 2000,
           temperature: 0.8,
         });
+        console.log(`[CHAT] Tertiary model succeeded`);
+        return result;
       } catch (err) {
         lastError = err;
-        if (DEBUG) console.error(`[CHAT] Tertiary model failed: ${err instanceof Error ? err.message.slice(0, 100) : String(err)}`);
+        console.error(`[CHAT] Tertiary model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
       }
 
       // All models failed
-      if (DEBUG) console.error(`[CHAT] All models exhausted. Final error: ${lastError instanceof Error ? lastError.message.slice(0, 150) : String(lastError)}`);
-      return typeof lastError === "string" ? lastError : fallbackMessage;
+      console.error(`[CHAT] All models exhausted. Final error: ${lastError instanceof Error ? lastError.message.slice(0, 150) : String(lastError)}`);
+      console.log(`[CHAT] Returning fallback message: ${fallbackMessage}`);
+      return fallbackMessage;
     };
 
     const completionResult = await createCompletion();
