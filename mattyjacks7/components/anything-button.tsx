@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
-import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check } from "lucide-react";
-import { motion, useDragControls } from "framer-motion";
+import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw } from "lucide-react";
+import { motion, useDragControls, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ChatMessage {
   id: string;
@@ -21,130 +23,171 @@ interface ChatSession {
 }
 
 const GREETING_VARIANTS = [
-  "Let's make some money together for the common good of humanity. I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. What are your orders, boss? \n👱🏻‍♀️ Valley Net 💘",
-  "Ready to make moves, Boss! I'm Valley Net, and I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. Let's build something great for humanity. \n👱🏻‍♀️ Valley Net 💘",
-  "Let's get to work for the good of humanity, Boss! I'm Valley Net, and I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. \n👱🏻‍♀️ Valley Net 💘",
-  "Time to make things happen! I'm Valley Net, and I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. Let's do this for humanity. \n👱🏻‍♀️ Valley Net 💘",
-  "Boss! Let's make some money and do some good for humanity. I'm Valley Net, and I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. \n👱🏻‍♀️ Valley Net 💘",
+  "Let's make some money together for the common good of humanity. I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. What are your orders, boss? \n\n👱🏻‍♀️ **Valley Net** 💘",
+  "Ready to make moves, Boss! I'm **Valley Net**, your high-performance AI operator. Give me a strategy to break down or code to write. \n\n👱🏻‍♀️ **Valley Net** 💘",
+  "Let's ship something great today! I'm **Valley Net**, capable of writing, planning, debugging, and strategizing. \n\n👱🏻‍♀️ **Valley Net** 💘"
 ];
 
-function getRandomGreeting(): string {
+const SUGGESTIONS = [
+  "Build a React Dashboard",
+  "Draft a Cold Email",
+  "Explain WebSockets"
+];
+
+function getRandomGreeting() {
   return GREETING_VARIANTS[Math.floor(Math.random() * GREETING_VARIANTS.length)];
 }
 
-function generateId(): string {
+function generateId() {
   const timestamp = Date.now().toString(36);
   const randomPart = crypto.getRandomValues(new Uint8Array(6)).reduce((acc, byte) => acc + byte.toString(36), '');
   return `${timestamp}-${randomPart}`;
 }
 
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  const hours = date.getHours().toString().padStart(2, "0");
-  const mins = date.getMinutes().toString().padStart(2, "0");
-  return `${hours}:${mins}`;
+function formatSmartTime(timestamp: number) {
+  const d = new Date(timestamp);
+  const now = new Date();
+  const isToday = d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return isToday ? `Today, ${timeStr}` : `${d.toLocaleDateString()} ${timeStr}`;
 }
 
-function sanitizeText(text: string): string {
-  if (typeof document === 'undefined') return text;
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+function CodeBlock({ node, inline, className, children, ...props }: any) {
+  const match = /language-(\w+)/.exec(className || "");
+  const codeString = String(children).replace(/\n$/, "");
+  // Local state hook workaround inside component
+  const [copied, setCopied] = useState(false);
 
-function renderMarkdown(text: string): React.ReactNode {
-  if (!text || typeof text !== 'string' || text.length > 10000) {
-    return sanitizeText(text?.slice(0, 10000) || '');
+  if (inline) {
+    return (
+      <code className="bg-zinc-200/60 dark:bg-zinc-800/80 rounded-[4px] px-1.5 py-0.5 text-[0.85em] font-mono text-emerald-700 dark:text-emerald-300 font-semibold shadow-sm" {...props}>
+        {children}
+      </code>
+    );
   }
 
-  const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-
-  const codeBlockRegex = /```([\s\S]*?)```/g;
-  let match;
-  const matches: Array<{ type: string; start: number; end: number; content: string }> = [];
-
-  while ((match = codeBlockRegex.exec(text)) !== null) {
-    const content = match[1].trim();
-    if (content.length > 5000) continue;
-    matches.push({
-      type: "codeBlock",
-      start: match.index,
-      end: match.index + match[0].length,
-      content: sanitizeText(content),
-    });
-  }
-
-  matches.sort((a, b) => a.start - b.start);
-
-  for (const m of matches) {
-    if (lastIndex < m.start) {
-      const plainText = text.substring(lastIndex, m.start);
-      parts.push(sanitizeText(plainText));
-    }
-    if (m.type === "codeBlock") {
-      parts.push(
-        <pre
-          key={`code-${m.start}`}
-          className="bg-zinc-800 text-zinc-100 p-2 rounded text-xs overflow-x-auto my-1"
-        >
-          <code>{m.content}</code>
-        </pre>
-      );
-    }
-    lastIndex = m.end;
-  }
-
-  if (lastIndex < text.length) {
-    parts.push(sanitizeText(text.substring(lastIndex)));
-  }
-
-  return parts.length > 0 ? parts : sanitizeText(text);
-}
-
-function MessageBubble({
-  message,
-  onCopy,
-}: {
-  message: ChatMessage;
-  onCopy: (text: string) => void;
-}) {
-  const isUser = message.role === "user";
+  const handleCopy = () => {
+    navigator.clipboard.writeText(codeString);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div
-      className={`flex ${isUser ? "justify-end" : "justify-start"} group`}
-      key={message.id}
-    >
-      <div
-        className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed transition-all ${
-          isUser
-            ? "bg-emerald-600 text-white rounded-br-md"
-            : message.error
-              ? "bg-sky-50 dark:bg-blue-950/30 text-blue-900 dark:text-sky-200 rounded-bl-md border border-sky-200 dark:border-blue-800"
-              : "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-bl-md border border-zinc-200 dark:border-zinc-800"
-        }`}
-      >
-        <div className="whitespace-pre-wrap break-words">{renderMarkdown(message.content)}</div>
-        <div
-          className={`flex items-center gap-2 mt-1.5 text-[10px] ${
-            isUser ? "text-emerald-100" : "text-zinc-500 dark:text-zinc-400"
-          }`}
-        >
-          <span>{formatTime(message.timestamp)}</span>
-          {!isUser && !message.error && (
-            <button
-              onClick={() => onCopy(message.content)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-zinc-700 dark:hover:text-zinc-300"
-              title="Copy message"
-              aria-label="Copy message"
-            >
-              <Copy className="w-3 h-3" />
-            </button>
-          )}
+    <div className="relative my-4 rounded-xl overflow-hidden shadow-2xl border border-zinc-300 dark:border-zinc-700 bg-[#0d1117] group">
+      <div className="flex items-center justify-between px-4 py-2 bg-[#161b22] border-b border-zinc-800/50">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
+          </div>
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest ml-1">{match ? match[1] : "Code"}</span>
         </div>
+        <button
+          onClick={handleCopy}
+          className="text-zinc-400 hover:text-white transition-all bg-white/5 hover:bg-white/10 px-2 py-1 rounded-md flex items-center gap-1.5 opacity-0 group-hover:opacity-100 focus:opacity-100"
+          title="Copy Code"
+        >
+          {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          <span className="text-[10px] uppercase font-bold tracking-wider">{copied ? "Copied" : "Copy"}</span>
+        </button>
+      </div>
+      <div className="p-4 overflow-x-auto text-sm text-zinc-300 font-mono leading-relaxed custom-scrollbar">
+        <code className={className}>{children}</code>
       </div>
     </div>
+  );
+}
+
+function MessageBubble({ message, onCopy }: { message: ChatMessage; onCopy: (text: string) => void }) {
+  const isUser = message.role === "user";
+  const [copied, setCopied] = useState(false);
+
+  const copyItem = () => {
+    onCopy(message.content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 15, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 220, damping: 20 }}
+      layout
+      className={`flex w-full ${isUser ? "justify-end" : "justify-start"} group mb-5`}
+    >
+      <div className={`flex w-full gap-3 ${isUser ? "flex-row-reverse" : "flex-row"} max-w-[95%] sm:max-w-[90%]`}>
+        <div className="flex-shrink-0 mt-1">
+          {isUser ? (
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-md">
+              <User className="w-4 h-4 text-white" />
+            </div>
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-800 to-black border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-500/10 relative">
+              <Bot className="w-4 h-4 text-emerald-400 z-10" />
+              {(!isUser && message.id.includes("temp")) && <div className="absolute inset-0 rounded-full border-2 border-emerald-500/50 border-t-transparent animate-spin z-0" />}
+            </div>
+          )}
+        </div>
+
+        <div className="relative group/bubble flex flex-col min-w-0 max-w-[calc(100%-2.5rem)]">
+          <div
+            className={`px-4 py-3 sm:px-5 sm:py-4 text-[15px] leading-[1.6] overflow-hidden break-words transition-all shadow-sm ${
+              isUser
+                ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-2xl rounded-tr-sm shadow-emerald-600/20"
+                : message.error
+                  ? "bg-sky-50 dark:bg-sky-950/30 text-sky-900 dark:text-sky-200 rounded-2xl rounded-tl-sm border border-sky-200 dark:border-sky-800 shadow-sky-900/5"
+                  : "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-2xl rounded-tl-sm border border-zinc-200/80 dark:border-zinc-800/80 shadow-black/5"
+            }`}
+          >
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code: CodeBlock,
+                a: ({ node, ...props }) => (
+                  <a {...props} target="_blank" rel="noopener noreferrer" className={`hover:underline underline-offset-4 decoration-2 font-bold transition-all ${isUser ? "text-emerald-100 hover:text-white decoration-emerald-200" : "text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 decoration-emerald-500/30 hover:decoration-emerald-500"}`} />
+                ),
+                p: ({ children }) => <p className="mb-4 last:mb-0 font-medium">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc list-outside ml-6 mb-4 space-y-1.5 marker:text-emerald-500">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-outside ml-6 mb-4 space-y-1.5 marker:text-emerald-500 font-bold">{children}</ol>,
+                li: ({ children }) => <li className="pl-1 leading-relaxed">{children}</li>,
+                strong: ({ children }) => <strong className={`font-black ${isUser ? "text-white" : "text-zinc-900 dark:text-white"}`}>{children}</strong>,
+                h1: ({ children }) => <h1 className={`text-2xl font-black mb-4 mt-6 ${isUser ? "" : "text-zinc-900 dark:text-white"} tracking-tight`}>{children}</h1>,
+                h2: ({ children }) => <h2 className={`text-xl font-bold mb-3 mt-5 pb-1 border-b ${isUser ? "border-emerald-500/30" : "border-zinc-200 dark:border-zinc-800"} tracking-tight`}>{children}</h2>,
+                h3: ({ children }) => <h3 className="text-lg font-bold mb-2 mt-4 tracking-tight">{children}</h3>,
+                blockquote: ({ children }) => <blockquote className={`border-l-4 pl-4 italic py-2 pr-4 rounded-r-xl my-4 ${isUser ? "border-emerald-300 bg-emerald-700/50 text-emerald-50" : "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-zinc-600 dark:text-zinc-400"}`}>{children}</blockquote>,
+                table: ({ children }) => <div className="overflow-x-auto my-5 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm"><table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-sm whitespace-nowrap">{children}</table></div>,
+                thead: ({ children }) => <thead className={isUser ? "bg-emerald-700/50" : "bg-zinc-50 dark:bg-zinc-900"}>{children}</thead>,
+                th: ({ children }) => <th className="px-4 py-3 text-left font-bold tracking-wider">{children}</th>,
+                td: ({ children }) => <td className={`px-4 py-3 font-medium border-t ${isUser ? "border-emerald-500/30" : "border-zinc-200 dark:border-zinc-800"} whitespace-normal`}>{children}</td>
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          </div>
+
+          <div className={`flex items-center gap-3 mt-2 text-[11px] font-bold tracking-wide opacity-0 group-hover/bubble:opacity-100 transition-opacity duration-300 ${isUser ? "justify-end text-emerald-600 dark:text-emerald-400 mr-2" : "justify-start text-zinc-500 ml-2"}`}>
+            <span>{formatSmartTime(message.timestamp)}</span>
+            {!message.error && (
+              <button
+                onClick={copyItem}
+                className="flex items-center gap-1 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors uppercase"
+                title="Copy message"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? "Copied" : "Copy"}
+              </button>
+            )}
+            {message.error && (
+              <span className="flex items-center gap-1 text-sky-600 uppercase">
+                <RotateCcw className="w-3.5 h-3.5" /> Failed
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -160,25 +203,32 @@ export default function AnythingButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const [charCount, setCharCount] = useState(0);
 
   const dragControls = useDragControls();
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const STORAGE_KEY = "valley_net_chat_sessions";
 
-  // Load sessions on mount
+  const scrollToBottom = useCallback((smooth = true) => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: smooth ? "smooth" : "auto",
+      });
+    }
+  }, []);
+
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed: ChatSession[] = JSON.parse(stored);
         setSessions(parsed);
-        if (parsed.length > 0) {
-          setCurrentSessionId(parsed[0].id);
-        }
+        if (parsed.length > 0) setCurrentSessionId(parsed[0].id);
       } else {
         createNewSession();
       }
@@ -187,191 +237,124 @@ export default function AnythingButton() {
     }
   }, []);
 
-  // Save sessions whenever they change
   useEffect(() => {
     if (sessions.length > 0) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-    } else if (isOpen) {
-      createNewSession();
     }
-  }, [sessions, isOpen]);
+  }, [sessions]);
 
   const currentSession = sessions.find((s) => s.id === currentSessionId);
   const messages = currentSession?.messages || [];
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 100;
+    setShowScrollBottom(!isAtBottom && messages.length > 4);
+  };
 
   const createNewSession = () => {
     const newId = generateId();
     const newSession: ChatSession = {
       id: newId,
       title: "New Conversation",
-      messages: [
-        {
-          id: generateId(),
-          role: "assistant",
-          content: getRandomGreeting(),
-          timestamp: Date.now(),
-        },
-      ],
+      messages: [{ id: generateId(), role: "assistant", content: getRandomGreeting(), timestamp: Date.now() }],
       updatedAt: Date.now(),
     };
     setSessions((prev) => [newSession, ...prev]);
     setCurrentSessionId(newId);
     setIsSidebarOpen(false);
     setError(null);
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
+    if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   const deleteSession = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     setSessions((prev) => {
       const next = prev.filter((s) => s.id !== id);
-      if (currentSessionId === id) {
-        setCurrentSessionId(next.length > 0 ? next[0].id : null);
-      }
+      if (currentSessionId === id) setCurrentSessionId(next.length > 0 ? next[0].id : null);
+      if (next.length === 0) setTimeout(() => createNewSession(), 0);
       return next;
     });
   };
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
-
-  useEffect(() => {
-    if (isOpen && currentSessionId) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 150);
+      scrollToBottom(false);
     }
-  }, [isOpen, currentSessionId]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
-      if (e.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+  }, [isOpen, currentSessionId, scrollToBottom]);
 
   const copyToClipboard = useCallback((text: string, id: string) => {
-    if (!text || typeof text !== 'string' || text.length > 10000) return;
-    navigator.clipboard.writeText(text).catch(() => {
-      console.error('Failed to copy to clipboard');
-    }).then(() => {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
       setCopiedId(id);
-      const timeoutId = setTimeout(() => setCopiedId(null), 2000);
-      return () => clearTimeout(timeoutId);
+      setTimeout(() => setCopiedId(null), 2000);
     });
   }, []);
 
   const updateCurrentSession = (updatedMessages: ChatMessage[], newTitle?: string) => {
-    setSessions((prev) =>
-      prev.map((s) => {
-        if (s.id === currentSessionId) {
-          return {
-            ...s,
-            messages: updatedMessages,
-            title: newTitle || s.title,
-            updatedAt: Date.now(),
-          };
-        }
-        return s;
-      })
-    );
+    setSessions((prev) => prev.map((s) => s.id === currentSessionId ? { ...s, messages: updatedMessages, title: newTitle || s.title, updatedAt: Date.now() } : s));
   };
 
-  const sendMessage = useCallback(async () => {
-    const trimmed = input.trim();
-    if (!trimmed || trimmed.length > 5000 || isLoading || !currentSessionId) return;
+  const stopGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
+    }
+  };
+
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    const textToSend = (textOverride || input).trim();
+    if (!textToSend || isLoading || !currentSessionId) return;
 
     setError(null);
     const userMessageId = generateId();
-    const userMessage: ChatMessage = {
-      id: userMessageId,
-      role: "user",
-      content: trimmed,
-      timestamp: Date.now(),
-    };
+    const userMessage: ChatMessage = { id: userMessageId, role: "user", content: textToSend, timestamp: Date.now() };
 
     const newMessages = [...messages, userMessage];
-    
-    // Auto-generate title if it's the first real user message
     const isFirstUserMsg = messages.filter(m => m.role === "user").length === 0;
-    const newTitle = isFirstUserMsg ? trimmed.slice(0, 30) + (trimmed.length > 30 ? "..." : "") : undefined;
+    const newTitle = isFirstUserMsg ? textToSend.slice(0, 30) + (textToSend.length > 30 ? "..." : "") : undefined;
 
     updateCurrentSession(newMessages, newTitle);
-    setInput("");
+    if (!textOverride) {
+      setInput("");
+      setCharCount(0);
+      if (inputRef.current) inputRef.current.style.height = 'auto'; // Reset height
+    }
+    
     setIsLoading(true);
+    setTimeout(() => scrollToBottom(), 50);
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-
+      abortControllerRef.current = controller;
+      
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: newMessages.map((m) => ({
-            role: m.role,
-            content: m.content.slice(0, 5000),
-          })),
-        }),
+        body: JSON.stringify({ messages: newMessages.map((m) => ({ role: m.role, content: m.content.slice(0, 5000) })) }),
         signal: controller.signal,
-        credentials: 'same-origin',
       });
 
-      clearTimeout(timeoutId);
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        const errorMsg = errData?.error || `Request failed (${res.status})`;
-        throw new Error(errorMsg);
-      }
-
+      if (!res.ok) throw new Error((await res.json().catch(() => null))?.error || `Request failed (${res.status})`);
       const data = await res.json();
-      if (!data || typeof data.message !== 'string') {
-        throw new Error('Invalid response format');
-      }
       
-      const assistantMessageId = generateId();
-      updateCurrentSession([
-        ...newMessages,
-        {
-          id: assistantMessageId,
-          role: "assistant",
-          content: data.message.slice(0, 8000),
-          timestamp: Date.now(),
-        },
-      ]);
+      updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: data.message, timestamp: Date.now() }]);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error && err.name === "AbortError"
-          ? "Request timed out. Please try again."
-          : err instanceof Error
-            ? err.message
-            : "Something went wrong. Give it another shot, Boss!";
-
-      setError(errorMessage);
-      updateCurrentSession([
-        ...newMessages,
-        {
-          id: generateId(),
-          role: "assistant",
-          content: errorMessage,
-          timestamp: Date.now(),
-          error: true,
-        },
-      ]);
+      if (err instanceof Error && err.name === "AbortError") {
+        updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: "Generation stopped manually.", timestamp: Date.now() }]);
+      } else {
+        const errorMessage = err instanceof Error ? err.message : "Something went wrong. Let's retry that.";
+        setError(errorMessage);
+        updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: errorMessage, timestamp: Date.now(), error: true }]);
+      }
     } finally {
       setIsLoading(false);
+      abortControllerRef.current = null;
+      setTimeout(() => scrollToBottom(), 50);
     }
-  }, [input, isLoading, messages, currentSessionId]);
+  }, [input, isLoading, messages, currentSessionId, scrollToBottom]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -380,210 +363,224 @@ export default function AnythingButton() {
     }
   };
 
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    setCharCount(e.target.value.length);
+    setError(null);
+    e.target.style.height = 'auto';
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+  };
+
   return (
     <>
-      <button
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #52525b; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #10b981; }
+      `}} />
+
+      <motion.button
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-sky-500/30 hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
-        aria-label={isOpen ? "Close Valley Net AI Chat" : "Open Valley Net AI Chat"}
-        title={isOpen ? "Close chat (Esc)" : "Valley Net - Ask AI Anything"}
+        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_8px_30px_rgb(16,185,129,0.3)] hover:shadow-[0_8px_40px_rgb(16,185,129,0.4)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50 outline-none"
+        aria-label="Toggle Valley Net AI Chat"
       >
-        <span className="text-2xl sm:text-3xl leading-none select-none">
-          {isOpen ? <X className="w-7 h-7" /> : "👱🏻‍♀️"}
-        </span>
-        {!isOpen && (
-          <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />
-        )}
-      </button>
+        <AnimatePresence mode="wait">
+          {isOpen ? (
+            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+              <ChevronDown className="w-8 h-8 flex-shrink-0" />
+            </motion.div>
+          ) : (
+            <motion.div key="open" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} className="flex items-center justify-center">
+               <Bot className="w-8 h-8 flex-shrink-0" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {!isOpen && <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />}
+      </motion.button>
 
-      {isOpen && (
-        <motion.div
-          drag
-          dragControls={dragControls}
-          dragListener={false}
-          dragMomentum={false}
-          ref={containerRef as React.LegacyRef<HTMLDivElement>}
-          style={{ resize: "both" }}
-          className="fixed bottom-24 right-3 sm:right-6 z-50 w-[94vw] sm:w-[92vw] max-w-[440px] min-w-[320px] h-[74vh] sm:h-[75vh] max-h-[85vh] min-h-[400px] flex flex-col rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 shadow-xl shadow-black/15 backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300"
-        >
-          {/* Header */}
-          <div 
-            onPointerDown={(e) => dragControls.start(e)}
-            className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-500 z-20 cursor-move"
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            drag
+            dragControls={dragControls}
+            dragListener={false}
+            dragMomentum={false}
+            initial={{ opacity: 0, y: 40, scale: 0.95, transformOrigin: 'bottom right' }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 40, scale: 0.95 }}
+            transition={{ type: "spring", bounce: 0.3, duration: 0.4 }}
+            style={{ resize: "both" }}
+            className="fixed bottom-24 right-3 sm:right-6 z-50 w-[94vw] sm:w-[420px] min-w-[320px] h-[75vh] sm:h-[650px] max-h-[85vh] min-h-[400px] flex flex-col rounded-3xl border border-zinc-200/80 dark:border-white/10 bg-white/80 dark:bg-zinc-950/80 shadow-2xl backdrop-blur-2xl overflow-hidden"
           >
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="text-white/90 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/15"
-              aria-label="Toggle Sessions Sidebar"
+            {/* Header */}
+            <div 
+              onPointerDown={(e) => dragControls.start(e)}
+              className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative"
             >
-              <Menu className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <div className="min-w-0">
-                <h3 className="text-white font-semibold text-base sm:text-lg leading-tight truncate">
-                  Valley Net 💘
-                </h3>
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="text-white/80 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/20"
+                aria-label="History"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              
+              <div className="flex flex-col flex-1 min-w-0 pointer-events-none select-none">
+                <div className="flex items-center justify-center gap-2">
+                  <GripHorizontal className="w-4 h-4 text-emerald-300 opacity-50" />
+                  <h3 className="text-white font-bold tracking-wide text-base whitespace-nowrap">Valley Net <span className="text-[14px]">💘</span></h3>
+                  <GripHorizontal className="w-4 h-4 text-emerald-300 opacity-50" />
+                </div>
+              </div>
+
+              <div className="hidden sm:flex items-center text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-50 border border-emerald-400/30">
+                Online
+              </div>
+              <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition-colors ml-1">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Sidebar Overlay */}
+            <div className={`absolute top-[60px] bottom-0 left-0 w-[280px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
+              <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/50 dark:bg-black/20">
+                <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat History</h4>
+                <button onClick={() => setIsSidebarOpen(false)} className="p-1 text-zinc-500 hover:text-zinc-800 dark:hover:text-white"><X className="w-4 h-4" /></button>
+              </div>
+              <div className="p-3">
+                <button onClick={createNewSession} className="flex items-center justify-center gap-2 w-full py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-xl text-sm font-bold shadow-sm hover:scale-[1.02] transition-transform">
+                  <Plus className="w-4 h-4" /> New Session
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                {sessions.map((session) => (
+                  <div key={session.id} onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); }} className={`group flex items-center justify-between px-3 py-3 rounded-xl cursor-pointer text-sm transition-all ${currentSessionId === session.id ? "bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold" : "hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-transparent font-medium"}`}>
+                    <div className="flex items-center gap-3 truncate">
+                      <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentSessionId === session.id ? 'text-emerald-500' : 'opacity-60'}`} />
+                      <span className="truncate">{session.title}</span>
+                    </div>
+                    <button onClick={(e) => deleteSession(e, session.id)} className="opacity-0 group-hover:opacity-100 hover:text-sky-600 transition-opacity p-1 bg-zinc-200/50 dark:bg-zinc-800 rounded-md" title="Delete Session">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="hidden sm:flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/15 text-white border border-white/20 whitespace-nowrap">
-              Ready to help
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-white/90 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/15"
-                aria-label="Close chat"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
 
-          {/* Sidebar Drawer */}
-          <div 
-            className={`absolute top-[60px] bottom-0 left-0 w-64 bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 z-10 transition-transform duration-300 flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-          >
-            <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
-              <button
-                onClick={createNewSession}
-                className="flex items-center gap-2 w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
-              >
-                <Plus className="w-4 h-4" /> New Chat
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-2 space-y-1">
-              {sessions.map((session) => (
-                <div
-                  key={session.id}
-                  onClick={() => {
-                    setCurrentSessionId(session.id);
-                    setIsSidebarOpen(false);
-                  }}
-                  className={`group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-sm transition-colors ${
-                    currentSessionId === session.id 
-                      ? "bg-zinc-200 dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 font-medium" 
-                      : "hover:bg-zinc-100 dark:hover:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 truncate">
-                    <MessageSquare className="w-4 h-4 opacity-70 flex-shrink-0" />
-                    <span className="truncate">{session.title}</span>
+            {/* Messages Area */}
+            <div 
+              ref={scrollAreaRef}
+              onScroll={handleScroll}
+              className="flex-1 overflow-y-auto px-4 sm:px-5 py-6 space-y-2 bg-zinc-50/50 dark:bg-zinc-950/30 custom-scrollbar scroll-smooth relative"
+              onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
+            >
+              {messages.length === 1 && messages[0].role === "assistant" && (
+                <div className="mb-8 mt-2 animation-fade-in flex flex-col items-center justify-center pt-8 pb-4">
+                  <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4 shadow-inner">
+                    <Bot className="w-8 h-8 text-emerald-500" />
                   </div>
-                  <button
-                    onClick={(e) => deleteSession(e, session.id)}
-                    className="opacity-0 group-hover:opacity-100 hover:text-sky-500 transition-opacity p-1"
-                    title="Delete Conversation"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <h3 className="text-xl font-black text-zinc-900 dark:text-white mb-2 tracking-tight text-center">How can I help you today?</h3>
+                  <div className="flex flex-wrap gap-2 justify-center mt-4">
+                    {SUGGESTIONS.map(s => (
+                      <button key={s} onClick={() => sendMessage(s)} className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-zinc-900 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 rounded-full hover:bg-emerald-50 dark:hover:bg-zinc-800 transition-colors shadow-sm">{s}</button>
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              {messages.map((msg, idx) => (
+                <MessageBubble key={msg.id} message={msg} onCopy={(text) => copyToClipboard(text, msg.id)} />
               ))}
-            </div>
-          </div>
 
-          {/* Messages Area */}
-          <div 
-            className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth bg-gradient-to-b from-white via-white to-emerald-50/40 dark:from-zinc-950 dark:via-zinc-950 dark:to-emerald-950/15 min-h-0 overscroll-contain touch-pan-y"
-            onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
-          >
-            {messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-center">
-                <div className="text-zinc-400 dark:text-zinc-600">
-                  <p className="text-sm font-medium">No messages yet</p>
-                  <p className="text-xs mt-1">Ask me anything, Boss!</p>
-                </div>
-              </div>
-            ) : (
-              messages.map((msg) => (
-                <MessageBubble
-                  key={msg.id}
-                  message={msg}
-                  onCopy={(text) => copyToClipboard(text, msg.id)}
-                />
-              ))
-            )}
-
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-white/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:0ms]" />
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:300ms]" />
+              {isLoading && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start mb-4 gap-3 max-w-[90%]">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-800 to-black border border-emerald-500/30 flex items-center justify-center shadow-lg relative flex-shrink-0 mt-1">
+                    <div className="absolute inset-0 rounded-full border-2 border-emerald-500/50 border-t-transparent animate-spin" />
+                    <Bot className="w-4 h-4 text-emerald-400" />
                   </div>
-                </div>
-              </div>
-            )}
-
-            {copiedId && (
-              <div className="flex justify-center flex-shrink-0">
-                <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 rounded-full flex items-center gap-1.5 my-1">
-                  <Check className="w-3 h-3" /> Copied to clipboard!
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Area */}
-          <div className="px-3 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur z-20">
-            {error && (
-              <div className="mb-2 text-xs text-blue-700 dark:text-sky-300 bg-sky-50 dark:bg-blue-950/40 px-3 py-2 rounded-lg border border-sky-200/70 dark:border-blue-800/70 shadow-sm">
-                {sanitizeText(error.slice(0, 500))}
-              </div>
-            )}
-            <div className="flex items-end gap-2">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => {
-                  const value = e.target.value.slice(0, 5000);
-                  setInput(value);
-                  setError(null);
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask me anything, Boss..."
-                rows={1}
-                className="flex-1 resize-none rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-3.5 py-2.75 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all max-h-28 shadow-inner"
-                style={{ minHeight: "42px" }}
-                disabled={isLoading}
-                aria-label="Message input"
-              />
-              <button
-                onClick={sendMessage}
-                disabled={isLoading || !input.trim()}
-                className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 cursor-pointer"
-                aria-label="Send message"
-                title="Send (Enter)"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                  />
-                </svg>
-              </button>
+                  <div className="px-5 py-4 rounded-2xl rounded-tl-sm bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex items-center gap-2">
+                    <div className="flex space-x-1.5">
+                      <motion.div className="w-2 h-2 rounded-full bg-emerald-500" animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }} />
+                      <motion.div className="w-2 h-2 rounded-full bg-emerald-500" animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} />
+                      <motion.div className="w-2 h-2 rounded-full bg-emerald-500" animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
-            
-            {/* Formatted clean footer */}
-            <div className="mt-2.5 flex justify-center">
-              <div className="px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 flex flex-col items-center">
-                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 bg-clip-text">
-                  Powered by <strong className="text-zinc-700 dark:text-zinc-300">GPT-5 Mini + GiveGigs AI</strong>
+
+            {/* Scroll to bottom button */}
+            <AnimatePresence>
+              {showScrollBottom && (
+                <motion.button initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} onClick={() => scrollToBottom()} className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30 bg-zinc-900/90 dark:bg-white/90 text-white dark:text-black border border-white/10 dark:border-black/10 rounded-full p-2.5 shadow-xl backdrop-blur-md">
+                   <ChevronDown className="w-5 h-5" />
+                </motion.button>
+              )}
+            </AnimatePresence>
+
+            {/* Input Area */}
+            <div className="p-4 border-t border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-xl shrink-0 z-20">
+              <div className="relative flex items-end gap-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 focus-within:border-emerald-500 dark:focus-within:border-emerald-500/50 rounded-2xl shadow-sm transition-colors p-1 pl-3 pr-1.5">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={handleInput}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Ask me anything..."
+                  rows={1}
+                  disabled={isLoading}
+                  className="w-full resize-none py-3.5 bg-transparent text-[15px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none custom-scrollbar"
+                  style={{ maxHeight: "200px" }}
+                />
+                
+                <div className="flex gap-1 pb-1.5 pl-1 shrink-0">
+                  {isLoading ? (
+                    <button
+                      onClick={stopGeneration}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 transition-colors"
+                      title="Stop generating"
+                    >
+                      <StopCircle className="w-5 h-5 fill-current" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => sendMessage()}
+                      disabled={!input.trim()}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-600 text-white disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 transition-colors group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                      title="Send message (Enter to send, Shift+Enter for new line)"
+                    >
+                      <Send className="w-4 h-4 ml-0.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress/Footer Bar */}
+              <div className="flex justify-between items-center mt-3 px-1">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
+                  {isLoading ? "Thinking..." : "Ready"}
                 </span>
+                
+                <div className="flex items-center gap-2">
+                  {charCount > 4000 && (
+                     <div className="w-16 h-1 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+                       <div className={`h-full ${charCount > 4800 ? 'bg-sky-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min((charCount / 5000) * 100, 100)}%` }} />
+                     </div>
+                  )}
+                  <span className="text-[10px] font-bold text-zinc-400 tracking-wider">
+                    Powered by Valley Net
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
