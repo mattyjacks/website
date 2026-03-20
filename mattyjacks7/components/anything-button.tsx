@@ -332,17 +332,17 @@ export default function AnythingButton() {
 
   return (
     <>
-      {/* Floating Anything Button */}
+      {/* Floating Valley Net Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 group flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-red-500/30 hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
-        aria-label={isOpen ? "Close Anything Button AI Chat" : "Open Anything Button AI Chat"}
-        title={isOpen ? "Close chat (Esc)" : "Anything Button - Ask AI Anything"}
+        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-red-500/30 hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+        aria-label={isOpen ? "Close Valley Net AI Chat" : "Open Valley Net AI Chat"}
+        title={isOpen ? "Close chat (Esc)" : "Valley Net - Ask AI Anything"}
       >
-        <span className="text-lg font-bold leading-none select-none">
+        <span className="text-2xl sm:text-3xl leading-none select-none">
           {isOpen ? (
             <svg
-              className="w-6 h-6"
+              className="w-7 h-7"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -355,7 +355,7 @@ export default function AnythingButton() {
               />
             </svg>
           ) : (
-            "[♾️]"
+            "👱🏻‍♀️"
           )}
         </span>
         {!isOpen && (
@@ -367,31 +367,34 @@ export default function AnythingButton() {
       {isOpen && (
         <div
           ref={containerRef}
-          className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[540px] max-h-[calc(100vh-8rem)] flex flex-col rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-2xl shadow-black/20 overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300"
+          className="fixed bottom-24 right-3 sm:right-6 z-50 w-[94vw] sm:w-[92vw] max-w-[440px] h-[74vh] sm:h-[75vh] max-h-[640px] flex flex-col rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 shadow-2xl shadow-black/15 backdrop-blur-xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300"
         >
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-emerald-600 to-emerald-500">
-            <div className="flex items-center gap-2 flex-1">
-              <span className="text-white text-lg font-bold">[♾️]</span>
-              <div>
-                <h3 className="text-white font-semibold text-sm leading-tight">
-                  Anything Button
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-500">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="text-white text-2xl sm:text-3xl" aria-hidden="true">👱🏻‍♀️</span>
+              <div className="min-w-0">
+                <h3 className="text-white font-semibold text-base sm:text-lg leading-tight truncate">
+                  Valley Net 💘
                 </h3>
-                <p className="text-emerald-100 text-[10px] leading-tight">
-                  ChatGPT OpenAI API GPT-5 Mini
+                <p className="text-emerald-100 text-[11px] leading-tight truncate">
+                  GPT-5 Mini + GiveGigs AI
                 </p>
               </div>
+            </div>
+            <div className="hidden sm:flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/15 text-white border border-white/20 whitespace-nowrap">
+              Ready to help
             </div>
             <div className="flex items-center gap-1">
               {canClear && (
                 <button
                   onClick={handleClearChat}
-                  className="text-white/80 hover:text-white transition-colors p-1 rounded hover:bg-white/10"
+                  className="text-white/90 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/15"
                   title="Clear chat (Ctrl+K)"
                   aria-label="Clear chat history"
                 >
                   <svg
-                    className="w-4 h-4"
+                    className="w-4.5 h-4.5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -407,7 +410,7 @@ export default function AnythingButton() {
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-white/80 hover:text-white transition-colors p-1 rounded hover:bg-white/10"
+                className="text-white/90 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/15"
                 aria-label="Close chat"
                 title="Close (Esc)"
               >
@@ -429,7 +432,7 @@ export default function AnythingButton() {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scroll-smooth">
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scroll-smooth bg-gradient-to-b from-white via-white to-emerald-50/40 dark:from-zinc-950 dark:via-zinc-950 dark:to-emerald-950/15">
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full text-center">
                 <div className="text-zinc-400 dark:text-zinc-600">
@@ -449,7 +452,7 @@ export default function AnythingButton() {
 
             {isLoading && (
               <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-white/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 shadow-sm">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:0ms]" />
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:150ms]" />
@@ -471,9 +474,9 @@ export default function AnythingButton() {
           </div>
 
           {/* Input Area */}
-          <div className="px-3 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+          <div className="px-3 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur">
             {error && (
-              <div className="mb-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 px-2 py-1 rounded">
+              <div className="mb-2 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 px-3 py-2 rounded-lg border border-red-200/70 dark:border-red-800/70 shadow-sm">
                 {sanitizeText(error.slice(0, 500))}
               </div>
             )}
@@ -489,8 +492,8 @@ export default function AnythingButton() {
                 onKeyDown={handleKeyDown}
                 placeholder="Ask me anything, Boss..."
                 rows={1}
-                className="flex-1 resize-none rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-3 py-2.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all max-h-24"
-                style={{ minHeight: "40px" }}
+                className="flex-1 resize-none rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-3.5 py-2.75 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all max-h-28 shadow-inner"
+                style={{ minHeight: "42px" }}
                 disabled={isLoading}
                 aria-label="Message input"
               />
@@ -516,8 +519,8 @@ export default function AnythingButton() {
                 </svg>
               </button>
             </div>
-            <p className="mt-1.5 text-[10px] text-zinc-400 dark:text-zinc-600 text-center">
-              Powered by ChatGPT OpenAI API GPT-5 Mini • {Math.min(messageCount, 999)} messages
+            <p className="mt-1.5 text-[10px] text-zinc-500 dark:text-zinc-600 text-center">
+              Powered by GPT-5 Mini + GiveGigs AI • {Math.min(messageCount, 999)} messages
             </p>
           </div>
         </div>
