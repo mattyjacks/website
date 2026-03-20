@@ -24,19 +24,42 @@ const MAX_RATE_LIMIT_ENTRIES = 10000;
 function getClientIp(req: NextRequest): string {
   const forwarded = req.headers.get("x-forwarded-for");
   const realIp = req.headers.get("x-real-ip");
-  const ip = realIp || (forwarded ? forwarded.split(",")[0].trim() : "unknown");
+  // Prefer x-real-ip, then LAST entry in x-forwarded-for (set by trusted proxy)
+  const ip = realIp || (forwarded ? forwarded.split(",").pop()?.trim() || "unknown" : "unknown");
   return ip.slice(0, 45);
 }
+
+function generateRequestId(): string {
+  return `req_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+const SECURITY_HEADERS: Record<string, string> = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+  "X-Content-Type-Options": "nosniff",
+  "X-Robots-Tag": "noindex",
+};
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const record = rateLimitMap.get(ip);
 
   if (!record || now > record.resetTime) {
+    // Evict expired entries periodically to prevent memory growth
     if (rateLimitMap.size >= MAX_RATE_LIMIT_ENTRIES) {
-      const oldestKey = Array.from(rateLimitMap.entries())
-        .sort((a, b) => a[1].resetTime - b[1].resetTime)[0]?.[0];
-      if (oldestKey) rateLimitMap.delete(oldestKey);
+      let evicted = 0;
+      for (const [key, val] of rateLimitMap) {
+        if (now > val.resetTime) {
+          rateLimitMap.delete(key);
+          evicted++;
+          if (evicted >= 100) break;
+        }
+      }
+      // If still full after eviction, remove oldest
+      if (rateLimitMap.size >= MAX_RATE_LIMIT_ENTRIES) {
+        const oldestKey = Array.from(rateLimitMap.entries())
+          .sort((a, b) => a[1].resetTime - b[1].resetTime)[0]?.[0];
+        if (oldestKey) rateLimitMap.delete(oldestKey);
+      }
     }
     rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     return true;
@@ -382,7 +405,7 @@ async function handleToolCall(
 
 const SYSTEM_PROMPT = `You are the "Anything Button" AI assistant on MattyJacks.com - the official website for MattyJacks, a holding company and full-service agency.
 
-You are powered by ChatGPT OpenAI API GPT-5.4 Mini.
+You are powered by ChatGPT OpenAI API GPT-4o Mini.
 
 CRITICAL RULES:
 - Call the user "Boss" as a sign of respect. Always.
@@ -481,20 +504,28 @@ function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
   return mapUserError(errOrMsg);
 }
 
-const debugLogs: string[] = [];
-
-function addLog(msg: string) {
-  debugLogs.push(`[${new Date().toISOString()}] ${msg}`);
-  console.log(msg);
-}
-
 export async function POST(request: NextRequest) {
-  debugLogs.length = 0;
-  addLog(`[CHAT] POST request started`);
+  const debugLogs: string[] = [];
+  const addLog = (msg: string) => {
+    debugLogs.push(`[${new Date().toISOString()}] ${msg}`);
+    console.log(msg);
+  };
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+  addLog(`[CHAT] POST request started (${requestId})`);
   const clientIp = getClientIp(request);
   let isAdmin = process.env.NODE_ENV === 'development';
-  const DEBUG = isAdmin;
   addLog(`[CHAT] Client IP: ${clientIp}, isAdmin: ${isAdmin}`);
+
+  // Validate Content-Length to reject oversized requests early
+  const contentLength = request.headers.get("content-length");
+  if (contentLength && parseInt(contentLength, 10) > 100000) {
+    addLog(`[CHAT] Content-Length too large: ${contentLength}`);
+    return NextResponse.json(
+      { error: "Request too large, Boss.", debugLogs, requestId },
+      { status: 413, headers: SECURITY_HEADERS }
+    );
+  }
   
   try {
     const supabase = await createClient();
@@ -503,7 +534,6 @@ export async function POST(request: NextRequest) {
       const appRole = user.app_metadata?.role;
       const userRole = user.user_metadata?.role;
       const email = user.email?.toLowerCase() || '';
-      // Grant admin access for explicit roles OR known admin emails
       if (
         appRole === 'admin' || appRole === 'moderator' ||
         userRole === 'admin' || userRole === 'moderator' ||
@@ -511,115 +541,126 @@ export async function POST(request: NextRequest) {
         email === 'matt@mattyjacks.com'
       ) {
         isAdmin = true;
+        addLog(`[CHAT] Admin access granted for ${email}`);
       }
     }
   } catch (e) {
-    // Gracefully fallback if not logged in or misconfigured
+    addLog(`[CHAT] Auth check skipped: ${e instanceof Error ? e.message.slice(0, 80) : 'unknown'}`);
   }
 
   try {
     if (!checkRateLimit(clientIp)) {
       addLog(`[CHAT] Rate limit exceeded`);
       return NextResponse.json(
-        { error: getErrorResponse("Too many requests. Please wait a moment, Boss.", isAdmin), debugLogs },
-        { status: 429, headers: { "Retry-After": "60" } }
+        { error: getErrorResponse("Too many requests. Please wait a moment, Boss.", isAdmin), debugLogs, requestId },
+        { status: 429, headers: { ...SECURITY_HEADERS, "Retry-After": "60" } }
       );
     }
 
     if (!process.env.OPENAI_API_KEY) {
       addLog(`[CHAT] OPENAI_API_KEY not configured`);
       return NextResponse.json(
-        { error: getErrorResponse("AI service not configured", isAdmin), debugLogs },
-        { status: 503 }
+        { error: getErrorResponse("AI service not configured", isAdmin), debugLogs, requestId },
+        { status: 503, headers: SECURITY_HEADERS }
       );
     }
 
     if (process.env.OPENAI_API_KEY.length < 20) {
       addLog(`[CHAT] Invalid OPENAI_API_KEY length: ${process.env.OPENAI_API_KEY.length}`);
       return NextResponse.json(
-        { error: getErrorResponse("AI service misconfigured", isAdmin), debugLogs },
-        { status: 503 }
+        { error: getErrorResponse("AI service misconfigured", isAdmin), debugLogs, requestId },
+        { status: 503, headers: SECURITY_HEADERS }
       );
     }
 
-    const contentType = request.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
+    // Log API key prefix safely for debugging (first 8 chars only)
+    addLog(`[CHAT] API key prefix: ${process.env.OPENAI_API_KEY.slice(0, 8)}...`);
+
+    // Validate Origin header to prevent CSRF-like attacks
+    const origin = request.headers.get("origin");
+    const allowedOrigins = ['https://mattyjacks.com', 'https://www.mattyjacks.com', 'http://localhost:3000', 'http://localhost:3001'];
+    if (origin && !allowedOrigins.some(o => origin.startsWith(o))) {
+      addLog(`[CHAT] Rejected origin: ${origin.slice(0, 100)}`);
       return NextResponse.json(
-        { error: getErrorResponse("Content-Type must be application/json", isAdmin) },
-        { status: 415 }
+        { error: "Unauthorized origin.", debugLogs, requestId },
+        { status: 403, headers: SECURITY_HEADERS }
       );
     }
 
-    const body = await request.text();
-    const bodySize = new TextEncoder().encode(body).byteLength;
-    if (bodySize > 50000) {
-      return NextResponse.json(
-        { error: getErrorResponse("Request too large (max 50KB)", isAdmin) },
-        { status: 413 }
-      );
-    }
-
-    let parsed: unknown;
+    // Parse request body using request.json() - more reliable than request.text() + JSON.parse() on Vercel
+    addLog(`[CHAT] Parsing request body...`);
+    let parsed: Record<string, unknown>;
     try {
-      parsed = JSON.parse(body, (key, value) => {
-        if (key === '__proto__' || key === 'constructor' || key === 'prototype') return undefined;
-        return value;
-      });
+      parsed = await request.json() as Record<string, unknown>;
+      addLog(`[CHAT] Body parsed OK, keys: ${Object.keys(parsed || {}).join(',')}`);
     } catch (err) {
+      addLog(`[CHAT] Body parse FAILED: ${err instanceof Error ? err.message : String(err)}`);
       return NextResponse.json(
-        { error: getErrorResponse(err instanceof Error ? err : "Invalid JSON", isAdmin) },
-        { status: 400 }
+        { error: "Invalid request body. Please try again, Boss.", debugLogs, requestId },
+        { status: 400, headers: SECURITY_HEADERS }
       );
     }
 
-    const parsed_obj = parsed as Record<string, unknown>;
-    const messages = parsed_obj?.messages;
+    // Sanitize against prototype pollution
+    if (parsed && typeof parsed === 'object') {
+      const dangerousKeys = ['__proto__', 'constructor', 'prototype', '__lookupGetter__', '__lookupSetter__'];
+      for (const key of Object.keys(parsed)) {
+        if (dangerousKeys.includes(key)) delete parsed[key];
+      }
+    }
 
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    const rawMessages = parsed?.messages;
+    if (!rawMessages || !Array.isArray(rawMessages) || rawMessages.length === 0) {
+      addLog(`[CHAT] Messages missing or empty. parsed keys: ${Object.keys(parsed || {}).join(',')}, messages type: ${typeof rawMessages}`);
       return NextResponse.json(
-        { error: getErrorResponse("Messages array is required and cannot be empty", isAdmin) },
-        { status: 400 }
+        { error: "Messages array is required. Please try again, Boss.", debugLogs, requestId },
+        { status: 400, headers: SECURITY_HEADERS }
       );
     }
 
-    if (messages.length > 50) {
+    addLog(`[CHAT] Received ${rawMessages.length} messages`);
+
+    if (rawMessages.length > 50) {
+      addLog(`[CHAT] Too many messages: ${rawMessages.length}`);
       return NextResponse.json(
-        { error: getErrorResponse("Too many messages (max 50)", isAdmin) },
-        { status: 400 }
+        { error: "Too many messages (max 50). Start a new chat, Boss.", debugLogs, requestId },
+        { status: 400, headers: SECURITY_HEADERS }
       );
     }
 
+    // Validate and sanitize each message
     const validRoles = new Set(["user", "assistant", "tool", "system"]);
-    for (let i = 0; i < messages.length; i++) {
-      const msg = messages[i] as Record<string, unknown>;
-      addLog(`[CHAT] Validating message ${i}: role=${msg?.role}, content_type=${typeof msg?.content}, content_length=${typeof msg?.content === 'string' ? msg.content.length : 'N/A'}`);
-      if (typeof msg?.role !== "string" || !validRoles.has(msg.role)) {
-        addLog(`[CHAT] Message ${i} validation failed: invalid role "${msg?.role}"`);
+    const sanitizedMessages: Array<{role: string; content: string}> = [];
+    for (let i = 0; i < rawMessages.length; i++) {
+      const msg = rawMessages[i] as Record<string, unknown>;
+      const role = typeof msg?.role === 'string' ? msg.role : '';
+      const content = typeof msg?.content === 'string' ? msg.content : '';
+
+      if (!validRoles.has(role)) {
+        addLog(`[CHAT] Message ${i} invalid role: "${role}"`);
         return NextResponse.json(
-          { error: getErrorResponse(`Message ${i}: invalid role`, isAdmin), debugLogs },
-          { status: 400 }
+          { error: `Message ${i} has an invalid role. Please retry, Boss.`, debugLogs, requestId },
+          { status: 400, headers: SECURITY_HEADERS }
         );
       }
-      if (typeof msg?.content !== "string" && msg.role !== "assistant") {
-        addLog(`[CHAT] Message ${i} validation failed: content is not string (type=${typeof msg?.content})`);
-        return NextResponse.json(
-          { error: getErrorResponse(`Message ${i}: content must be string`, isAdmin), debugLogs },
-          { status: 400 }
-        );
-      }
+
+      // Truncate overly long messages for safety
+      sanitizedMessages.push({ role, content: content.slice(0, 6000) });
     }
+    addLog(`[CHAT] All ${sanitizedMessages.length} messages validated OK`);
 
     const ragContext = loadRAGContext();
     const systemMessage = SYSTEM_PROMPT.replace("{RAG_CONTEXT}", ragContext);
 
     const chatMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: "system", content: systemMessage },
-      ...messages.map((m) => m as OpenAI.Chat.Completions.ChatCompletionMessageParam),
+      ...sanitizedMessages.map((m) => m as OpenAI.Chat.Completions.ChatCompletionMessageParam),
     ];
 
     let response: OpenAI.Chat.Completions.ChatCompletion;
     const openai = getOpenAI();
 
+    addLog(`[CHAT] Setup complete in ${Date.now() - startTime}ms, calling OpenAI...`);
     const fallbackMessage = "I'm having trouble reaching the AI right now, Boss. Please try again in a moment. If it keeps happening, wait 30 seconds and retry.";
 
     const primaryModel = "gpt-4o-mini";
@@ -629,58 +670,44 @@ export async function POST(request: NextRequest) {
     const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;
 
-      // Try primary model once
-      try {
-        addLog(`[CHAT] Trying primary model: ${primaryModel}`);
+      // Helper to call OpenAI with timeout
+      const callModel = async (modelName: string): Promise<OpenAI.Chat.Completions.ChatCompletion> => {
+        const modelStart = Date.now();
+        addLog(`[CHAT] Trying model: ${modelName}`);
         const result = await openai.chat.completions.create({
-          model: primaryModel,
+          model: modelName,
           messages: chatMessages,
           tools,
           tool_choice: "auto",
           max_tokens: 2000,
           temperature: 0.8,
         });
-        addLog(`[CHAT] Primary model succeeded`);
+        addLog(`[CHAT] Model ${modelName} succeeded in ${Date.now() - modelStart}ms`);
         return result;
+      };
+
+      // Try primary model
+      try {
+        return await callModel(primaryModel);
       } catch (err) {
         lastError = err;
-        addLog(`[CHAT] Primary model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
+        addLog(`[CHAT] Primary failed: ${err instanceof Error ? err.message.slice(0, 200) : String(err)}`);
       }
 
-      // Try fallback model once
+      // Try fallback model
       try {
-        addLog(`[CHAT] Trying fallback model: ${fallbackModel}`);
-        const result = await openai.chat.completions.create({
-          model: fallbackModel,
-          messages: chatMessages,
-          tools,
-          tool_choice: "auto",
-          max_tokens: 2000,
-          temperature: 0.8,
-        });
-        addLog(`[CHAT] Fallback model succeeded`);
-        return result;
+        return await callModel(fallbackModel);
       } catch (err) {
         lastError = err;
-        addLog(`[CHAT] Fallback model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
+        addLog(`[CHAT] Fallback failed: ${err instanceof Error ? err.message.slice(0, 200) : String(err)}`);
       }
 
-      // Try tertiary model once
+      // Try tertiary model
       try {
-        addLog(`[CHAT] Trying tertiary model: ${tertiaryModel}`);
-        const result = await openai.chat.completions.create({
-          model: tertiaryModel,
-          messages: chatMessages,
-          tools,
-          tool_choice: "auto",
-          max_tokens: 2000,
-          temperature: 0.8,
-        });
-        addLog(`[CHAT] Tertiary model succeeded`);
-        return result;
+        return await callModel(tertiaryModel);
       } catch (err) {
         lastError = err;
-        addLog(`[CHAT] Tertiary model failed: ${err instanceof Error ? err.message.slice(0, 150) : String(err)}`);
+        addLog(`[CHAT] Tertiary failed: ${err instanceof Error ? err.message.slice(0, 200) : String(err)}`);
       }
 
       // All models failed
@@ -692,14 +719,20 @@ export async function POST(request: NextRequest) {
     const completionResult = await createCompletion();
     if (completionResult instanceof NextResponse) return completionResult;
     if (typeof completionResult === "string") {
-      return NextResponse.json({ message: completionResult, model: primaryModel, toolCalls: 0, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+      return NextResponse.json(
+        { message: completionResult, model: primaryModel, toolCalls: 0, debugLogs, requestId },
+        { headers: SECURITY_HEADERS }
+      );
     }
     response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
 
     let assistantMessage = response.choices[0]?.message;
     if (!assistantMessage) {
       addLog(`[CHAT] No assistant message in response`);
-      return NextResponse.json({ error: getErrorResponse("No response from AI model", isAdmin), debugLogs }, { status: 500, headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+      return NextResponse.json(
+        { error: getErrorResponse("No response from AI model", isAdmin), debugLogs, requestId },
+        { status: 500, headers: SECURITY_HEADERS }
+      );
     }
 
     addLog(`[CHAT] Got assistant message, tool_calls: ${assistantMessage.tool_calls?.length || 0}`);
@@ -728,7 +761,7 @@ export async function POST(request: NextRequest) {
         if (completionResult instanceof NextResponse) return completionResult;
         if (typeof completionResult === "string") {
           addLog(`[CHAT] Tool loop returned fallback message`);
-          return NextResponse.json({ message: completionResult, model: usedModel, toolCalls: toolCallDepth, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+          return NextResponse.json({ message: completionResult, model: usedModel, toolCalls: toolCallDepth, debugLogs, requestId }, { headers: SECURITY_HEADERS });
         }
         response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
       } catch (err) {
@@ -744,13 +777,21 @@ export async function POST(request: NextRequest) {
     }
 
     const content = assistantMessage?.content || "Sorry Boss, I hit a snag. The AI didn't return a response. Try again!";
-    addLog(`[CHAT] Returning success response with ${content.length} chars, model: ${response.model}`);
-    return NextResponse.json({ message: content.slice(0, 8000), model: response.model, toolCalls: toolCallDepth, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
-  } catch (error: unknown) {
-    addLog(`[CHAT] Caught top-level error: ${error instanceof Error ? error.message.slice(0, 150) : String(error)}`);
+    const totalMs = Date.now() - startTime;
+    addLog(`[CHAT] SUCCESS in ${totalMs}ms, ${content.length} chars, model: ${response.model}, tools: ${toolCallDepth}`);
     return NextResponse.json(
-      { error: getErrorResponse(error, isAdmin), debugLogs },
-      { status: 500, headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } }
+      { message: content.slice(0, 8000), model: response.model, toolCalls: toolCallDepth, responseTimeMs: totalMs, debugLogs, requestId },
+      { headers: { ...SECURITY_HEADERS, "X-Response-Time": `${totalMs}ms` } }
+    );
+  } catch (error: unknown) {
+    const totalMs = Date.now() - startTime;
+    addLog(`[CHAT] FATAL ERROR in ${totalMs}ms: ${error instanceof Error ? error.message.slice(0, 200) : String(error)}`);
+    if (error instanceof Error && error.stack) {
+      addLog(`[CHAT] Stack: ${error.stack.slice(0, 300)}`);
+    }
+    return NextResponse.json(
+      { error: getErrorResponse(error, isAdmin), debugLogs, requestId },
+      { status: 500, headers: SECURITY_HEADERS }
     );
   }
 }

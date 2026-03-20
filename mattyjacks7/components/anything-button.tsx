@@ -387,6 +387,9 @@ export default function AnythingButton() {
     try {
       const controller = new AbortController();
       abortControllerRef.current = controller;
+
+      // 30-second timeout to prevent hanging requests
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
       
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -396,15 +399,49 @@ export default function AnythingButton() {
         signal: controller.signal,
       });
 
-      if (!res.ok) throw new Error((await res.json().catch(() => null))?.error || `Request failed (${res.status})`);
-      const data = await res.json();
-      
+      clearTimeout(timeoutId);
+
+      // Parse response body once (handles both success and error)
+      const data = await res.json().catch(() => null);
+
+      // Always log debug info from backend
+      if (data?.debugLogs && Array.isArray(data.debugLogs)) {
+        console.group('%c[Valley Net Debug Logs]', 'color: #10b981; font-weight: bold');
+        data.debugLogs.forEach((log: string) => console.log(log));
+        console.groupEnd();
+      }
+
+      if (!res.ok) {
+        const errMsg = data?.error || `Request failed (${res.status})`;
+        // Show last few debug log entries in the error bubble for diagnosis
+        const lastLogs = data?.debugLogs?.slice(-5) || [];
+        const debugSuffix = lastLogs.length > 0 ? '\n\n---\n**Debug trail:**\n' + lastLogs.map((l: string) => '`' + l + '`').join('\n') : '';
+        throw new Error(errMsg + debugSuffix);
+      }
+
+      if (!data?.message) {
+        const lastLogs = data?.debugLogs?.slice(-3) || [];
+        throw new Error("No response from AI." + (lastLogs.length ? '\n\nDebug: ' + lastLogs.join(' | ') : ''));
+      }
+
       updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: data.message, timestamp: Date.now() }]);
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
-        updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: "Generation stopped manually.", timestamp: Date.now() }]);
+        // Check if it was a timeout or manual stop
+        const wasManualStop = !abortControllerRef.current;
+        const abortMsg = wasManualStop
+          ? "Generation stopped manually."
+          : "Request timed out after 30 seconds. The AI might be busy - please try again, Boss.";
+        updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: abortMsg, timestamp: Date.now(), error: !wasManualStop }]);
+      } else if (err instanceof TypeError && err.message.includes('fetch')) {
+        // Network error (offline, DNS failure, etc.)
+        const netMsg = "Network error - check your internet connection and try again, Boss.";
+        console.error('[Valley Net Network Error]', err.message);
+        setError(netMsg);
+        updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: netMsg, timestamp: Date.now(), error: true }]);
       } else {
         const errorMessage = err instanceof Error ? err.message : "Something went wrong. Let's retry that.";
+        console.error('[Valley Net Error]', errorMessage);
         setError(errorMessage);
         updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: errorMessage, timestamp: Date.now(), error: true }]);
       }
@@ -632,7 +669,7 @@ export default function AnythingButton() {
 
               <div className="flex justify-between items-center mt-3 px-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
-                  {isLoading ? "Thinking..." : "Ready"}
+                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : "Ready"}
                 </span>
                 <div className="flex items-center gap-2">
                   {charCount > 4000 && (
