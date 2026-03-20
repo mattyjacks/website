@@ -692,7 +692,7 @@ export async function POST(request: NextRequest) {
     let assistantMessage = response.choices[0]?.message;
     if (!assistantMessage) {
       addLog(`[CHAT] No assistant message in response`);
-      return NextResponse.json({ error: getErrorResponse("No response from AI model", isAdmin), debugLogs }, { status: 500 });
+      return NextResponse.json({ error: getErrorResponse("No response from AI model", isAdmin), debugLogs }, { status: 500, headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
     }
 
     addLog(`[CHAT] Got assistant message, tool_calls: ${assistantMessage.tool_calls?.length || 0}`);
