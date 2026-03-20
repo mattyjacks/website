@@ -220,10 +220,13 @@ export default function AnythingButton() {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const isMobile = vw < 640;
-    const w = isMobile ? vw - 20 : Math.min(440, vw - 48);
-    const h = isMobile ? vh - 20 : Math.min(Math.floor(vh * 0.80), 680);
-    const x = isMobile ? 10 : Math.max(0, vw - w - 24);
-    const y = isMobile ? 10 : Math.max(60, vh - h - 24);
+    // Give more breathing room on desktop (wider and taller) while keeping margins
+    const horizontalMargin = isMobile ? 10 : 16;
+    const verticalMargin = isMobile ? 10 : 12;
+    const w = isMobile ? vw - horizontalMargin * 2 : Math.min(520, vw - horizontalMargin * 2);
+    const h = isMobile ? vh - verticalMargin * 2 : Math.min(Math.floor(vh * 0.92), vh - verticalMargin * 2);
+    const x = isMobile ? horizontalMargin : Math.max(horizontalMargin, vw - w - horizontalMargin);
+    const y = isMobile ? verticalMargin : Math.max(verticalMargin, vh - h - verticalMargin);
     setChatBounds({ x, y, width: w, height: h });
 
     return () => window.removeEventListener('resize', handleResize);

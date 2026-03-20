@@ -426,32 +426,22 @@ PROJECT DOCUMENTATION CONTEXT:
 {RAG_CONTEXT}`;
 
 const ERROR_VARIATIONS = [
-  "Sorry, boss! Try again! Error! I love you!",
-  "Oops, boss! Try again! We hit an error! I love you!",
-  "My bad, boss! Try again! Error encountered! I love you!",
-  "Apologies, boss! Try again! Error! I love you though!",
-  "Sorry, boss! Error! Please try again! I love you!",
-  "Sorry, boss! Try again! Big error! I love you!",
-  "Whoops, boss! Try again! Error! I love you!",
-  "Dang it, boss! Try again! Error! I love you!",
-  "Sorry, boss! Hit an error, try again! I love you!",
-  "Yikes, boss! Try again! Error! I love you!",
-  "Sorry, boss! Try again! Error occurred! I love you!",
-  "My apologies, boss! Try again! Error! I love you!",
-  "Sorry, boss! Try again! Unexpected error! I love you!",
-  "Oopsie, boss! Try again! Error! I love you!",
-  "Sorry, boss! Try again! System error! I love you!",
-  "Bummer, boss! Try again! Error! I love you!",
-  "Sorry, boss! Try again! Internal error! I love you!",
-  "Ah shoot, boss! Try again! Error! I love you!",
-  "Sorry, boss! Try again! Fatal error! I love you!",
-  "My fault, boss! Try again! Error! I love you!",
-  "Sorry, boss! Try again! Network error! I love you!",
-  "Ouch, boss! Try again! Error! I love you!",
-  "Sorry, boss! Try again! AI error! I love you!",
-  "Sorry, boss! Try again! Unknown error! I love you!",
-  "Gosh, boss! Try again! Error! I love you!"
+  "AI service is rate limited. Please try again in a moment, Boss.",
+  "AI service is unavailable right now. Please retry soon, Boss.",
+  "AI request timed out. Give it a moment and try again, Boss.",
+  "AI model is busy. Please try again shortly, Boss.",
+  "AI service hit an error. Please retry, Boss."
 ];
+
+function mapUserError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : typeof err === "string" ? err : "";
+  const msg = raw.toLowerCase();
+  if (msg.includes("rate") || msg.includes("limit")) return ERROR_VARIATIONS[0];
+  if (msg.includes("timeout") || msg.includes("abort")) return ERROR_VARIATIONS[2];
+  if (msg.includes("model") || msg.includes("not found")) return "AI model is unavailable. Please try again soon, Boss.";
+  if (msg.includes("authentication") || msg.includes("api key")) return "AI service auth issue. Please try again shortly, Boss.";
+  return ERROR_VARIATIONS[4];
+}
 
 function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
   if (isAdmin) {
@@ -460,7 +450,7 @@ function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
     }
     return `[ADMIN ERROR LOG] ${typeof errOrMsg === 'string' ? errOrMsg : JSON.stringify(errOrMsg)}`;
   }
-  return ERROR_VARIATIONS[Math.floor(Math.random() * ERROR_VARIATIONS.length)];
+  return mapUserError(errOrMsg);
 }
 
 export async function POST(request: NextRequest) {
