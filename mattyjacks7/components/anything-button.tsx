@@ -997,7 +997,7 @@ Create a summary that another AI can use to understand the context and continue 
             className="flex flex-col rounded-2xl border border-zinc-200/80 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
           >
             {/* Header */}
-            <div className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0 select-none">
+            <div className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="text-white/80 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/20"
@@ -1168,7 +1168,7 @@ Create a summary that another AI can use to understand the context and continue 
               onScroll={handleScroll}
               onWheel={(e) => e.stopPropagation()}
               onTouchMove={(e) => e.stopPropagation()}
-              className="flex-1 overflow-y-auto px-4 sm:px-5 py-6 space-y-2 bg-zinc-50/50 dark:bg-zinc-950/30 custom-scrollbar scroll-smooth relative"
+              className="flex-1 overflow-y-auto px-4 sm:px-5 py-6 space-y-2 bg-zinc-50/50 dark:bg-zinc-950/30 custom-scrollbar scroll-smooth relative select-text"
               onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
             >
               {messages.length === 1 && messages[0].role === "assistant" && (
