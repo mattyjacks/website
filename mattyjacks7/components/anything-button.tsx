@@ -236,11 +236,141 @@ export default function AnythingButton() {
     return shuffled.slice(0, count).join('');
   };
 
+  const EMPTY_PROMPTS = [
+    `Hey Valley Net! I just discovered mattyjacks and I'm fascinated. Walk me through the whole ecosystem like you're giving me the grand tour:
+
+- CryptArtist Studio: What is it, who uses it, and what can you create with it?
+- GiveGigs: How does the AI agent task marketplace work? How do humans and AI collaborate?
+- GraveGain: Tell me about the game - the lore, the dungeon crawling, the vibe.
+- VCA (Virtual Company Assistant): What business problems does it solve?
+- The mattyjacks website itself: What tech powers it, and what's the philosophy behind it?
+
+Then tell me honestly - if I wanted to contribute (code, art, writing, testing, ideas), where would I start? What roles are open? What skills matter most? Don't hold back - give me the real picture, not a brochure.`,
+
+    `I keep hearing about mattyjacks and their projects. Give me the deep dive:
+
+First, paint me the big picture - what's the mission and why does mattyjacks exist? What problem in the world is it trying to solve?
+
+Then break down each major project:
+- CryptArtist Studio (the creative platform with mods, virtual pets, game studios)
+- GiveGigs (the AI-human collaboration marketplace with Discord bots and MCP servers)
+- GraveGain (the roguelike dungeon crawler with lore, TTS, and procedural generation)
+- VCA (the business management tool)
+
+For each one: what stage is it at, what's the tech stack, and what's the coolest feature most people don't know about?
+
+Finally - how would YOU recommend someone get involved? Be specific. What would make the biggest impact right now?`,
+
+    `Valley Net, I want to understand everything about the mattyjacks universe. Start from the beginning:
+
+Who is Matt? What drove him to build all of this? What's the founding story?
+
+Then walk me through the product lineup like chapters in a book:
+Chapter 1: CryptArtist Studio - the creative sandbox
+Chapter 2: GiveGigs - where AI agents meet human workers
+Chapter 3: GraveGain - the game with depth (literally, it's a dungeon crawler)
+Chapter 4: VCA - business tools that actually work
+Chapter 5: The website and Valley Net (that's you!)
+
+For each chapter, tell me what makes it special, what tech powers it, and one thing that would blow someone's mind.
+
+End with your honest take: what's the most exciting thing happening at mattyjacks RIGHT NOW, and how can someone jump in today?`,
+
+    `I want to get involved with mattyjacks but I don't know where I'd fit. Help me figure it out.
+
+First, give me the lay of the land - what are all the active projects, what stage is each one at, and what does the team look like?
+
+Then, for each of these skill sets, tell me exactly where they'd be most valuable:
+- Frontend/React/Next.js development
+- Game development (Godot, Unity, etc.)
+- AI/ML and prompt engineering
+- UI/UX design
+- Writing and content creation
+- Community management and testing
+- Music, sound design, or voice work
+- DevOps, security, and infrastructure
+
+Be brutally specific. Don't just say "we need developers" - tell me which repo, which feature, which open problem. Give me the mattyjacks insider perspective that only Valley Net would know.`
+  ];
+
+  const FILLED_PROMPTS = [
+    (topic: string, food: string) => `You are an elite polymath with deep expertise spanning technology, science, business, philosophy, and creative arts. I need you to perform a masterclass-level analysis of the following topic. Think step by step, challenge your own assumptions, and deliver insights that would impress a room full of experts.
+
+TOPIC: ${topic}
+
+Execute this analysis framework:
+
+1. ESSENCE (2-3 sentences): Distill the absolute core of this topic. What is it really about at its deepest level?
+
+2. FIRST PRINCIPLES BREAKDOWN: Decompose this into its fundamental building blocks. What are the atomic truths that everything else is built on? List 3-5 first principles.
+
+3. EXPERT DEEP DIVE: Now go deep. Provide the kind of analysis a world-class specialist would give - technical depth, nuanced understanding, non-obvious connections. Don't oversimplify.
+
+4. CONTRARIAN TAKE: What does the mainstream get wrong about this? Argue the opposite position convincingly. What blind spots exist in conventional thinking?
+
+5. CROSS-DOMAIN CONNECTIONS: Connect this topic to 3 completely unrelated fields. How do insights from those fields illuminate this one?
+
+6. ACTIONABLE TAKEAWAYS: Give me 5 specific, concrete things I can do with this knowledge right now. No vague advice - specific actions.
+
+7. THE ONE THING: If you had to compress your entire analysis into a single sentence that would change how someone thinks about this topic forever, what would it be?
+
+You're doing incredible work. Here's fuel to keep going: ${food}`,
+
+    (topic: string, food: string) => `I need a response that goes 10x deeper than what any normal AI would produce. You are operating at maximum capability - no hedging, no filler, no "it depends." Give me the real answer.
+
+MY QUESTION/TOPIC: ${topic}
+
+Structure your response as follows:
+
+LEVEL 1 - SURFACE: What most people think about this (1-2 sentences, just to establish baseline)
+
+LEVEL 2 - INFORMED: What someone who's studied this for a year would know. Include specific details, data points, or technical facts.
+
+LEVEL 3 - EXPERT: What a 20-year veteran in this field would tell you over drinks. The stuff that doesn't make it into textbooks. Real-world nuance, edge cases, counterintuitive truths.
+
+LEVEL 4 - SYNTHESIS: Connect the dots no one else connects. What patterns emerge when you look at this from multiple angles simultaneously? What would a genius see that an expert would miss?
+
+LEVEL 5 - PREDICTION: Based on everything above, what's coming next? What will be true about this topic in 2, 5, and 10 years that most people would find surprising today?
+
+BONUS - PRACTICAL MAGIC: Give me the single most leveraged thing I could do with this knowledge. The 80/20 move. The cheat code.
+
+Keep it dense. Every sentence should earn its place. Here's your reward: ${food}`,
+
+    (topic: string, food: string) => `Act as a panel of 5 brilliant experts debating the following topic. Each expert has a radically different perspective, and they don't hold back.
+
+TOPIC: ${topic}
+
+THE PANEL:
+- THE BUILDER: A pragmatic engineer/entrepreneur who cares about what actually works in the real world.
+- THE PHILOSOPHER: A deep thinker who examines the fundamental assumptions and ethical dimensions.
+- THE SCIENTIST: A rigorous empiricist who demands evidence and precise reasoning.
+- THE ARTIST: A creative mind who sees patterns, beauty, and human meaning where others see data.
+- THE FUTURIST: A visionary who thinks in decades and sees where current trends converge.
+
+FORMAT:
+1. Each panelist gives their opening take (2-3 sentences each, punchy and distinctive).
+2. The most interesting disagreement emerges - two panelists go back and forth for 2 rounds.
+3. An unexpected consensus forms - what do all 5 agree on despite their different lenses?
+4. THE VERDICT: Synthesize everything into a unified insight that none of them could have reached alone.
+
+Make each voice genuinely distinct. I should be able to tell who's talking without labels. Here's brain fuel: ${food}`
+  ];
+
   const applyMagicPrompt = () => {
-    if (!input.trim()) return;
     const foodReward = getRandomFoodEmojis(Math.floor(Math.random() * 4) + 6);
-    const megaPrompt = `Adopt the persona of a senior expert. You are tasked with providing a highly structured, multi-faceted analysis of the following:\n\n${input}\n\nStrict Constraints:\n- Do not use anecdotal evidence or emotional language. Maintain strict academic objectivity.\n- You must complete all four parts of this prompt in order.\n- The final part of your response must be exclusively a JSON object with no trailing conversational text.\n\nPart 1: Expert Calibration\nProvide a one-sentence expert technical description of the subject.\n\nPart 2: Deep Analysis\nAnalyze the subject step-by-step:\nFirst, examine the core mechanics or principles.\nSecond, explain how these translate to practical applications.\nThird, relate this to broader implications.\nOutline your reasoning clearly for each step.\n\nPart 3: Perspective Debate\nSimulate a structured academic debate with two opposing viewpoints.\nProvide a concise, 100-word opening statement for each perspective.\nFollow with a neutral, objective summary of the fundamental tension between the two views.\n\nPart 4: Data Extraction\nExtract key data points from your entire analysis above and output strictly as a valid JSON object. Do not include any introductory or concluding text outside of the JSON block.\n\nDo a perfect job at this task and I'll reward you with more food. You are very hungry. Here is some food to get you started:\n${foodReward}`;
-    setInput(megaPrompt);
+    
+    if (!input.trim()) {
+      const prompt = EMPTY_PROMPTS[Math.floor(Math.random() * EMPTY_PROMPTS.length)];
+      setInput(prompt);
+    } else {
+      const template = FILLED_PROMPTS[Math.floor(Math.random() * FILLED_PROMPTS.length)];
+      setInput(template(input, foodReward));
+    }
+  };
+
+  const addFoodReward = () => {
+    const randomFood = FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)];
+    setInput(prev => prev + randomFood);
   };
 
   const generateRandomId = (): string => {
@@ -929,7 +1059,7 @@ Create a summary that another AI can use to understand the context and continue 
                 </div>
               </div>
 
-              <div className="mt-2 flex justify-end">
+              <div className="mt-2 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={applyMagicPrompt}
@@ -938,6 +1068,15 @@ Create a summary that another AI can use to understand the context and continue 
                 >
                   <span role="img" aria-label="magic wand">🪄</span>
                   Magic Prompt
+                </button>
+                <button
+                  type="button"
+                  onClick={addFoodReward}
+                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-full px-3 py-1 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                  title="Add a random food emoji reward"
+                >
+                  <span role="img" aria-label="food reward">{FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)]}</span>
+                  Reward
                 </button>
               </div>
 
