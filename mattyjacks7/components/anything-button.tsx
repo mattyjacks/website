@@ -239,12 +239,23 @@ export default function AnythingButton() {
       setMorphTarget(1);
       // Delay showing the chat window so the morph animation plays
       const timer = setTimeout(() => setChatReady(true), 600);
+      // Lock background scroll while chat is open
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
       return () => clearTimeout(timer);
     } else {
       setMorphTarget(0);
       setChatReady(false);
+      document.body.style.overflow = '';
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      // Cleanup overflow lock on unmount
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   useEffect(() => {
     if (!showImageModal) return;
@@ -470,7 +481,7 @@ export default function AnythingButton() {
             className="flex flex-col rounded-2xl border border-zinc-200/80 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
           >
             {/* Header */}
-            <div className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0">
+            <div className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0 select-none">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="text-white/80 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/20"
@@ -479,7 +490,7 @@ export default function AnythingButton() {
                 <Menu className="w-5 h-5" />
               </button>
 
-              <div className="flex flex-col flex-1 min-w-0 pointer-events-none select-none">
+              <div className="flex flex-col flex-1 min-w-0">
                 <div className="flex items-center justify-center gap-2">
                   <button 
                     onClick={() => {
@@ -538,6 +549,8 @@ export default function AnythingButton() {
             <div 
               ref={scrollAreaRef}
               onScroll={handleScroll}
+              onWheel={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
               className="flex-1 overflow-y-auto px-4 sm:px-5 py-6 space-y-2 bg-zinc-50/50 dark:bg-zinc-950/30 custom-scrollbar scroll-smooth relative"
               onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
             >

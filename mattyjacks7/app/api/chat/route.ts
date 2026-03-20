@@ -438,7 +438,7 @@ function mapUserError(err: unknown): string {
   const msg = raw.toLowerCase();
   if (msg.includes("rate") || msg.includes("limit")) return ERROR_VARIATIONS[0];
   if (msg.includes("timeout") || msg.includes("abort")) return ERROR_VARIATIONS[2];
-  if (msg.includes("model") || msg.includes("not found")) return "AI model is waking up. Please try again in a few seconds, Boss.";
+  if (msg.includes("model") || msg.includes("not found")) return "AI model is waking up. Please try again in a moment, Boss.";
   if (msg.includes("authentication") || msg.includes("api key")) return "AI service auth issue. Please try again shortly, Boss.";
   return ERROR_VARIATIONS[4];
 }
@@ -570,7 +570,7 @@ export async function POST(request: NextRequest) {
 
     const createCompletion = async () => {
       let lastError: unknown = null;
-      for (let attempt = 0; attempt < 2; attempt++) {
+      for (let attempt = 0; attempt < 3; attempt++) {
         try {
           return await openai.chat.completions.create({
             model: "gpt-5.4-mini",
@@ -585,8 +585,9 @@ export async function POST(request: NextRequest) {
           const rawMsg = err instanceof Error ? err.message : "Unknown error";
           const msg = rawMsg.slice(0, 200).toLowerCase();
           const transient = msg.includes("rate_limit") || msg.includes("timeout") || msg.includes("fetch failed") || msg.includes("temporarily") || msg.includes("overloaded") || msg.includes("model") || msg.includes("server error") || msg.includes("503") || msg.includes("bad gateway") || msg.includes("gateway timeout");
-          if (!transient || attempt === 1) break;
-          await new Promise((res) => setTimeout(res, 350));
+          if (!transient || attempt === 2) break;
+          const backoff = 350 + attempt * 200;
+          await new Promise((res) => setTimeout(res, backoff));
         }
       }
 
