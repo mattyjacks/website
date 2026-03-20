@@ -692,7 +692,7 @@ export async function POST(request: NextRequest) {
     const completionResult = await createCompletion();
     if (completionResult instanceof NextResponse) return completionResult;
     if (typeof completionResult === "string") {
-      return NextResponse.json({ message: completionResult, model: "gpt-5.4-mini", toolCalls: 0, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+      return NextResponse.json({ message: completionResult, model: primaryModel, toolCalls: 0, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
     }
     response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
 
@@ -706,6 +706,7 @@ export async function POST(request: NextRequest) {
 
     let toolCallDepth = 0;
     const maxToolCalls = 5;
+    let usedModel = primaryModel;
 
     while (assistantMessage?.tool_calls && assistantMessage.tool_calls.length > 0 && toolCallDepth < maxToolCalls) {
       toolCallDepth++;
@@ -727,7 +728,7 @@ export async function POST(request: NextRequest) {
         if (completionResult instanceof NextResponse) return completionResult;
         if (typeof completionResult === "string") {
           addLog(`[CHAT] Tool loop returned fallback message`);
-          return NextResponse.json({ message: completionResult, model: "gpt-5.4-mini", toolCalls: toolCallDepth, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+          return NextResponse.json({ message: completionResult, model: usedModel, toolCalls: toolCallDepth, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
         }
         response = completionResult as OpenAI.Chat.Completions.ChatCompletion;
       } catch (err) {
@@ -743,8 +744,8 @@ export async function POST(request: NextRequest) {
     }
 
     const content = assistantMessage?.content || "Sorry Boss, I hit a snag. The AI didn't return a response. Try again!";
-    addLog(`[CHAT] Returning success response with ${content.length} chars`);
-    return NextResponse.json({ message: content.slice(0, 8000), model: "gpt-5.4-mini", toolCalls: toolCallDepth, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
+    addLog(`[CHAT] Returning success response with ${content.length} chars, model: ${response.model}`);
+    return NextResponse.json({ message: content.slice(0, 8000), model: response.model, toolCalls: toolCallDepth, debugLogs }, { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" } });
   } catch (error: unknown) {
     addLog(`[CHAT] Caught top-level error: ${error instanceof Error ? error.message.slice(0, 150) : String(error)}`);
     return NextResponse.json(
