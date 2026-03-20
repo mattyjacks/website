@@ -626,56 +626,50 @@ Create a summary that another AI can use to understand the context and continue 
 
   return (
     <>
-      {/* Floating launcher with torus border */}
-      <div className="fixed bottom-0 right-0 pointer-events-none flex items-end justify-end p-2" style={{ zIndex: 120, width: threeSize, height: threeSize }}>
-        <div className="relative flex items-center justify-center w-full h-full">
-          <ThreeBorderBack size={threeSize} />
-          <motion.button
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsOpen(!isOpen)}
-            className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300 focus:outline-none outline-none pointer-events-auto cursor-pointer"
-            aria-label="Toggle Valley Net AI Chat"
-            style={{ zIndex: 5, width: threeSize * 0.6, height: threeSize * 0.6 }}
-          >
-            <AnimatePresence mode="wait">
-              {isOpen ? (
-                <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-                  <ChevronDown className="w-10 h-10 flex-shrink-0" />
-                </motion.div>
-              ) : (
+      {/* Floating launcher with torus border (hidden while chat is open) */}
+      {!isOpen && (
+        <div className="fixed bottom-0 right-0 pointer-events-none flex items-end justify-end p-2" style={{ zIndex: 120, width: threeSize, height: threeSize }}>
+          <div className="relative flex items-center justify-center w-full h-full">
+            <ThreeBorderBack size={threeSize} />
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsOpen(true)}
+              className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-300 focus:outline-none outline-none pointer-events-auto cursor-pointer"
+              aria-label="Toggle Valley Net AI Chat"
+              style={{ zIndex: 5, width: threeSize * 0.6, height: threeSize * 0.6 }}
+            >
+              <motion.div
+                key="open"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                className="flex items-center justify-center w-full h-full relative"
+              >
                 <motion.div
-                  key="open"
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  className="flex items-center justify-center w-full h-full relative"
+                  className="relative w-full h-full"
+                  animate={{ rotate: [-2, 2, -2], y: [0, -3, 0] }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <motion.div
-                    className="relative w-full h-full"
-                    animate={{ rotate: [-2, 2, -2], y: [0, -3, 0] }}
-                    transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <Image
-                      src="/images/valley%20net%20CUTOUT%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
-                      alt="Valley Net"
-                      fill
-                      sizes="140px"
-                      className="object-contain object-bottom"
-                      priority
-                    />
-                  </motion.div>
-                  <ThreeBorderFront size={threeSize * 0.6} />
+                  <Image
+                    src="/images/valley%20net%20CUTOUT%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
+                    alt="Valley Net"
+                    fill
+                    sizes="140px"
+                    className="object-contain object-bottom"
+                    priority
+                  />
                 </motion.div>
-              )}
-            </AnimatePresence>
-            {!isOpen && <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />}
-          </motion.button>
-          <ThreeBorderFront size={threeSize} />
+                <ThreeBorderFront size={threeSize * 0.6} />
+              </motion.div>
+              <span className="absolute inset-0 rounded-full bg-emerald-500 opacity-20 animate-ping" />
+            </motion.button>
+            <ThreeBorderFront size={threeSize} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Chat window */}
       <AnimatePresence>
