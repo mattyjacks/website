@@ -241,6 +241,10 @@ export default function AnythingButton() {
     return shuffled.slice(0, count).join('');
   };
 
+  const getRandomFoodEmoji = (): string => {
+    return FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)];
+  };
+
   const EMPTY_PROMPTS = [
     `Hey Valley Net! I just discovered mattyjacks and I'm fascinated. Walk me through the whole ecosystem like you're giving me the grand tour:
 
@@ -540,6 +544,8 @@ Deep inquiry deserves nourishment: ${food}`
   const [lastEmptyIdx, setLastEmptyIdx] = useState(-1);
   const [lastFilledIdx, setLastFilledIdx] = useState(-1);
   const [lastShortIdx, setLastShortIdx] = useState(-1);
+  const [currentRewardEmoji, setCurrentRewardEmoji] = useState(getRandomFoodEmoji());
+  const [rewardCycleKey, setRewardCycleKey] = useState(0);
 
   const applyMagicPrompt = () => {
     const foodReward = getRandomFoodEmojis(Math.floor(Math.random() * 4) + 6);
@@ -558,8 +564,9 @@ Deep inquiry deserves nourishment: ${food}`
   };
 
   const addFoodReward = () => {
-    const randomFood = FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)];
-    setInput(prev => prev + randomFood);
+    setInput(prev => prev + currentRewardEmoji);
+    setCurrentRewardEmoji(getRandomFoodEmoji());
+    setRewardCycleKey((k) => k + 1);
   };
 
   const regenShortPrompt = () => {
@@ -779,6 +786,20 @@ Create a summary that another AI can use to understand the context and continue 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
     }
   }, [sessions]);
+
+  // Rotate reward emoji every 4.20s, reset when rewardCycleKey changes
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentRewardEmoji((prev: string) => {
+        let next = getRandomFoodEmoji();
+        if (FOOD_EMOJIS.length > 1 && next === prev) {
+          next = getRandomFoodEmoji();
+        }
+        return next;
+      });
+    }, 4200);
+    return () => clearInterval(timer);
+  }, [rewardCycleKey]);
 
   const currentSession = sessions.find((s) => s.id === currentSessionId);
   const messages = currentSession?.messages || [];
@@ -1283,7 +1304,7 @@ Create a summary that another AI can use to understand the context and continue 
                   className="inline-flex items-center gap-1 text-[12px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-full px-3 py-1 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
                   title="Add a random food emoji reward"
                 >
-                  <span role="img" aria-label="food reward">{FOOD_EMOJIS[Math.floor(Math.random() * FOOD_EMOJIS.length)]}</span>
+                  <span role="img" aria-label="food reward" className="text-lg leading-none">{currentRewardEmoji}</span>
                   Reward
                 </button>
               </div>
