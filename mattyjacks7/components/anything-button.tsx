@@ -11,6 +11,8 @@ import { renameConversation, createRenameData, updateRenameDataOnOpen, markAsMan
 import { processImageFiles, handlePasteEvent, handleDropEvent, type UploadedImage } from "@/lib/image-upload-handler";
 import { getRandomPlaceholder } from "@/lib/chat-placeholders";
 import { ImageGallery } from "./image-preview";
+import { analyzeImage, createImageContextMessage, type ImageAnalysis } from "@/lib/image-analysis";
+import { compressConversationHistory, shouldCompress } from "@/lib/context-compression";
 import { Rnd } from "react-rnd";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -1073,10 +1075,32 @@ Create a summary that another AI can use to understand the context and continue 
 
     setError(null);
     const userMessageId = generateId();
+    
+    // Analyze images to create invisible context
+    let imageContextSummary = '';
+    if (uploadedImages.length > 0) {
+      try {
+        const analyses: ImageAnalysis[] = [];
+        for (const img of uploadedImages) {
+          const analysis = await analyzeImage(img.base64, img.fileName);
+          if (analysis) {
+            analyses.push(analysis);
+          }
+        }
+        if (analyses.length > 0) {
+          imageContextSummary = createImageContextMessage(analyses);
+        }
+      } catch (err) {
+        console.error('Image analysis error:', err);
+        // Continue without analysis if it fails
+      }
+    }
+    
+    const messageContent = textToSend || (uploadedImages.length > 0 ? `[Sent ${uploadedImages.length} image(s)]` : "");
     const userMessage: ChatMessage = { 
       id: userMessageId, 
       role: "user", 
-      content: textToSend || (uploadedImages.length > 0 ? `[Sent ${uploadedImages.length} image(s)]` : ""), 
+      content: messageContent + imageContextSummary, 
       timestamp: Date.now(),
       images: uploadedImages.length > 0 ? uploadedImages : undefined
     };
@@ -1103,6 +1127,17 @@ Create a summary that another AI can use to understand the context and continue 
       // 30-second timeout to prevent hanging requests
       const timeoutId = setTimeout(() => controller.abort(), 30000);
       
+      // Apply sliding context window compression if needed
+      let messagesToSend = newMessages;
+      if (shouldCompress(newMessages)) {
+        try {
+          messagesToSend = await compressConversationHistory(newMessages);
+        } catch (err) {
+          console.error('Context compression failed, using original messages:', err);
+          // Continue with original messages if compression fails
+        }
+      }
+      
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1110,11 +1145,15 @@ Create a summary that another AI can use to understand the context and continue 
         body: JSON.stringify({ 
           model: selectedModel, 
           nickname: nickname, 
-          messages: newMessages.map((m) => ({ 
-            role: m.role, 
-            content: m.content.slice(0, 5000),
-            images: m.images || []
-          })) 
+          messages: messagesToSend.map((m) => {
+            // Only send images for the current user message, strip from history to reduce payload
+            const isCurrentMessage = m.id === userMessageId;
+            return {
+              role: m.role,
+              content: m.content.slice(0, 5000),
+              images: isCurrentMessage && m.images ? m.images : []
+            };
+          })
         }),
         signal: controller.signal,
       });
