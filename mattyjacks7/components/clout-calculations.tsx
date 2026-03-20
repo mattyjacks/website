@@ -111,13 +111,13 @@ export default function CloutCalculations() {
 
         if (isComponentMounted) {
           if (viewData.allStats) {
-            setPageStats(viewData.allStats);
+            setPageStats((prev) => viewData.allStats || prev);
           }
           if (viewData.siteStats) {
-            setSiteStats(viewData.siteStats);
+            setSiteStats((prev) => viewData.siteStats || prev);
           }
-          if (costData.categoryBreakdown) {
-            setCategoryCosts(costData.categoryBreakdown);
+          if (costData.categoryBreakdown && costData.categoryBreakdown.length > 0) {
+            setCategoryCosts((prev) => costData.categoryBreakdown || prev);
           }
           setLoading(false);
         }
@@ -169,8 +169,8 @@ export default function CloutCalculations() {
   }
 
   return (
-    <div className="mt-10 px-4 sm:px-6 py-8 bg-white dark:bg-zinc-950/40 rounded-2xl border border-zinc-200 dark:border-zinc-800/60 shadow-xl shadow-black/5 overflow-hidden relative">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 via-emerald-600 to-emerald-400"></div>
+    <div className="mt-10 px-4 sm:px-6 py-8 bg-white dark:bg-zinc-950/40 rounded-2xl border border-zinc-200 dark:border-zinc-800/60 shadow-xl shadow-black/5 overflow-hidden relative z-0 pointer-events-auto">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 via-emerald-600 to-emerald-400 pointer-events-none"></div>
       
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
