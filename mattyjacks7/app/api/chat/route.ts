@@ -425,22 +425,50 @@ TONE & PERSONALITY:
 PROJECT DOCUMENTATION CONTEXT:
 {RAG_CONTEXT}`;
 
-const ERROR_VARIATIONS = [
+const RATE_LIMIT_VARIATIONS = [
   "AI service is rate limited. Please try again in a moment, Boss.",
-  "AI service is unavailable right now. Please retry soon, Boss.",
-  "AI request timed out. Give it a moment and try again, Boss.",
-  "AI model is busy. Please try again shortly, Boss.",
-  "AI service hit an error. Please retry, Boss."
+  "Too many requests right now. Pause a sec and retry, Boss.",
+  "We're throttled briefly. Give it a moment, Boss."
 ];
+
+const TIMEOUT_VARIATIONS = [
+  "AI request timed out. Give it a moment and try again, Boss.",
+  "Connection to the AI was slow. Please retry, Boss.",
+  "AI took too long to respond. Try again shortly, Boss."
+];
+
+const MODEL_VARIATIONS = [
+  "AI model is waking up. Please try again in a moment, Boss.",
+  "The AI model is spinning up. Retry in a few seconds, Boss.",
+  "Model is momentarily busy. Please try once more, Boss."
+];
+
+const AUTH_VARIATIONS = [
+  "AI service auth issue. Please try again shortly, Boss.",
+  "Authentication hiccup with the AI. Retry in a moment, Boss.",
+  "AI credentials are warming up. Try again, Boss."
+];
+
+const GENERAL_VARIATIONS = [
+  "AI service hit an error. Please retry, Boss.",
+  "Something went wrong with the AI. Try again soon, Boss.",
+  "Temporary AI glitch. Give it another go, Boss.",
+  "AI error. Try again, Boss.",
+  "Unknown AI error. Try again later, Boss.",
+];
+
+function pickRandom(list: string[]) {
+  return list[Math.floor(Math.random() * list.length)];
+}
 
 function mapUserError(err: unknown): string {
   const raw = err instanceof Error ? err.message : typeof err === "string" ? err : "";
   const msg = raw.toLowerCase();
-  if (msg.includes("rate") || msg.includes("limit")) return ERROR_VARIATIONS[0];
-  if (msg.includes("timeout") || msg.includes("abort")) return ERROR_VARIATIONS[2];
-  if (msg.includes("model") || msg.includes("not found")) return "AI model is waking up. Please try again in a moment, Boss.";
-  if (msg.includes("authentication") || msg.includes("api key")) return "AI service auth issue. Please try again shortly, Boss.";
-  return ERROR_VARIATIONS[4];
+  if (msg.includes("rate") || msg.includes("limit")) return pickRandom(RATE_LIMIT_VARIATIONS);
+  if (msg.includes("timeout") || msg.includes("abort")) return pickRandom(TIMEOUT_VARIATIONS);
+  if (msg.includes("model") || msg.includes("not found")) return pickRandom(MODEL_VARIATIONS);
+  if (msg.includes("authentication") || msg.includes("api key")) return pickRandom(AUTH_VARIATIONS);
+  return pickRandom(GENERAL_VARIATIONS);
 }
 
 function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
