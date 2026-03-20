@@ -854,7 +854,7 @@ export async function POST(request: NextRequest) {
     const inputCost = (inputTokens / 1000) * 0.075; // gpt-5.4-mini pricing
     const outputCost = (outputTokens / 1000) * 0.3;
     const totalCost = inputCost + outputCost;
-    trackCategorizedCost(categorization, inputTokens, outputTokens, totalCost);
+    await trackCategorizedCost(categorization, inputTokens, outputTokens, totalCost);
     
     // Track OpenServ prompts and potentially add counter message
     let finalMessage = content;

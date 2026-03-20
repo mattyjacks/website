@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
 
     const userAgent = request.headers.get("user-agent") || "unknown";
 
-    // Record the view
-    recordView(path, userAgent);
+    // Record the view (async with Supabase persistence)
+    await recordView(path, userAgent);
 
     // Return current stats for this page
     const pageStats = getPageStats(path);

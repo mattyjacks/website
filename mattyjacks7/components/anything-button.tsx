@@ -894,10 +894,8 @@ Create a summary that another AI can use to understand the context and continue 
     };
   }, []);
 
-  // Auto-rename conversations when sidebar opens
+  // Auto-rename conversations when messages change or sidebar opens
   useEffect(() => {
-    if (!isSidebarOpen) return;
-
     const autoRenameConversations = async () => {
       setSessions((prevSessions) =>
         prevSessions.map((session) => {
@@ -949,7 +947,7 @@ Create a summary that another AI can use to understand the context and continue 
     };
 
     autoRenameConversations();
-  }, [isSidebarOpen]);
+  }, [sessions, isSidebarOpen]);
 
   useEffect(() => {
     if (!showImageModal) return;
@@ -1385,15 +1383,16 @@ Create a summary that another AI can use to understand the context and continue 
 
             {/* Sidebar */}
             <div className={`absolute top-[60px] bottom-0 left-0 w-[60vw] sm:w-[50vw] lg:w-[45vw] min-w-[340px] max-w-[700px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
-              <div className="p-5 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/50 dark:bg-black/20">
-                <div className="flex flex-col gap-2 flex-1">
+              <div className="p-4 border-b border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-black/20 shrink-0">
+                <div className="flex items-center justify-between mb-3">
                   <h4 className="font-bold text-base text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat Menu</h4>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <button onClick={() => setShowSettings(!showSettings)} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50" aria-label="Toggle chat settings">Settings</button>
-                    <button onClick={() => setShowSumUpMenu(!showSumUpMenu)} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50" aria-label="Toggle sum up conversations">Sum Up</button>
-                  </div>
+                  <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-white flex-shrink-0"><X className="w-5 h-5" /></button>
                 </div>
-                <button onClick={() => setIsSidebarOpen(false)} className="p-2 text-zinc-500 hover:text-zinc-800 dark:hover:text-white flex-shrink-0"><X className="w-5 h-5" /></button>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button onClick={createNewSession} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-white border border-emerald-600 dark:bg-emerald-600 dark:border-emerald-700 transition-all hover:shadow-sm hover:bg-emerald-600 dark:hover:bg-emerald-700" aria-label="Create new conversation"><Plus className="w-3.5 h-3.5 inline mr-1" />New Chat</button>
+                  <button onClick={() => setShowSettings(!showSettings)} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50" aria-label="Toggle chat settings">Settings</button>
+                  <button onClick={() => setShowSumUpMenu(!showSumUpMenu)} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50" aria-label="Toggle sum up conversations">Sum Up</button>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
                 {showSumUpMenu ? (
@@ -1747,13 +1746,18 @@ Create a summary that another AI can use to understand the context and continue 
                   ref={magicWandRef}
                   type="button"
                   onClick={applyMagicPrompt}
-                  animate={isMagicShaking ? { rotate: [-5, 5, -5, 5, -5, 5, 0] } : { rotate: 0 }}
-                  transition={{ duration: 0.6, ease: "easeInOut" }}
-                  style={{ originX: 0, originY: 1 }}
                   className="inline-flex items-center justify-center text-4xl font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-full w-10 h-10 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
                   title="Magic prompt - tap to shake!"
                 >
-                  <span role="img" aria-label="magic wand">🪄</span>
+                  <motion.span
+                    role="img"
+                    aria-label="magic wand"
+                    animate={isMagicShaking ? { rotate: [-5, 5, -5, 5, -5, 5, 0] } : { rotate: 0 }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                    style={{ originX: 0, originY: 1, display: 'inline-block' }}
+                  >
+                    🪄
+                  </motion.span>
                 </motion.button>
                 <motion.button
                   type="button"
@@ -1761,11 +1765,10 @@ Create a summary that another AI can use to understand the context and continue 
                   disabled={isRegenRotating}
                   animate={isRegenRotating ? { rotate: 360 } : { rotate: 0 }}
                   transition={{ duration: 1, ease: "linear" }}
-                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800 rounded-full px-3 py-1 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center justify-center text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800 rounded-full w-10 h-10 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Regenerate a random short prompt"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  Regen
+                  <RotateCcw className="w-4 h-4" />
                 </motion.button>
                 <button
                   type="button"

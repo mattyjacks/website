@@ -11,8 +11,7 @@ export default function ViewTracker() {
       return;
     }
 
-    // Track view - allow multiple views per page per session
-    // Each page load/refresh will record a new view
+    // Track view via API endpoint (which handles Supabase persistence)
     fetch("/api/views", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
