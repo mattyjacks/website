@@ -40,6 +40,16 @@ const WICKED_MODELS = {
     name: 'Venice Uncensored (free)',
     description: 'Free uncensored Venice edition',
   },
+  'nous-mixtral-free': {
+    id: 'nousresearch/nous-hermes-2-mixtral-8x7b:free',
+    name: 'Nous Hermes 2 Mixtral 8x7B (free)',
+    description: 'Uncensored nous hermes mixtral variant',
+  },
+  'uncensored-generic': {
+    id: 'openrouter/uncensored:free',
+    name: 'OpenRouter Uncensored (free)',
+    description: 'Generic uncensored fallback',
+  },
 } as const;
 
 const WICKED_MODEL_KEYS = Object.keys(WICKED_MODELS) as (keyof typeof WICKED_MODELS)[];
@@ -895,20 +905,22 @@ export async function POST(request: NextRequest) {
         isWickedMode = false; // fall through to good-mode flow below
       }
 
-      // Wicked mode doesn't support tool calls - return directly
-      const wickedContent = response!.choices[0]?.message?.content || `No response from the wicked AI, ${nickname}. Try again!`;
-      const totalMs = Date.now() - startTime;
+      if (wickedSuccess) {
+        // Wicked mode doesn't support tool calls - return directly
+        const wickedContent = response!.choices[0]?.message?.content || `No response from the wicked AI, ${nickname}. Try again!`;
+        const totalMs = Date.now() - startTime;
 
-      // Track costs (free models = $0)
-      const inputTokens = response!.usage?.prompt_tokens || 0;
-      const outputTokens = response!.usage?.completion_tokens || 0;
-      trackApiCall(usedModel, inputTokens, outputTokens, false);
+        // Track costs (free models = $0)
+        const inputTokens = response!.usage?.prompt_tokens || 0;
+        const outputTokens = response!.usage?.completion_tokens || 0;
+        trackApiCall(usedModel, inputTokens, outputTokens, false);
 
-      addLog(`[CHAT] WICKED SUCCESS in ${totalMs}ms, ${wickedContent.length} chars, model: ${usedModel}`);
-      return NextResponse.json(
-        { message: wickedContent.slice(0, 8000), model: usedModel, mode: 'wicked', toolCalls: 0, responseTimeMs: totalMs, debugLogs, requestId },
-        { headers: { ...SECURITY_HEADERS, "X-Response-Time": `${totalMs}ms` } }
-      );
+        addLog(`[CHAT] WICKED SUCCESS in ${totalMs}ms, ${wickedContent.length} chars, model: ${usedModel}`);
+        return NextResponse.json(
+          { message: wickedContent.slice(0, 8000), model: usedModel, mode: 'wicked', toolCalls: 0, responseTimeMs: totalMs, debugLogs, requestId },
+          { headers: { ...SECURITY_HEADERS, "X-Response-Time": `${totalMs}ms` } }
+        );
+      }
     }
 
     // GOOD MODE - use OpenAI as before (also used as fallback if wicked failed)
