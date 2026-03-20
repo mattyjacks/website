@@ -544,7 +544,9 @@ export async function POST(request: NextRequest) {
         temperature: 0.8,
       });
     } catch (err) {
-      const msg = err instanceof Error ? err.message.slice(0, 200) : "Unknown error";
+      const rawMsg = err instanceof Error ? err.message : "Unknown error";
+      const msg = rawMsg.slice(0, 200).toLowerCase();
+
       if (msg.includes("rate_limit")) {
         return NextResponse.json(
           { error: "OpenAI rate limited. Try again in a moment, Boss." },
@@ -557,13 +559,34 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      if (msg.includes("authentication")) {
+      if (
+        msg.includes("authentication") ||
+        msg.includes("api key") ||
+        msg.includes("apikey") ||
+        msg.includes("api_key") ||
+        msg.includes("no api key")
+      ) {
         return NextResponse.json(
-          { error: "AI service authentication failed" },
+          { error: "AI service authentication failed. Check your OPENAI_API_KEY, Boss." },
           { status: 503 }
         );
       }
-      throw err;
+      if (
+        msg.includes("enotfound") ||
+        msg.includes("getaddrinfo") ||
+        msg.includes("self signed certificate") ||
+        msg.includes("fetch failed") ||
+        msg.includes("timeout")
+      ) {
+        return NextResponse.json(
+          { error: "AI service unreachable. Check network connectivity and try again, Boss." },
+          { status: 503 }
+        );
+      }
+      return NextResponse.json(
+        { error: "AI service error. Please try again in a moment, Boss." },
+        { status: 503 }
+      );
     }
 
     let assistantMessage = response.choices[0]?.message;
@@ -614,11 +637,27 @@ export async function POST(request: NextRequest) {
           temperature: 0.8,
         });
       } catch (err) {
-        const msg = err instanceof Error ? err.message.slice(0, 200) : "Unknown error";
+        const rawMsg = err instanceof Error ? err.message : "Unknown error";
+        const msg = rawMsg.slice(0, 200).toLowerCase();
         if (msg.includes("rate_limit")) {
           break;
         }
-        if (msg.includes("authentication")) {
+        if (
+          msg.includes("authentication") ||
+          msg.includes("api key") ||
+          msg.includes("apikey") ||
+          msg.includes("api_key") ||
+          msg.includes("no api key")
+        ) {
+          break;
+        }
+        if (
+          msg.includes("enotfound") ||
+          msg.includes("getaddrinfo") ||
+          msg.includes("self signed certificate") ||
+          msg.includes("fetch failed") ||
+          msg.includes("timeout")
+        ) {
           break;
         }
         throw err;
