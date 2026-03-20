@@ -681,6 +681,8 @@ export async function POST(request: NextRequest) {
     const tertiaryModel = "gpt-4o-mini";
     const modelOrder = [requestedModel || primaryModel, fallbackModel, tertiaryModel].filter((m, idx, arr) => arr.indexOf(m) === idx);
 
+    let usedModel = primaryModel;
+
     const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;
 
@@ -693,9 +695,7 @@ export async function POST(request: NextRequest) {
           messages: chatMessages,
           tools,
           tool_choice: "auto",
-          // Newer OpenAI models expect max_completion_tokens instead of max_tokens
           max_completion_tokens: 2000,
-          temperature: 0.8,
         });
         addLog(`[CHAT] Model ${modelName} succeeded in ${Date.now() - modelStart}ms`);
         return result;
@@ -741,7 +741,6 @@ export async function POST(request: NextRequest) {
 
     let toolCallDepth = 0;
     const maxToolCalls = 5;
-    let usedModel = primaryModel;
 
     while (assistantMessage?.tool_calls && assistantMessage.tool_calls.length > 0 && toolCallDepth < maxToolCalls) {
       toolCallDepth++;
