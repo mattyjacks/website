@@ -735,7 +735,12 @@ export default function Home() {
 
           <div className="space-y-20">
             {/* Case Study 1: TristateHoney */}
-            <div ref={tristateRef} className="relative">
+            <div ref={tristateRef} className="relative overflow-hidden rounded-3xl">
+              <div className="pointer-events-none absolute inset-0 opacity-60" style={{
+                backgroundImage: `radial-gradient(circle at 0 0, rgba(255,199,102,0.08) 0, rgba(255,199,102,0.08) 24%, transparent 28%), radial-gradient(circle at 30px 52px, rgba(255,199,102,0.09) 0, rgba(255,199,102,0.09) 20%, transparent 24%)`,
+                backgroundSize: '120px 104px',
+                mixBlendMode: 'multiply'
+              }} />
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">01</div>
                 <div>
@@ -750,6 +755,18 @@ export default function Home() {
               <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-300 mb-6 max-w-3xl leading-relaxed">
                 TristateHoney.com is still getting real inquiries! One recent message came from a company looking to order bulk honey for a new product they&apos;re developing.
               </p>
+
+              <div className="relative max-w-4xl mb-6 rounded-3xl overflow-hidden border border-amber-200/70 dark:border-amber-800/60 shadow-lg">
+                <Image
+                  src="/images/tristatehoney-lead.jpg"
+                  alt="TristateHoney lead generation landing visuals"
+                  width={1600}
+                  height={900}
+                  className="w-full h-full object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-amber-50/40 dark:from-black/30 dark:via-black/10 dark:to-amber-500/10" />
+              </div>
 
               <div className="group relative max-w-4xl mb-6 h-[400px] md:h-[500px]">
                 <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 bg-white dark:bg-zinc-900 h-full">

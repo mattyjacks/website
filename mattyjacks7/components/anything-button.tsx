@@ -143,7 +143,7 @@ function MessageBubble({ message, onCopy }: { message: ChatMessage; onCopy: (tex
                 ul: ({ children }) => <ul className="list-disc list-outside ml-6 mb-4 space-y-1.5 marker:text-emerald-500">{children}</ul>,
                 ol: ({ children }) => <ol className="list-decimal list-outside ml-6 mb-4 space-y-1.5 marker:text-emerald-500 font-bold">{children}</ol>,
                 li: ({ children }) => <li className="pl-1 leading-relaxed">{children}</li>,
-                strong: ({ children }) => <strong className={`font-black ${isUser ? "text-white" : "text-zinc-900 dark:text-white"}`}>{children}</strong>,
+                strong: ({ children }) => <strong className="font-black text-current">{children}</strong>,
                 h1: ({ children }) => <h1 className={`text-2xl font-black mb-4 mt-6 ${isUser ? "" : "text-zinc-900 dark:text-white"} tracking-tight`}>{children}</h1>,
                 h2: ({ children }) => <h2 className={`text-xl font-bold mb-3 mt-5 pb-1 border-b ${isUser ? "border-emerald-500/30" : "border-zinc-200 dark:border-zinc-800"} tracking-tight`}>{children}</h2>,
                 h3: ({ children }) => <h3 className="text-lg font-bold mb-2 mt-4 tracking-tight">{children}</h3>,
@@ -204,6 +204,11 @@ export default function AnythingButton() {
   const [chatReady, setChatReady] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageTeaserIndex, setImageTeaserIndex] = useState(0);
+
+  const [showSettings, setShowSettings] = useState(false);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+  const [consoleDebugEnabled, setConsoleDebugEnabled] = useState(true);
+  const [selectedModel, setSelectedModel] = useState("gpt-5.4-mini-2026-03-17");
 
   useEffect(() => {
     const calcThreeSize = () => {
@@ -395,7 +400,7 @@ export default function AnythingButton() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ messages: newMessages.map((m) => ({ role: m.role, content: m.content.slice(0, 5000) })) }),
+        body: JSON.stringify({ model: selectedModel, messages: newMessages.map((m) => ({ role: m.role, content: m.content.slice(0, 5000) })) }),
         signal: controller.signal,
       });
 
@@ -405,7 +410,7 @@ export default function AnythingButton() {
       const data = await res.json().catch(() => null);
 
       // Always log debug info from backend
-      if (data?.debugLogs && Array.isArray(data.debugLogs)) {
+      if (consoleDebugEnabled && data?.debugLogs && Array.isArray(data.debugLogs)) {
         console.group('%c[Valley Net Debug Logs]', 'color: #10b981; font-weight: bold');
         data.debugLogs.forEach((log: string) => console.log(log));
         console.groupEnd();
@@ -448,9 +453,11 @@ export default function AnythingButton() {
     } finally {
       setIsLoading(false);
       abortControllerRef.current = null;
-      setTimeout(() => scrollToBottom(), 50);
+      if (autoScrollEnabled) {
+        setTimeout(() => scrollToBottom(), 50);
+      }
     }
-  }, [input, isLoading, messages, currentSessionId, scrollToBottom]);
+  }, [input, isLoading, messages, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -557,28 +564,72 @@ export default function AnythingButton() {
             </div>
 
             {/* Sidebar */}
-            <div className={`absolute top-[60px] bottom-0 left-0 w-[280px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
+            <div className={`absolute top-[60px] bottom-0 left-0 w-[320px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
               <div className="p-4 border-b border-zinc-200 dark:border-white/10 flex justify-between items-center bg-white/50 dark:bg-black/20">
-                <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat History</h4>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat Menu</h4>
+                  <button onClick={() => setShowSettings(!showSettings)} className="px-2 py-1 text-[11px] font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm" aria-label="Toggle chat settings">Settings</button>
+                </div>
                 <button onClick={() => setIsSidebarOpen(false)} className="p-1 text-zinc-500 hover:text-zinc-800 dark:hover:text-white"><X className="w-4 h-4" /></button>
               </div>
-              <div className="p-3">
-                <button onClick={createNewSession} className="flex items-center justify-center gap-2 w-full py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-xl text-sm font-bold shadow-sm hover:scale-[1.02] transition-transform">
-                  <Plus className="w-4 h-4" /> New Session
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
-                {sessions.map((session) => (
-                  <div key={session.id} onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); }} className={`group flex items-center justify-between px-3 py-3 rounded-xl cursor-pointer text-sm transition-all ${currentSessionId === session.id ? "bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold" : "hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-transparent font-medium"}`}>
-                    <div className="flex items-center gap-3 truncate">
-                      <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentSessionId === session.id ? 'text-emerald-500' : 'opacity-60'}`} />
-                      <span className="truncate">{session.title}</span>
-                    </div>
-                    <button onClick={(e) => deleteSession(e, session.id)} className="opacity-0 group-hover:opacity-100 hover:text-sky-600 transition-opacity p-1 bg-zinc-200/50 dark:bg-zinc-800 rounded-md" title="Delete Session">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+              <div className="flex-1 overflow-y-auto p-2 space-y-3 custom-scrollbar">
+                <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <h5 className="text-xs font-bold uppercase tracking-widest text-zinc-500">History</h5>
+                    <button onClick={createNewSession} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold shadow-sm hover:scale-[1.02] transition-transform"><Plus className="w-3.5 h-3.5" /> New</button>
                   </div>
-                ))}
+                  <div className="space-y-1">
+                    {sessions.map((session) => (
+                      <div key={session.id} onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); }} className={`group flex items-center justify-between px-3 py-3 rounded-xl cursor-pointer text-sm transition-all ${currentSessionId === session.id ? "bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold" : "hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-transparent font-medium"}`}>
+                        <div className="flex items-center gap-3 truncate">
+                          <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentSessionId === session.id ? 'text-emerald-500' : 'opacity-60'}`} />
+                          <span className="truncate">{session.title}</span>
+                        </div>
+                        <button onClick={(e) => deleteSession(e, session.id)} className="opacity-0 group-hover:opacity-100 hover:text-sky-600 transition-opacity p-1 bg-zinc-200/50 dark:bg-zinc-800 rounded-md" title="Delete Session">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {showSettings && (
+                  <div className="p-3 rounded-2xl bg-white/80 dark:bg-black/30 border border-emerald-200 dark:border-emerald-800 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Settings</h5>
+                      <span className="text-[10px] font-bold text-emerald-500">Valley Net</span>
+                    </div>
+                    <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
+                      <div className="flex flex-col">
+                        <span>Model</span>
+                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Choose AI engine</span>
+                      </div>
+                      <select
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        className="text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-2 py-1"
+                      >
+                        <option value="gpt-5.4-mini-2026-03-17">GPT-5.4 Mini (primary)</option>
+                        <option value="gpt-5-mini-2025-08-07">GPT-5 Mini</option>
+                        <option value="gpt-4o-mini">GPT-4o Mini</option>
+                      </select>
+                    </label>
+                    <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
+                      <div className="flex flex-col">
+                        <span>Auto-scroll on replies</span>
+                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Keeps the newest message in view</span>
+                      </div>
+                      <input type="checkbox" checked={autoScrollEnabled} onChange={(e) => setAutoScrollEnabled(e.target.checked)} className="h-4 w-4" />
+                    </label>
+                    <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
+                      <div className="flex flex-col">
+                        <span>Console debug logs</span>
+                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Show backend debug trail in DevTools</span>
+                      </div>
+                      <input type="checkbox" checked={consoleDebugEnabled} onChange={(e) => setConsoleDebugEnabled(e.target.checked)} className="h-4 w-4" />
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
 

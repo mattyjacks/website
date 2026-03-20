@@ -405,7 +405,7 @@ async function handleToolCall(
 
 const SYSTEM_PROMPT = `You are the "Anything Button" AI assistant on MattyJacks.com - the official website for MattyJacks, a holding company and full-service agency.
 
-You are powered by ChatGPT OpenAI API GPT-4o Mini.
+You are powered by ChatGPT OpenAI API GPT-5.4 Mini.
 
 CRITICAL RULES:
 - Call the user "Boss" as a sign of respect. Always.
@@ -610,6 +610,7 @@ export async function POST(request: NextRequest) {
     }
 
     const rawMessages = parsed?.messages;
+    const requestedModelRaw = parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>).model : undefined;
     if (!rawMessages || !Array.isArray(rawMessages) || rawMessages.length === 0) {
       addLog(`[CHAT] Messages missing or empty. parsed keys: ${Object.keys(parsed || {}).join(',')}, messages type: ${typeof rawMessages}`);
       return NextResponse.json(
@@ -647,7 +648,9 @@ export async function POST(request: NextRequest) {
       // Truncate overly long messages for safety
       sanitizedMessages.push({ role, content: content.slice(0, 6000) });
     }
-    addLog(`[CHAT] All ${sanitizedMessages.length} messages validated OK`);
+    const allowedModels = new Set(["gpt-5.4-mini-2026-03-17", "gpt-5-mini-2025-08-07", "gpt-4o-mini"]);
+    const requestedModel = typeof requestedModelRaw === 'string' && allowedModels.has(requestedModelRaw) ? requestedModelRaw : null;
+    addLog(`[CHAT] All ${sanitizedMessages.length} messages validated OK${requestedModel ? `, requestedModel=${requestedModel}` : ''}`);
 
     const ragContext = loadRAGContext();
     const systemMessage = SYSTEM_PROMPT.replace("{RAG_CONTEXT}", ragContext);
@@ -663,9 +666,10 @@ export async function POST(request: NextRequest) {
     addLog(`[CHAT] Setup complete in ${Date.now() - startTime}ms, calling OpenAI...`);
     const fallbackMessage = "I'm having trouble reaching the AI right now, Boss. Please try again in a moment. If it keeps happening, wait 30 seconds and retry.";
 
-    const primaryModel = "gpt-4o-mini";
-    const fallbackModel = "gpt-4-turbo";
-    const tertiaryModel = "gpt-3.5-turbo";
+    const primaryModel = "gpt-5.4-mini-2026-03-17";
+    const fallbackModel = "gpt-5-mini-2025-08-07";
+    const tertiaryModel = "gpt-4o-mini";
+    const modelOrder = [requestedModel || primaryModel, fallbackModel, tertiaryModel].filter((m, idx, arr) => arr.indexOf(m) === idx);
 
     const createCompletion = async (): Promise<OpenAI.Chat.Completions.ChatCompletion | string | NextResponse> => {
       let lastError: unknown = null;
@@ -686,28 +690,15 @@ export async function POST(request: NextRequest) {
         return result;
       };
 
-      // Try primary model
-      try {
-        return await callModel(primaryModel);
-      } catch (err) {
-        lastError = err;
-        addLog(`[CHAT] Primary failed: ${err instanceof Error ? err.message.slice(0, 200) : String(err)}`);
-      }
-
-      // Try fallback model
-      try {
-        return await callModel(fallbackModel);
-      } catch (err) {
-        lastError = err;
-        addLog(`[CHAT] Fallback failed: ${err instanceof Error ? err.message.slice(0, 200) : String(err)}`);
-      }
-
-      // Try tertiary model
-      try {
-        return await callModel(tertiaryModel);
-      } catch (err) {
-        lastError = err;
-        addLog(`[CHAT] Tertiary failed: ${err instanceof Error ? err.message.slice(0, 200) : String(err)}`);
+      for (const modelName of modelOrder) {
+        try {
+          const result = await callModel(modelName);
+          usedModel = modelName;
+          return result;
+        } catch (err) {
+          lastError = err;
+          addLog(`[CHAT] Model ${modelName} failed: ${err instanceof Error ? err.message.slice(0, 200) : String(err)}`);
+        }
       }
 
       // All models failed
