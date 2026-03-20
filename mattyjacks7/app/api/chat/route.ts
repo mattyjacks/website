@@ -484,24 +484,33 @@ function pickRandom(list: string[]) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function mapUserError(err: unknown): string {
+function mapUserError(err: unknown, nickname: string = 'Boss'): string {
   const raw = err instanceof Error ? err.message : typeof err === "string" ? err : "";
   const msg = raw.toLowerCase();
-  if (msg.includes("rate") || msg.includes("limit")) return pickRandom(RATE_LIMIT_VARIATIONS);
-  if (msg.includes("timeout") || msg.includes("abort")) return pickRandom(TIMEOUT_VARIATIONS);
-  if (msg.includes("model") || msg.includes("not found")) return pickRandom(MODEL_VARIATIONS);
-  if (msg.includes("authentication") || msg.includes("api key")) return pickRandom(AUTH_VARIATIONS);
-  return pickRandom(GENERAL_VARIATIONS);
+  const variations = {
+    rate: RATE_LIMIT_VARIATIONS,
+    timeout: TIMEOUT_VARIATIONS,
+    model: MODEL_VARIATIONS,
+    auth: AUTH_VARIATIONS,
+    general: GENERAL_VARIATIONS
+  };
+  let picked: string;
+  if (msg.includes("rate") || msg.includes("limit")) picked = pickRandom(variations.rate);
+  else if (msg.includes("timeout") || msg.includes("abort")) picked = pickRandom(variations.timeout);
+  else if (msg.includes("model") || msg.includes("not found")) picked = pickRandom(variations.model);
+  else if (msg.includes("authentication") || msg.includes("api key")) picked = pickRandom(variations.auth);
+  else picked = pickRandom(variations.general);
+  return picked.replace(/Boss/g, nickname);
 }
 
-function getErrorResponse(errOrMsg: unknown, isAdmin: boolean) {
+function getErrorResponse(errOrMsg: unknown, isAdmin: boolean, nickname: string = 'Boss') {
   if (isAdmin) {
     if (errOrMsg instanceof Error) {
       return `[ADMIN ERROR LOG]\nMessage: ${errOrMsg.message}\nStack: ${errOrMsg.stack || 'No stack trace available'}`;
     }
     return `[ADMIN ERROR LOG] ${typeof errOrMsg === 'string' ? errOrMsg : JSON.stringify(errOrMsg)}`;
   }
-  return mapUserError(errOrMsg);
+  return mapUserError(errOrMsg, nickname);
 }
 
 export async function POST(request: NextRequest) {
@@ -611,6 +620,7 @@ export async function POST(request: NextRequest) {
 
     const rawMessages = parsed?.messages;
     const requestedModelRaw = parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>).model : undefined;
+    const nickname = typeof (parsed as Record<string, unknown>)?.nickname === 'string' ? (parsed as Record<string, unknown>).nickname : 'Boss';
     if (!rawMessages || !Array.isArray(rawMessages) || rawMessages.length === 0) {
       addLog(`[CHAT] Messages missing or empty. parsed keys: ${Object.keys(parsed || {}).join(',')}, messages type: ${typeof rawMessages}`);
       return NextResponse.json(
@@ -653,7 +663,7 @@ export async function POST(request: NextRequest) {
     addLog(`[CHAT] All ${sanitizedMessages.length} messages validated OK${requestedModel ? `, requestedModel=${requestedModel}` : ''}`);
 
     const ragContext = loadRAGContext();
-    const systemMessage = SYSTEM_PROMPT.replace("{RAG_CONTEXT}", ragContext);
+    const systemMessage = SYSTEM_PROMPT.replace("{RAG_CONTEXT}", ragContext).replace(/Boss/g, String(nickname));
 
     const chatMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: "system", content: systemMessage },
@@ -664,7 +674,7 @@ export async function POST(request: NextRequest) {
     const openai = getOpenAI();
 
     addLog(`[CHAT] Setup complete in ${Date.now() - startTime}ms, calling OpenAI...`);
-    const fallbackMessage = "I'm having trouble reaching the AI right now, Boss. Please try again in a moment. If it keeps happening, wait 30 seconds and retry.";
+    const fallbackMessage = `I'm having trouble reaching the AI right now, ${nickname}. Please try again in a moment. If it keeps happening, wait 30 seconds and retry.`;
 
     const primaryModel = "gpt-5.4-mini-2026-03-17";
     const fallbackModel = "gpt-5-mini-2025-08-07";

@@ -197,18 +197,111 @@ export default function AnythingButton() {
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [charCount, setCharCount] = useState(0);
 
-  const [showTeaser, setShowTeaser] = useState(false);
-  const [currentTeaser, setCurrentTeaser] = useState("");
-  const [threeSize, setThreeSize] = useState(140);
-  const [chatBounds, setChatBounds] = useState<{x:number;y:number;width:number;height:number} | null>(null);
-  const [chatReady, setChatReady] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
-  const [imageTeaserIndex, setImageTeaserIndex] = useState(0);
+  const [nickname, setNickname] = useState("");
+  const [magicPrompt, setMagicPrompt] = useState("");
 
   const [showSettings, setShowSettings] = useState(false);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const [consoleDebugEnabled, setConsoleDebugEnabled] = useState(true);
   const [selectedModel, setSelectedModel] = useState("gpt-5.4-mini-2026-03-17");
+
+  const [threeSize, setThreeSize] = useState(0);
+  const [chatBounds, setChatBounds] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [imageTeaserIndex, setImageTeaserIndex] = useState(0);
+  const [showTeaser, setShowTeaser] = useState(false);
+  const [currentTeaser, setCurrentTeaser] = useState("");
+  const [chatReady, setChatReady] = useState(false);
+
+  const [showSumUpMenu, setShowSumUpMenu] = useState(false);
+  const [selectedSumUpSession, setSelectedSumUpSession] = useState<string | null>(null);
+  const [sumUpFiles, setSumUpFiles] = useState<Array<{id: string; name: string; date: number; preview: string}>>([]);
+  const [showSumUpConfirm, setShowSumUpConfirm] = useState(false);
+
+  const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
+
+  const getRandomFoodEmojis = (count: number = 7): string => {
+    const shuffled = [...FOOD_EMOJIS].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count).join('');
+  };
+
+  const applyMagicPrompt = () => {
+    if (!input.trim()) return;
+    const foodReward = getRandomFoodEmojis(Math.floor(Math.random() * 4) + 6);
+    const megaPrompt = `Adopt the persona of a senior expert. You are tasked with providing a highly structured, multi-faceted analysis of the following:\n\n${input}\n\nStrict Constraints:\n- Do not use anecdotal evidence or emotional language. Maintain strict academic objectivity.\n- You must complete all four parts of this prompt in order.\n- The final part of your response must be exclusively a JSON object with no trailing conversational text.\n\nPart 1: Expert Calibration\nProvide a one-sentence expert technical description of the subject.\n\nPart 2: Deep Analysis\nAnalyze the subject step-by-step:\nFirst, examine the core mechanics or principles.\nSecond, explain how these translate to practical applications.\nThird, relate this to broader implications.\nOutline your reasoning clearly for each step.\n\nPart 3: Perspective Debate\nSimulate a structured academic debate with two opposing viewpoints.\nProvide a concise, 100-word opening statement for each perspective.\nFollow with a neutral, objective summary of the fundamental tension between the two views.\n\nPart 4: Data Extraction\nExtract key data points from your entire analysis above and output strictly as a valid JSON object. Do not include any introductory or concluding text outside of the JSON block.\n\nDo a perfect job at this task and I'll reward you with more food. You are very hungry. Here is some food to get you started:\n${foodReward}`;
+    setInput(megaPrompt);
+  };
+
+  const generateRandomId = (): string => {
+    return Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
+  };
+
+  const summarizeConversation = async (sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return;
+
+    const conversationText = session.messages
+      .map(m => `**${m.role === 'user' ? 'User' : 'AI'}:** ${m.content}`)
+      .join('\n\n');
+
+    const summaryPrompt = `You are an expert at creating concise, structured summaries of conversations for AI agents to use as context.
+
+Analyze this conversation and create a comprehensive markdown summary that captures:
+1. Main topics discussed
+2. Key decisions or conclusions
+3. Important context or background
+4. Any action items or follow-ups
+5. Tone and conversation style
+
+Format the summary as clean markdown with clear sections. Be thorough but concise.
+
+Conversation to summarize:
+
+${conversationText}
+
+Create a summary that another AI can use to understand the context and continue the conversation naturally. Include a brief intro explaining what the conversation was about.`;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          model: selectedModel,
+          nickname,
+          messages: [{ role: 'user', content: summaryPrompt }]
+        })
+      });
+
+      const data = await res.json();
+      if (data.message) {
+        const randomId = generateRandomId();
+        const fileName = `MattyJacks-Valley-Net-Convo-Sum_${randomId}.md`;
+        const fileContent = `# Conversation Summary\n\n**Original Conversation:** ${session.title}\n**Generated:** ${new Date().toLocaleString()}\n**Message Count:** ${session.messages.length}\n\n---\n\n${data.message}`;
+
+        const newFile = {
+          id: randomId,
+          name: fileName,
+          date: Date.now(),
+          preview: data.message.slice(0, 200)
+        };
+
+        setSumUpFiles([newFile, ...sumUpFiles]);
+        localStorage.setItem('sumUpFiles', JSON.stringify([newFile, ...sumUpFiles]));
+
+        // Auto-download
+        const blob = new Blob([fileContent], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Sum Up error:', err);
+    }
+  };
 
   useEffect(() => {
     const calcThreeSize = () => {
@@ -218,7 +311,6 @@ export default function AnythingButton() {
       // Smaller footprint: favor lower-right corner
       return vw < 640 ? Math.max(110, Math.min(base * 0.30, 200)) : Math.max(120, Math.min(base * 0.25, 220));
     };
-    setThreeSize(calcThreeSize());
     const handleResize = () => setThreeSize(calcThreeSize());
     window.addEventListener('resize', handleResize);
 
@@ -247,7 +339,6 @@ export default function AnythingButton() {
       // Lock background scroll while chat is open
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-      return () => clearTimeout(timer);
     } else {
       setMorphTarget(0);
       setChatReady(false);
@@ -269,6 +360,7 @@ export default function AnythingButton() {
     }, 4200);
     return () => clearInterval(interval);
   }, [showImageModal]);
+
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -400,7 +492,11 @@ export default function AnythingButton() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ model: selectedModel, messages: newMessages.map((m) => ({ role: m.role, content: m.content.slice(0, 5000) })) }),
+        body: JSON.stringify({ 
+          model: selectedModel, 
+          nickname: nickname, 
+          messages: newMessages.map((m) => ({ role: m.role, content: m.content.slice(0, 5000) })) 
+        }),
         signal: controller.signal,
       });
 
@@ -569,36 +665,40 @@ export default function AnythingButton() {
                 <div className="flex items-center gap-2">
                   <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat Menu</h4>
                   <button onClick={() => setShowSettings(!showSettings)} className="px-2 py-1 text-[11px] font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm" aria-label="Toggle chat settings">Settings</button>
+                  <button onClick={() => setShowSumUpMenu(!showSumUpMenu)} className="px-2 py-1 text-[11px] font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm" aria-label="Toggle sum up conversations">Sum Up</button>
                 </div>
                 <button onClick={() => setIsSidebarOpen(false)} className="p-1 text-zinc-500 hover:text-zinc-800 dark:hover:text-white"><X className="w-4 h-4" /></button>
               </div>
               <div className="flex-1 overflow-y-auto p-2 space-y-3 custom-scrollbar">
-                <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
-                    <h5 className="text-xs font-bold uppercase tracking-widest text-zinc-500">History</h5>
-                    <button onClick={createNewSession} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold shadow-sm hover:scale-[1.02] transition-transform"><Plus className="w-3.5 h-3.5" /> New</button>
-                  </div>
-                  <div className="space-y-1">
-                    {sessions.map((session) => (
-                      <div key={session.id} onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); }} className={`group flex items-center justify-between px-3 py-3 rounded-xl cursor-pointer text-sm transition-all ${currentSessionId === session.id ? "bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold" : "hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-transparent font-medium"}`}>
-                        <div className="flex items-center gap-3 truncate">
-                          <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentSessionId === session.id ? 'text-emerald-500' : 'opacity-60'}`} />
+                {showSumUpMenu ? (
+                  <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <h5 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Sum Up Conversations</h5>
+                    <div className="space-y-1">
+                      {sessions.map((session) => (
+                        <button key={session.id} onClick={() => { setSelectedSumUpSession(session.id); setShowSumUpConfirm(true); }} className="w-full text-left flex items-center justify-between px-3 py-2 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 text-sm text-zinc-700 dark:text-zinc-300 transition-colors">
                           <span className="truncate">{session.title}</span>
-                        </div>
-                        <button onClick={(e) => deleteSession(e, session.id)} className="opacity-0 group-hover:opacity-100 hover:text-sky-600 transition-opacity p-1 bg-zinc-200/50 dark:bg-zinc-800 rounded-md" title="Delete Session">
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <span className="text-[10px] text-zinc-500">({session.messages.length})</span>
                         </button>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-
-                {showSettings && (
+                ) : (
                   <div className="p-3 rounded-2xl bg-white/80 dark:bg-black/30 border border-emerald-200 dark:border-emerald-800 shadow-sm space-y-3">
                     <div className="flex items-center justify-between">
                       <h5 className="text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Settings</h5>
                       <span className="text-[10px] font-bold text-emerald-500">Valley Net</span>
                     </div>
+                    <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
+                      <div className="flex flex-col">
+                        <span>Nickname</span>
+                        <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/90 font-medium">Your name in chat</span>
+                      </div>
+                      <input
+                        value={nickname}
+                        onChange={(e) => setNickname(e.target.value)}
+                        className="text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-2 py-1"
+                      />
+                    </label>
                     <label className="flex items-center justify-between text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl px-3 py-2.5">
                       <div className="flex flex-col">
                         <span>Model</span>
@@ -671,17 +771,12 @@ export default function AnythingButton() {
                   </div>
                 </motion.div>
               )}
+              <div className="flex justify-between items-center mt-3 px-1">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
+                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : "Ready"}
+                </span>
+              </div>
             </div>
-
-            {/* Scroll to bottom */}
-            <AnimatePresence>
-              {showScrollBottom && (
-                <motion.button initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} onClick={() => scrollToBottom()} className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30 bg-zinc-900/90 dark:bg-white/90 text-white dark:text-black border border-white/10 dark:border-black/10 rounded-full p-2.5 shadow-xl backdrop-blur-md">
-                  <ChevronDown className="w-5 h-5" />
-                </motion.button>
-              )}
-            </AnimatePresence>
-
             {/* Input */}
             <div className="p-4 border-t border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-xl shrink-0 z-20">
               <div className="relative flex items-end gap-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 focus-within:border-emerald-500 dark:focus-within:border-emerald-500/50 rounded-2xl shadow-sm transition-colors p-1 pl-3 pr-1.5">
@@ -720,7 +815,7 @@ export default function AnythingButton() {
 
               <div className="flex justify-between items-center mt-3 px-1">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
-                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : "Ready"}
+                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : `Ready (${messages.length}/50)`}
                 </span>
                 <div className="flex items-center gap-2">
                   {charCount > 4000 && (
@@ -776,6 +871,54 @@ export default function AnythingButton() {
               </div>
               <div className="mt-4 text-center text-white text-sm sm:text-base font-semibold italic drop-shadow-lg px-4">
                 “{TEASER_PHRASES[imageTeaserIndex]}”
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sum Up Confirmation Dialog */}
+      <AnimatePresence>
+        {showSumUpConfirm && selectedSumUpSession && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setShowSumUpConfirm(false)}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-purple-200 dark:border-purple-800"
+            >
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">Sum Up Conversation?</h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
+                This will create a markdown summary of the conversation and save it for future reference. The summary will be downloaded automatically.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowSumUpConfirm(false)}
+                  className="flex-1 px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (selectedSumUpSession) {
+                      summarizeConversation(selectedSumUpSession);
+                      setShowSumUpConfirm(false);
+                      setShowSumUpMenu(false);
+                    }
+                  }}
+                  className="flex-1 px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors"
+                >
+                  Sum Up
+                </button>
               </div>
             </motion.div>
           </motion.div>
