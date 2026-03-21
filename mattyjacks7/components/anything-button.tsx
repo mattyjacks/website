@@ -1481,7 +1481,7 @@ Create a summary that another AI can use to understand the context and continue 
               </button>
 
               <div className="flex flex-col flex-1 min-w-0">
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center justify-start gap-2">
                   <button 
                     onClick={() => {
                       setImageTeaserIndex(Math.floor(Math.random() * TEASER_PHRASES.length));
@@ -1512,9 +1512,6 @@ Create a summary that another AI can use to understand the context and continue 
                 </div>
               </div>
 
-              <div className="hidden sm:flex items-center text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-50 border border-emerald-400/30">
-                Online
-              </div>
               <button onClick={() => setIsFullscreen(!isFullscreen)} className="hidden sm:inline-flex text-white font-bold text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-md transition-colors ml-2 whitespace-nowrap relative z-50">
                 {isFullscreen ? "Minimize" : "Fullscreen"}
               </button>

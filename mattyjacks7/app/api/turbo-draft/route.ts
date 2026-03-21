@@ -62,19 +62,24 @@ STRICT RULES:
 - 2 short paragraphs MAXIMUM.
 - Do NOT start with your name or labels. Just write the raw message.`;
 
-    // Filter messages and invert roles
-    const cleanedMessages = messages.slice(-8).map((m: any) => ({
-      role: (m.role === "user" ? "assistant" : "user") as "user" | "assistant", // INVERSION
-      content: typeof m.content === "string"
-        ? m.content
-        : Array.isArray(m.content)
-          ? m.content.filter((c: any) => c.type === "text").map((c: any) => c.text).join(" ")
-          : String(m.content),
-    }));
+    // Flatten the recent history to make Wicked context grabbing super-efficient
+    // and prevent OpenRouter from crashing on mismatched role arrays.
+    const recentHistory = messages.slice(-6);
+    const historyTranscript = recentHistory.map((m: any) => {
+      const speaker = m.role === "user" ? "You" : "Valley Net";
+      const text = typeof m.content === "string" 
+        ? m.content 
+        : Array.isArray(m.content) 
+          ? m.content.filter((c: any) => c.type === "text").map((c: any) => c.text).join(" ") 
+          : String(m.content);
+      return `${speaker}: ${text}`;
+    }).join("\n\n");
+
+    const userPrompt = `[RECENT CONVERSATION HISTORY]\n${historyTranscript}\n\n[INSTRUCTION]\nWrite your (the human's) very next message. Do not write labels. Do not narrate for Valley Net.`;
 
     const draftMessages = [
       { role: "system" as const, content: systemPrompt },
-      ...cleanedMessages,
+      { role: "user" as const, content: userPrompt }
     ];
 
     let lastError: unknown;
