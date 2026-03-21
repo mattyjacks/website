@@ -34,7 +34,7 @@ export default function InternshipPage() {
               We&apos;re Hiring
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6">
-              MattyJacks <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-emerald-400">Internship</span> Opportunity
+              MattyJacks <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-400">Internship</span> Opportunity
             </h1>
             <p className="text-xl text-zinc-600 dark:text-zinc-300 leading-relaxed mb-10">
               Join our specialized internship program focused on the emerging field of <strong className="text-zinc-900 dark:text-white">Vibe Coding</strong>. Build your portfolio, learn AI-driven development, and start making money immediately.
@@ -84,7 +84,7 @@ export default function InternshipPage() {
       <section className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">The <span className="font-bold text-sky-600 dark:text-sky-400">Program</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">The <span className="font-bold text-red-600 dark:text-red-500">Program</span></p>
             <h2 className="text-3xl md:text-4xl font-bold">What You Will Do</h2>
           </div>
 
@@ -99,9 +99,9 @@ export default function InternshipPage() {
               </p>
             </div>
 
-            <div className="group rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 bg-white dark:bg-zinc-950 hover:border-sky-400 dark:hover:border-sky-500 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-              <div className="w-14 h-14 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Briefcase className="w-7 h-7 text-sky-600 dark:text-sky-400" />
+            <div className="group rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 bg-white dark:bg-zinc-950 hover:border-red-400 dark:hover:border-red-500 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <div className="w-14 h-14 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Briefcase className="w-7 h-7 text-red-600 dark:text-red-400" />
               </div>
               <h3 className="text-xl font-bold mb-3">Portfolio Building</h3>
               <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">
@@ -208,7 +208,7 @@ export default function InternshipPage() {
       <section className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Vibe <span className="font-bold text-sky-600 dark:text-sky-400">Coded</span> Examples</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">Vibe <span className="font-bold text-red-600 dark:text-red-500">Coded</span> Examples</p>
             <h2 className="text-3xl md:text-4xl font-bold">What You Will Build</h2>
           </div>
 
@@ -223,7 +223,7 @@ export default function InternshipPage() {
               <div className="p-6">
                 <h3 className="font-bold text-lg mb-2">Aicelle&apos;s First Hour</h3>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">This beautiful portfolio was built by one of our interns in her literally first hour of learning to vibe code.</p>
-                <a href="https://aicelles1stproject.vercel.app/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                <a href="https://aicelles1stproject.vercel.app/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                   View Live Site <ExternalLink className="ml-1 w-4 h-4" />
                 </a>
               </div>
@@ -236,7 +236,7 @@ export default function InternshipPage() {
               <div className="p-6">
                 <h3 className="font-bold text-lg mb-2">Quick Speculative Work</h3>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Example of a rapidly vibe-coded website demo designed to land a prospective client immediately.</p>
-                <a href="https://itxmen-demo4.vercel.app/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                <a href="https://itxmen-demo4.vercel.app/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                   View Live Site <ExternalLink className="ml-1 w-4 h-4" />
                 </a>
               </div>

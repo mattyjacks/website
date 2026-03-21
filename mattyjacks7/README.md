@@ -1,23 +1,42 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# MattyJacks.com Website & Valley Net Integration
+
+Welcome to the official repository for MattyJacks.com! This Next.js application serves as the central hub for the MattyJacks ecosystem and houses **Valley Net**, our flagship frontend AI assistant.
 
 <p align="center">
- The fastest way to build apps with Next.js and Supabase
+  <a href="#valley-net"><strong>Valley Net</strong></a> ·
+  <a href="#advanced-modes"><strong>Advanced Modes</strong></a> ·
+  <a href="#features"><strong>Base Template Features</strong></a>
 </p>
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## Valley Net
+Valley Net is a highly capable, 21-year-old female AI persona integrated directly into the site. She is designed to be enthusiastic, confident, and action-oriented. She has native text-to-speech utilizing OpenAI's TTS and dictation via Whisper.
 
-## Features
+## Advanced Modes
+
+### ⚡ Alive Speech Mode
+"Alive Speech" allows unbroken, entirely vocal conversations with Valley Net. 
+- The system constantly listens using advanced silence-detection.
+- Automatically transcribes audio, sends it to the LLM, and plays her response out loud via TTS.
+- **Voice Commands**: 
+  - `stop stop`: Aborts generation and pauses mode.
+  - `regen regen`: Forces alternative regeneration.
+  - `pause pause`: Pauses live transcription.
+  - `go go go`: Reactivates microphone.
+
+### 😈 Wicked Mode
+An 18+ explicitly uncensored version of Valley Net.
+- Connects exclusively to OpenRouter's unaligned, open-source models (like MythoMax, Liquid).
+- Retains conversational context but ignores standard safety protocols, becoming intensely aggressive and explicitly uncensored.
+
+### 🚀 Turbo Mode (Auto-Roleplay Ghostwriter)
+Available exclusively within Wicked Mode.
+- Users provide a target "Fantasy" scenario.
+- An autonomous ghostwriter LLM automatically drafts the *user's* NEXT message to explicitly advance the fantasy.
+- This creates an endless autonomous conversational loop of dynamic roleplay running for exactly 2 minutes (120 seconds).
+
+---
+
+## Base Template Features
 
 - Works across the entire [Next.js](https://nextjs.org) stack
   - App Router

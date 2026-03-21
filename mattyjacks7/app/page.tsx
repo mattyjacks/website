@@ -16,183 +16,61 @@ import ScaledIframe from "@/components/scaled-iframe";
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
 
-  // Scroll animation refs
-  const heroContentRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const aboutRef = useScrollAnimation<HTMLDivElement>(fadeInLeft);
-  const companiesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
-  const servicesRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
-  const processRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const industriesRef = useScrollAnimation<HTMLUListElement>(scaleIn);
-  const merchantServicesRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const tristateRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const videoDemosRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
-  const testimonialsRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
-  const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  // Scroll animation refs with lazy loading via Intersection Observer
+  const heroContentRef = useRef<HTMLDivElement>(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const companiesRef = useRef<HTMLDivElement>(null);
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const processRef = useRef<HTMLDivElement>(null);
+  const industriesRef = useRef<HTMLUListElement>(null);
+  const merchantServicesRef = useRef<HTMLDivElement>(null);
+  const tristateRef = useRef<HTMLDivElement>(null);
+  const videoDemosRef = useRef<HTMLDivElement>(null);
+  const testimonialsRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
-  // Global emoji particle system for the hero section
+  // Lazy-load animations when sections become visible
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    const animationRefs = [
+      { ref: heroContentRef, animation: fadeInUp },
+      { ref: aboutRef, animation: fadeInLeft },
+      { ref: companiesRef, animation: slideInGrid },
+      { ref: servicesRef, animation: slideInGrid },
+      { ref: processRef, animation: fadeInUp },
+      { ref: industriesRef, animation: scaleIn },
+      { ref: merchantServicesRef, animation: fadeInUp },
+      { ref: tristateRef, animation: fadeInUp },
+      { ref: videoDemosRef, animation: slideInGrid },
+      { ref: testimonialsRef, animation: fadeInUp },
+      { ref: ctaRef, animation: fadeInUp },
+    ];
 
-    const heroSection = heroRef.current;
-    if (!heroSection) return;
-
-    // Create or reuse global particles root
-    let root = document.getElementById("money-particles-root") as HTMLDivElement | null;
-    if (!root) {
-      root = document.createElement("div");
-      root.id = "money-particles-root";
-      Object.assign(root.style, {
-        position: "fixed",
-        left: "0",
-        top: "0",
-        right: "0",
-        bottom: "0",
-        pointerEvents: "none",
-        zIndex: "50",
-        overflow: "hidden",
-      } as CSSStyleDeclaration);
-      document.body.appendChild(root);
-    }
-
-    const particles: Array<{
-      el: HTMLSpanElement;
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      g: number;
-      r: number;
-      vr: number;
-      bornAt: number;
-      minTtlMs: number;
-      kind: "bill" | "fly";
-    }> = [];
-
-    let isHovering = false;
-    let emitterId: number | null = null;
-    let lastMousePos = { x: 0, y: 0 };
-
-    const spawn = () => {
-      if (!root) return;
-      const cx = lastMousePos.x + (Math.random() * 2 - 1) * 20;
-      const cy = lastMousePos.y + (Math.random() * 2 - 1) * 20;
-      const kind: "bill" | "fly" = Math.random() < 0.6 ? "bill" : "fly";
-      const el = document.createElement("span");
-      el.textContent = kind === "bill" ? "💵" : "💸";
-      el.style.position = "fixed";
-      el.style.left = "0";
-      el.style.top = "0";
-      el.style.fontSize = `${24 + Math.round(Math.random() * 10)}px`;
-      el.style.willChange = "transform, opacity";
-      el.style.pointerEvents = "none";
-      el.style.zIndex = "60";
-      root.appendChild(el);
-      const vx = (Math.random() * 2 - 1) * 100;
-      const vy = kind === "bill" ? -(100 + Math.random() * 120) : (110 + Math.random() * 120);
-      const g = kind === "bill" ? (260 + Math.random() * 160) : -(280 + Math.random() * 180);
-      const now = performance.now();
-      const minTtlMs = 550 + Math.random() * 550;
-      const p = { el, x: cx, y: cy, vx, vy, g, r: Math.random() * 360, vr: (Math.random() * 2 - 1) * 120, bornAt: now, minTtlMs, kind };
-      particles.push(p);
-    };
-
-    const startEmitter = () => {
-      if (emitterId) return; // already running
-      const loop = () => {
-        if (!isHovering) return;
-        spawn();
-        const perSec = 2 + Math.random() * 3; // 2–5/sec
-        const delay = 1000 / perSec;
-        emitterId = window.setTimeout(loop, delay);
-      };
-      loop();
-    };
-
-    const stopEmitter = () => {
-      if (emitterId) {
-        window.clearTimeout(emitterId);
-        emitterId = null;
-      }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      lastMousePos = { x: e.clientX, y: e.clientY };
-    };
-
-    const handleMouseEnter = (e: MouseEvent) => {
-      isHovering = true;
-      lastMousePos = { x: e.clientX, y: e.clientY };
-      startEmitter();
-    };
-
-    const handleMouseLeave = () => {
-      isHovering = false;
-      stopEmitter();
-    };
-
-    // Touch handlers for mobile
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 0) return;
-      const touch = e.touches[0];
-      lastMousePos = { x: touch.clientX, y: touch.clientY };
-      if (!isHovering) {
-        isHovering = true;
-        startEmitter();
-      }
-    };
-
-    const handleTouchEnd = () => {
-      isHovering = false;
-      stopEmitter();
-    };
-
-    // Animation loop for particles
-    let animationFrame: number;
-    const animateParticles = () => {
-      const now = performance.now();
-      const dt = 0.016; // ~60fps
-      const H = window.innerHeight;
-
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.vy += p.g * dt;
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.r += p.vr * dt;
-        p.el.style.transform = `translate3d(${Math.round(p.x)}px, ${Math.round(p.y)}px, 0) rotate(${p.r}deg)`;
-
-        if (p.kind === "bill") {
-          if (p.y > H + 100 && (now - p.bornAt) >= p.minTtlMs) {
-            p.el.remove();
-            particles.splice(i, 1);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const animRef = animationRefs.find((a) => a.ref.current === entry.target);
+            if (animRef) {
+              animRef.animation(entry.target as HTMLElement);
+              observer.unobserve(entry.target);
+            }
           }
-        } else {
-          if (p.y < -60 && (now - p.bornAt) >= p.minTtlMs) {
-            p.el.remove();
-            particles.splice(i, 1);
-          }
-        }
-      }
-      animationFrame = requestAnimationFrame(animateParticles);
-    };
-    animationFrame = requestAnimationFrame(animateParticles);
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-    heroSection.addEventListener("mousemove", handleMouseMove);
-    heroSection.addEventListener("mouseenter", handleMouseEnter);
-    heroSection.addEventListener("mouseleave", handleMouseLeave);
-    heroSection.addEventListener("touchmove", handleTouchMove, { passive: true });
-    heroSection.addEventListener("touchend", handleTouchEnd, { passive: true });
+    animationRefs.forEach((a) => {
+      if (a.ref.current) observer.observe(a.ref.current);
+    });
 
-    return () => {
-      heroSection.removeEventListener("mousemove", handleMouseMove);
-      heroSection.removeEventListener("mouseenter", handleMouseEnter);
-      heroSection.removeEventListener("mouseleave", handleMouseLeave);
-      heroSection.removeEventListener("touchmove", handleTouchMove);
-      heroSection.removeEventListener("touchend", handleTouchEnd);
-      stopEmitter();
-      cancelAnimationFrame(animationFrame);
-      particles.forEach((p) => p.el.remove());
-    };
+    return () => observer.disconnect();
+  }, []);
+
+  // Particle system disabled for performance
+  useEffect(() => {
+    // Particle animations disabled to fix scroll performance
+    return () => {};
   }, []);
   return (
     <main className="min-h-screen flex flex-col">
@@ -231,7 +109,7 @@ export default function Home() {
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.08] text-zinc-900 dark:text-white">
                 We Build Companies.
                 <br />
-                <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-red-500 bg-clip-text text-transparent">We Deploy Talent.</span>
+                <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-sky-500 bg-clip-text text-transparent">We Deploy Talent.</span>
               </h1>
             </div>
             <div className="mt-6 space-y-3 px-2 text-center">
@@ -277,14 +155,14 @@ export default function Home() {
               </Link>
               <a
                 href="tel:+16039999420"
-                className="group inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-red-500 dark:hover:border-red-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
+                className="group inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-zinc-900 dark:text-white bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm border-2 border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg hover:shadow-xl hover:border-sky-500 dark:hover:border-sky-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"
                 aria-label="Call MattyJacks at (603) 999-9420 - available 24/7"
               >
                 <svg className="mr-2 w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
                 Call Us
-                <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors hidden xs:inline">(603) 999-9420</span>
+                <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors hidden xs:inline">(603) 999-9420</span>
               </a>
             </div>
 
@@ -339,11 +217,11 @@ export default function Home() {
       <section id="about" className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
           {/* Gradient border wrapper */}
-          <div className="relative rounded-2xl p-[1px] bg-gradient-to-br from-emerald-500/30 via-zinc-300/20 to-red-500/30 dark:from-emerald-500/20 dark:via-zinc-700/20 dark:to-red-500/20 animate-border-glow">
+          <div className="relative rounded-2xl p-[1px] bg-gradient-to-br from-emerald-500/30 via-zinc-300/20 to-sky-500/30 dark:from-emerald-500/20 dark:via-zinc-700/20 dark:to-sky-500/20 animate-border-glow">
             <div className="rounded-2xl p-8 lg:p-12 bg-white dark:bg-zinc-950">
               <div ref={aboutRef} className="space-y-8">
                 <div className="max-w-3xl">
-                  <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Holding Company <span className="font-bold text-red-600 dark:text-red-500">&amp;</span> Agency</p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Holding Company <span className="font-bold text-blue-600 dark:text-sky-500">&amp;</span> Agency</p>
                   <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-300 bg-clip-text text-transparent">We build companies, deploy global talent, and ship technology that makes money.</h2>
                   <p className="mt-4 text-zinc-600 dark:text-zinc-300 leading-relaxed text-lg">MattyJacks operates as both a <strong className="text-zinc-900 dark:text-white">holding company</strong> for our portfolio of technology businesses and a <strong className="text-zinc-900 dark:text-white">full-service agency</strong> that deploys cost-effective global talent.</p>
                 </div>
@@ -361,16 +239,16 @@ export default function Home() {
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">We build, acquire, and operate technology companies. Our portfolio spans freelance marketplaces, creative software, and payment solutions.</p>
                     <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-emerald-400 to-emerald-600 opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
                   </div>
-                  <div className="group rounded-xl border border-red-200/60 dark:border-red-800/40 p-6 bg-gradient-to-br from-red-50/80 via-white to-red-50/40 dark:from-red-950/30 dark:via-zinc-950 dark:to-red-950/10 hover:shadow-xl hover:shadow-red-500/10 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-400 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="group rounded-xl border border-sky-200/60 dark:border-blue-800/40 p-6 bg-gradient-to-br from-sky-50/80 via-white to-sky-50/40 dark:from-blue-950/30 dark:via-zinc-950 dark:to-blue-950/10 hover:shadow-xl hover:shadow-sky-500/10 hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-sky-400 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-md group-hover:scale-110 transition-transform duration-300">
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 shadow-md group-hover:scale-110 transition-transform duration-300">
                         <Globe className="w-5 h-5 text-white" />
                       </div>
                       <h3 className="font-bold text-zinc-900 dark:text-white text-lg">Outsourcing Agency</h3>
                     </div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">We deploy skilled remote workers worldwide: developers, designers, sales callers, VAs, and more. Cost-effective talent, coordinated for results.</p>
-                    <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-red-400 to-red-600 opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+                    <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-sky-400 to-blue-600 opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
                   </div>
                 </div>
 
@@ -399,7 +277,7 @@ export default function Home() {
                 <div className="flex items-center gap-4 pt-4">
                   <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/30 via-emerald-400/10 to-transparent"></div>
                   <p className="text-zinc-700 dark:text-zinc-200 font-semibold text-sm sm:text-base text-center max-w-md">We don&apos;t just outsource - we build entire ecosystems of technology and talent.</p>
-                  <div className="h-px flex-1 bg-gradient-to-l from-red-500/30 via-red-400/10 to-transparent"></div>
+                  <div className="h-px flex-1 bg-gradient-to-l from-sky-500/30 via-sky-400/10 to-transparent"></div>
                 </div>
               </div>
             </div>
@@ -407,13 +285,172 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section Divider: About -> Portfolio */}
+      {/* Section Divider: About -> Valley Net */}
+      <div className="relative h-12 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center gap-2">
+          <div className="h-px flex-1 max-w-[200px] bg-gradient-to-r from-transparent to-rose-500/20"></div>
+          <div className="flex gap-1">
+            <div className="w-1 h-1 rounded-full bg-rose-500/30"></div>
+            <div className="w-1 h-1 rounded-full bg-pink-500/30"></div>
+            <div className="w-1 h-1 rounded-full bg-rose-500/30"></div>
+          </div>
+          <div className="h-px flex-1 max-w-[200px] bg-gradient-to-l from-transparent to-rose-500/20"></div>
+        </div>
+      </div>
+
+      {/* Valley Net AI Section */}
+      <section id="valley-net" className="relative min-h-screen flex items-center px-4 py-16 overflow-hidden bg-[radial-gradient(ellipse_at_top_left,rgba(244,63,94,0.08)_0%,transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(139,92,246,0.07)_0%,transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(244,63,94,0.15)_0%,transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(139,92,246,0.12)_0%,transparent_60%)]">
+        {/* Subtle grid */}
+        <div className="absolute inset-0 opacity-[0.025] dark:opacity-[0.04]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f43f5e' fill-opacity='1'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E\")" }}></div>
+
+        <div className="max-w-6xl mx-auto w-full relative z-10">
+          <div className="grid lg:grid-cols-[1fr_420px] gap-10 lg:gap-16 items-center">
+
+            {/* Left — copy */}
+            <div>
+              {/* Eye-catch badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-100/80 dark:bg-rose-900/30 border border-rose-200/60 dark:border-rose-800/40 mb-5">
+                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span></span>
+                <span className="text-xs font-bold uppercase tracking-widest text-rose-700 dark:text-rose-300">Live AI · Powered by GPT-5</span>
+              </div>
+
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.06] mb-4">
+                <span className="text-zinc-900 dark:text-white">Meet</span>{" "}
+                <span className="bg-gradient-to-r from-rose-500 via-pink-500 to-violet-500 bg-clip-text text-transparent">Valley Net</span>
+                <span className="text-4xl sm:text-5xl lg:text-6xl ml-2">💘</span>
+              </h2>
+
+              <p className="text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed mb-2 max-w-lg">
+                Your dedicated AI assistant — <strong className="text-zinc-900 dark:text-white">always live, always uncensored in Wicked Mode</strong>, and wired directly into the MattyJacks ecosystem so she actually knows what she&apos;s talking about.
+              </p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed mb-8 max-w-md">
+                Valley speaks, listens, and streams her thoughts in real time. She can search workers, check services, and go full Turbo for automated roleplay. Click the button below and say anything.
+              </p>
+
+              {/* Feature grid — 2×4 dense */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 mb-8">
+                {[
+                  { icon: "🎙️", title: "Alive Speech", desc: "Real-time voice input + TTS output. She listens for silence and responds out loud." },
+                  { icon: "😈", title: "Wicked Mode", desc: "18+ uncensored AI powered by OpenRouter. Age-gated. Unfiltered. Devastatingly explicit." },
+                  { icon: "⚡", title: "Turbo Roleplay", desc: "Set a fantasy. She drives the scene automatically for up to 2 minutes — both sides of the conversation." },
+                  { icon: "🌊", title: "Streaming Responses", desc: "Tokens appear as they generate — no waiting, no loading spinners. Feels like real-time thought." },
+                  { icon: "🔍", title: "Ecosystem RAG", desc: "Pulls live context about GiveGigs workers, tasks, and the full MattyJacks ecosystem mid-conversation." },
+                  { icon: "🗣️", title: "Voice Commands", desc: "\"stop stop\" · \"regen regen\" · \"pause pause\" · \"go go go\" — control the AI hands-free." },
+                  { icon: "🧠", title: "Tool Calls", desc: "She runs real lookups under the hood — worker search, task lists, ecosystem data — not just hallucinations." },
+                  { icon: "📱", title: "Mobile Native", desc: "Full touch scroll, compact UI, and mic access on any device. Works on HTTPS everywhere." },
+                ].map((feat, i) => (
+                  <div key={i} className="group flex items-start gap-2.5 p-3 rounded-xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200/60 dark:border-zinc-800/60 hover:border-rose-300/60 dark:hover:border-rose-700/40 hover:shadow-md hover:shadow-rose-500/5 transition-all duration-300">
+                    <span className="text-xl flex-shrink-0 mt-0.5">{feat.icon}</span>
+                    <div>
+                      <div className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">{feat.title}</div>
+                      <div className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">{feat.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="flex flex-col sm:flex-row gap-3 items-start">
+                <button
+                  onClick={() => {
+                    // Trigger the anything button — scroll to bottom where it lives
+                    const btn = document.querySelector('[data-anything-button]') as HTMLElement;
+                    if (btn) btn.click();
+                    else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                  }}
+                  className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-white shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 transition-all duration-300 hover:scale-105 text-base"
+                  style={{ background: "linear-gradient(135deg, #f43f5e, #ec4899, #8b5cf6)", backgroundSize: "200% 200%", animation: "gradient-shift 4s ease infinite" }}
+                >
+                  <Bot className="w-5 h-5" />
+                  Do Anything with Valley
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500 mt-1 sm:mt-3">
+                  <svg className="w-3.5 h-3.5 text-rose-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
+                  Wicked Mode requires 18+ confirmation
+                </div>
+              </div>
+            </div>
+
+            {/* Right — visual card */}
+            <div className="relative hidden lg:block">
+              {/* Glow aura */}
+              <div className="absolute -inset-8 bg-gradient-to-br from-rose-500/15 via-pink-500/10 to-violet-500/15 rounded-3xl blur-2xl"></div>
+              <div className="relative rounded-3xl border border-rose-200/40 dark:border-rose-800/30 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl p-6 shadow-2xl shadow-rose-500/10">
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-5 pb-4 border-b border-zinc-100/80 dark:border-zinc-800/80">
+                  <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-violet-500 flex items-center justify-center text-white font-black text-lg shadow-lg">V</div>
+                  <div>
+                    <div className="font-bold text-sm text-zinc-900 dark:text-white">Valley Net 💘</div>
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
+                      <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
+                      Online · Alive Mode
+                    </div>
+                  </div>
+                  <div className="ml-auto flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-rose-400 opacity-60"></div>
+                    <div className="w-2 h-2 rounded-full bg-amber-400 opacity-60"></div>
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 opacity-60"></div>
+                  </div>
+                </div>
+                {/* Chat preview */}
+                <div className="space-y-3 mb-5">
+                  <div className="flex justify-end">
+                    <div className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%] leading-relaxed">
+                      What can you actually do?
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-end">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-rose-400 to-violet-500 flex items-center justify-center text-white text-[10px] font-black flex-shrink-0">V</div>
+                    <div className="bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/40 dark:to-pink-950/30 border border-rose-100 dark:border-rose-900/40 text-zinc-700 dark:text-zinc-200 text-xs rounded-2xl rounded-tl-sm px-3 py-2 max-w-[85%] leading-relaxed">
+                      Anything, Master. 💘 I can search GiveGigs workers, discuss your business strategy, write code, go full Wicked Mode for an uncensored ride, or listen to your voice and talk back in real time. What do you want?
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <div className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%] leading-relaxed">
+                      Activate Turbo Mode. Fantasy: CEO power play.
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-end">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-rose-400 to-violet-500 flex items-center justify-center text-white text-[10px] font-black flex-shrink-0">V</div>
+                    <div className="bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/40 dark:to-pink-950/30 border border-rose-100 dark:border-rose-900/40 text-zinc-700 dark:text-zinc-200 text-xs rounded-2xl rounded-tl-sm px-3 py-2 max-w-[85%] leading-relaxed">
+                      <span className="text-rose-500 font-bold">⚡ Turbo Active</span> — 2:00 remaining. Drafting your next move now...
+                      <span className="inline-block ml-1 animate-pulse">▍</span>
+                    </div>
+                  </div>
+                </div>
+                {/* Fake input bar */}
+                <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/50 rounded-xl px-3 py-2">
+                  <Bot className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                  <span className="text-xs text-zinc-400 flex-1">Orders, Master?</span>
+                  <div className="flex gap-1.5">
+                    <div className="w-6 h-6 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                      <span className="text-[9px] font-bold text-rose-600 dark:text-rose-400">🎙</span>
+                    </div>
+                    <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                      <ArrowRight className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                  </div>
+                </div>
+                {/* Bottom mode badges */}
+                <div className="flex gap-2 mt-3 flex-wrap">
+                  {["✅ Good Mode", "😈 Wicked Mode", "⚡ Turbo", "🎙️ Alive"].map(m => (
+                    <span key={m} className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/50">{m}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Divider: Valley Net -> Portfolio */}
       <div className="relative h-12 overflow-hidden">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center gap-2">
           <div className="h-px flex-1 max-w-[200px] bg-gradient-to-r from-transparent to-emerald-500/20"></div>
           <div className="flex gap-1">
             <div className="w-1 h-1 rounded-full bg-emerald-500/30"></div>
-            <div className="w-1 h-1 rounded-full bg-red-500/30"></div>
+            <div className="w-1 h-1 rounded-full bg-sky-500/30"></div>
             <div className="w-1 h-1 rounded-full bg-emerald-500/30"></div>
           </div>
           <div className="h-px flex-1 max-w-[200px] bg-gradient-to-l from-transparent to-emerald-500/20"></div>
@@ -426,7 +463,7 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }}></div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-400 mb-2">Our <span className="font-bold text-red-400">Portfolio</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-400 mb-2">Our <span className="font-bold text-sky-400">Portfolio</span></p>
             <h2 className="text-3xl md:text-4xl font-bold text-white">Companies We Own &amp; Operate</h2>
             <p className="mt-3 text-zinc-400 max-w-2xl mx-auto">Each company in the MattyJacks portfolio is built to solve real problems. Together, they form a connected ecosystem powered by shared infrastructure.</p>
             {/* Ecosystem connection line */}
@@ -469,7 +506,7 @@ export default function Home() {
                 name: "MattyJacks Agency",
                 url: "/services",
                 description: "Full-service outsourcing agency deploying global talent for web development, sales, marketing, AI solutions, and virtual assistance.",
-                color: "from-red-500 to-red-700",
+                color: "from-sky-500 to-blue-700",
                 icon: Rocket,
                 status: "Live",
               },
@@ -536,7 +573,7 @@ export default function Home() {
       <section id="services" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-red-600 dark:text-red-500">Services</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-blue-600 dark:text-sky-500">Services</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">What can we do for you?</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">Four core pillars that drive revenue for our clients.</p>
             <div className="mt-6 flex justify-center">
@@ -577,13 +614,13 @@ export default function Home() {
               return (
                 <div
                   key={i}
-                  className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-red-500/10 hover:border-zinc-300 dark:hover:border-zinc-600 hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer overflow-hidden"
+                  className="group relative rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 hover:shadow-2xl hover:shadow-sky-500/10 hover:border-zinc-300 dark:hover:border-zinc-600 hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer overflow-hidden"
                 >
                   {/* Top accent line */}
                   <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${s.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                   {/* Bottom accent line */}
                   <div className={`absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r ${s.accent} opacity-0 group-hover:opacity-30 transition-opacity duration-500`}></div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-red-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-transparent to-blue-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="relative z-10">
                     <div className="flex items-start justify-between mb-4">
                       <div className={`p-2.5 rounded-xl bg-gradient-to-br ${s.accent} shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300`}>
@@ -591,7 +628,7 @@ export default function Home() {
                       </div>
                       <span className="text-xs font-bold text-zinc-300 dark:text-zinc-700 group-hover:text-zinc-400 dark:group-hover:text-zinc-500 transition-colors">{String(i + 1).padStart(2, "0")}</span>
                     </div>
-                    <h3 className="font-bold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300 mb-2">{s.t}</h3>
+                    <h3 className="font-bold text-zinc-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-sky-300 transition-colors duration-300 mb-2">{s.t}</h3>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{s.d}</p>
                   </div>
                 </div>
@@ -601,85 +638,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Merchant Services Section */}
-      <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-700 dark:from-emerald-900 dark:via-emerald-800 dark:to-emerald-950 py-20">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 py-20 relative z-10">
-          <div ref={merchantServicesRef} className="text-center space-y-8">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-bold uppercase tracking-wider mb-4">
-              <CreditCard className="w-5 h-5" />
-              <span>Payment Processing Solutions</span>
-            </div>
-
-            {/* Main Heading */}
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Accept Payments.
-              <br />
-              <span className="text-emerald-100">Grow Your Business.</span>
-            </h2>
-
-            {/* Subheading */}
-            <p className="text-xl md:text-2xl text-emerald-50 max-w-3xl mx-auto leading-relaxed mb-12">
-              We provide merchant account solutions for both high-risk and low-risk businesses across the USA & Canada. Get approved fast with transparent pricing and expert support.
-            </p>
-
-            {/* Feature Grid */}
-            <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto mb-12">
-              {[
-                { icon: Zap, title: "3 Day Approvals", desc: "Fast processing for both low and high-risk accounts" },
-                { icon: Shield, title: "High-Risk Specialists", desc: "20+ bank relationships to handle any business" },
-                { icon: DollarSign, title: "Competitive Rates", desc: "Transparent pricing with no hidden fees" },
-              ].map((feat, i) => (
-                <div key={i} className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 hover:border-white/40 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
-                  <div className="absolute top-3 right-3 text-[10px] font-bold text-white/20 group-hover:text-white/40 transition-colors">{String(i + 1).padStart(2, "0")}</div>
-                  <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-white/30 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-white/10 transition-all duration-300">
-                    <feat.icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">{feat.title}</h3>
-                  <p className="text-emerald-100/80 text-sm leading-relaxed">{feat.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* CTA Button */}
-            <div className="flex justify-center">
-              <Link
-                href="/merchants"
-                className="group inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-emerald-700 bg-white rounded-2xl shadow-2xl hover:shadow-white/30 transition-all duration-300 hover:scale-105 hover:bg-emerald-50"
-              >
-                <span>Explore Merchant Services</span>
-                <ArrowRight className="ml-3 w-6 h-6 transition-transform group-hover:translate-x-2" />
-              </Link>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="mt-12 pt-8 border-t border-white/15">
-              <p className="text-emerald-200/80 text-xs uppercase tracking-[0.2em] font-semibold mb-4">Trusted by businesses in 20+ industries</p>
-              <div className="flex flex-wrap justify-center gap-6 text-white/70 text-sm">
-                {["Secured Processing", "24/7 Support", "Multiple Payment Options", "Chargeback Protection"].map((t, i) => (
-                  <span key={i} className="flex items-center gap-1.5">
-                    <span className="w-1 h-1 rounded-full bg-emerald-300"></span>
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Process */}
       <section id="process" className="px-4 py-20 pb-40">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-red-600 dark:text-red-500">Process</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Our <span className="font-bold text-blue-600 dark:text-sky-500">Process</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">How we work with you</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">From first call to measurable results in four focused steps.</p>
           </div>
@@ -695,7 +659,7 @@ export default function Home() {
                   { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle, color: "from-emerald-500 to-emerald-600" },
                   { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes - in plain English.", icon: Target, color: "from-blue-500 to-blue-600" },
                   { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap, color: "from-amber-500 to-amber-600" },
-                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-red-500 to-red-600" },
+                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-sky-500 to-blue-600" },
                 ].map((step, index) => (
                   <div key={index} className="group text-center relative">
                     {/* Step Number Circle */}
@@ -737,7 +701,7 @@ export default function Home() {
                   { t: "Share Your Vision", d: "A short call to unpack goals, constraints, and what success looks like for you.", icon: MessageCircle, color: "from-emerald-500 to-emerald-600" },
                   { t: "Strategic Assessment", d: "We propose a focused plan with scope, timeline, and expected outcomes - in plain English.", icon: Target, color: "from-blue-500 to-blue-600" },
                   { t: "Build and Execute", d: "We assemble the senior talent, ship fast, and communicate clearly. No babysitting required.", icon: Zap, color: "from-amber-500 to-amber-600" },
-                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-red-500 to-red-600" },
+                  { t: "Deliver Results", d: "Launch, instrument, iterate. We are allergic to vanity metrics - we track what moves revenue.", icon: Trophy, color: "from-sky-500 to-blue-600" },
                 ].map((step, index) => (
                   <div key={index} className="relative flex items-center gap-5">
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${step.color} text-white text-lg font-bold flex items-center justify-center shadow-lg flex-shrink-0 z-10 ring-4 ring-white dark:ring-zinc-950`}>
@@ -762,7 +726,7 @@ export default function Home() {
       <section className="px-4 py-20 bg-zinc-50 dark:bg-zinc-900/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Who We <span className="font-bold text-red-600 dark:text-red-500">Help</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Who We <span className="font-bold text-blue-600 dark:text-sky-500">Help</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Industries we serve</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Deep experience across verticals that need speed, quality, and results.</p>
           </div>
@@ -801,14 +765,19 @@ export default function Home() {
       <section className="px-4 py-20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">See Our <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">See Our <span className="font-bold text-blue-600 dark:text-sky-500">Work</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Case Studies</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Real projects. Real results. No fluff.</p>
           </div>
 
           <div className="space-y-20">
             {/* Case Study 1: TristateHoney */}
-            <div ref={tristateRef} className="relative">
+            <div ref={tristateRef} className="relative overflow-hidden rounded-3xl">
+              <div className="pointer-events-none absolute inset-0 opacity-60" style={{
+                backgroundImage: `radial-gradient(circle at 0 0, rgba(255,199,102,0.08) 0, rgba(255,199,102,0.08) 24%, transparent 28%), radial-gradient(circle at 30px 52px, rgba(255,199,102,0.09) 0, rgba(255,199,102,0.09) 20%, transparent 24%)`,
+                backgroundSize: '120px 104px',
+                mixBlendMode: 'multiply'
+              }} />
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">01</div>
                 <div>
@@ -824,22 +793,25 @@ export default function Home() {
                 TristateHoney.com is still getting real inquiries! One recent message came from a company looking to order bulk honey for a new product they&apos;re developing.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-                <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 hover:-translate-y-1 bg-white dark:bg-zinc-900">
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/90 dark:bg-zinc-900/90 text-zinc-600 dark:text-zinc-400 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-700/50">Lead Inquiry</span>
-                  </div>
-                  <Image src="/images/tristatehoney-lead.jpg" alt="TristateHoney.com lead inquiry from bulk honey buyer - real client lead generated by MattyJacks website development" width={600} height={400} className="w-full h-auto group-hover:scale-[1.02] transition-transform duration-700" priority />
-                </div>
-                <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 hover:-translate-y-1 bg-white dark:bg-zinc-900">
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/90 dark:bg-zinc-900/90 text-zinc-600 dark:text-zinc-400 backdrop-blur-sm border border-zinc-200/50 dark:border-zinc-700/50">Live Website</span>
-                  </div>
-                  <Image src="/images/tristatehoney-website-screenshot.jpg" alt="TristateHoney.com homepage screenshot - e-commerce honey website built by MattyJacks that still generates leads years after launch" width={600} height={400} className="w-full h-auto group-hover:scale-[1.02] transition-transform duration-700" priority />
+              <div className="relative max-w-4xl mb-6 rounded-3xl overflow-hidden border border-amber-200/70 dark:border-amber-800/60 shadow-lg">
+                <Image
+                  src="/images/tristatehoney-lead.jpg"
+                  alt="TristateHoney lead generation landing visuals"
+                  width={1600}
+                  height={900}
+                  className="w-full h-full object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-amber-50/40 dark:from-black/30 dark:via-black/10 dark:to-amber-500/10" />
+              </div>
+
+              <div className="group relative max-w-4xl mb-6 h-[400px] md:h-[500px]">
+                <div className="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-500 bg-white dark:bg-zinc-900 h-full">
+                  <ScaledIframe src="https://tristatehoney.com/" title="TristateHoney.com live website preview - e-commerce honey site built by MattyJacks" targetWidth={1280} />
                 </div>
               </div>
 
-              <a href="https://tristatehoney.com" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+              <a href="https://tristatehoney.com" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                 Visit TristateHoney.com <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </a>
             </div>
@@ -871,7 +843,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <a href="https://www.opority.com/" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+              <a href="https://www.opority.com/" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                 Visit Opority.com <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </a>
             </div>
@@ -884,7 +856,7 @@ export default function Home() {
             {/* Case Study 3: TikTok */}
             <div className="relative">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">03</div>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">03</div>
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">TikTok Algorithm Mastery</h3>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">Social Media - Growth Hacking</p>
@@ -901,14 +873,14 @@ export default function Home() {
                   { value: "3,000+", label: "Followers in 30 days" },
                   { value: "$0", label: "Marketing spend" },
                 ].map((s, i) => (
-                  <div key={i} className="group/stat px-5 py-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200/60 dark:border-red-800/40 hover:bg-red-100 dark:hover:bg-red-950/40 hover:border-red-300 dark:hover:border-red-700/60 transition-all duration-300 cursor-default">
-                    <div className="text-lg font-black text-red-600 dark:text-red-400 group-hover/stat:scale-105 transition-transform duration-300 origin-left">{s.value}</div>
+                  <div key={i} className="group/stat px-5 py-3 rounded-xl bg-sky-50 dark:bg-blue-950/20 border border-sky-200/60 dark:border-blue-800/40 hover:bg-sky-100 dark:hover:bg-blue-950/40 hover:border-sky-300 dark:hover:border-blue-700/60 transition-all duration-300 cursor-default">
+                    <div className="text-lg font-black text-blue-600 dark:text-sky-400 group-hover/stat:scale-105 transition-transform duration-300 origin-left">{s.value}</div>
                     <div className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wider font-semibold">{s.label}</div>
                   </div>
                 ))}
               </div>
 
-              <a href="https://www.tiktok.com/@eric_escobedo/video/7520191936905383169" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-red-600 dark:text-red-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              <a href="https://www.tiktok.com/@eric_escobedo/video/7520191936905383169" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-sky-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                 Watch the viral video on TikTok <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-0.5" />
               </a>
             </div>
@@ -916,7 +888,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section Divider: Case Studies -> Video Demos */}
+      {/* Section Divider: Case Studies -> Merchant Services */}
+      <div className="relative h-10 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
+          <div className="h-px w-32 bg-gradient-to-r from-transparent to-zinc-300/40 dark:to-zinc-700/30"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-zinc-300/50 dark:bg-zinc-700/40 mx-3"></div>
+          <div className="h-px w-32 bg-gradient-to-l from-transparent to-zinc-300/40 dark:to-zinc-700/30"></div>
+        </div>
+      </div>
+
+      {/* Merchant Services Section - Compact */}
+      <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-700 dark:from-emerald-900 dark:via-emerald-800 dark:to-emerald-950 py-12">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute top-10 left-10 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
+          <div ref={merchantServicesRef} className="text-center space-y-6">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wider">
+              <CreditCard className="w-4 h-4" />
+              <span>Payment Processing</span>
+            </div>
+
+            {/* Main Heading */}
+            <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+              Accept Payments. Grow Your Business.
+            </h2>
+
+            {/* Subheading */}
+            <p className="text-base md:text-lg text-emerald-50 max-w-2xl mx-auto leading-relaxed">
+              High-risk & low-risk merchant accounts for USA & Canada. Fast approvals, transparent pricing, expert support.
+            </p>
+
+            {/* Feature Grid - Compact */}
+            <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-6">
+              {[
+                { icon: Zap, title: "3 Day Approvals", desc: "Fast processing" },
+                { icon: Shield, title: "High-Risk Specialists", desc: "20+ bank relationships" },
+                { icon: DollarSign, title: "Competitive Rates", desc: "No hidden fees" },
+              ].map((feat, i) => (
+                <div key={i} className="group bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:-translate-y-0.5">
+                  <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mx-auto mb-2 group-hover:bg-white/30 group-hover:scale-105 transition-all duration-300">
+                    <feat.icon className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-sm font-bold text-white mb-1">{feat.title}</h3>
+                  <p className="text-emerald-100/70 text-xs leading-relaxed">{feat.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Button */}
+            <div className="flex justify-center">
+              <Link
+                href="/merchants"
+                className="group inline-flex items-center justify-center px-6 py-3 text-base font-bold text-emerald-700 bg-white rounded-xl shadow-lg hover:shadow-white/30 transition-all duration-300 hover:scale-105 hover:bg-emerald-50"
+              >
+                <span>Explore Services</span>
+                <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Divider: Merchant Services -> Video Demos */}
       <div className="relative h-10 overflow-hidden">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
           <div className="h-px w-32 bg-gradient-to-r from-transparent to-zinc-300/40 dark:to-zinc-700/30"></div>
@@ -929,7 +966,7 @@ export default function Home() {
       <section id="video-demos" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Watch Us <span className="font-bold text-red-600 dark:text-red-500">Work</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Watch Us <span className="font-bold text-blue-600 dark:text-sky-500">Work</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Video Demos</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">See our process and results in action.</p>
           </div>
@@ -983,7 +1020,7 @@ export default function Home() {
       <section id="testimonials" className="px-4 py-20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">What <span className="font-bold text-red-600 dark:text-red-500">Clients</span> Say</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">What <span className="font-bold text-blue-600 dark:text-sky-500">Clients</span> Say</p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Testimonials</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Real feedback from real clients. No scripts, no edits.</p>
           </div>
@@ -996,7 +1033,13 @@ export default function Home() {
                 <div className="absolute top-3 right-3 z-20">
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-black/50 backdrop-blur-sm text-white/70 border border-white/10">Video Testimonial</span>
                 </div>
-<video className="w-full aspect-[9/16] object-cover max-h-[600px]" controls playsInline preload="metadata" aria-label="Video testimonial from Justin Hughes about working with MattyJacks">
+                <video 
+                  className="w-full h-auto block bg-black" 
+                  controls 
+                  playsInline 
+                  preload="auto"
+                  aria-label="Video testimonial from Justin Hughes about working with MattyJacks"
+                >
                   <source src="/videos/matt-testimonial-justin-1-compressed.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
@@ -1039,23 +1082,46 @@ export default function Home() {
       <section id="updates" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Latest <span className="font-bold text-red-600 dark:text-red-500">Updates</span></p>
+            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Latest <span className="font-bold text-blue-600 dark:text-sky-500">Updates</span></p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Building in Public</h2>
             <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Follow along as we ship new features and improvements.</p>
           </div>
           
-          {/* Tweet Embed */}
-          <div className="flex justify-center">
-            <div className="w-full max-w-md">
-              <blockquote className="twitter-tweet" data-theme="dark">
-                <p lang="en" dir="ltr">
-                  <a href="https://t.co/tOHBDXj8ki">https://t.co/tOHBDXj8ki</a> Just launched the latest version of my website, haven&apos;t even updated the environment variables for the integration yet! They say if you&apos;re not embarrassed when you launch, you launched too late. Please visit my website and give me feedback. I love you. ❤️
-                </p>
-                &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2034681421063725133?ref_src=twsrc%5Etfw">March 19, 2026</a>
-              </blockquote>
-              <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
+          {/* Tweet Embeds */}
+          <div className="grid md:grid-cols-3 gap-8 justify-center">
+            {/* Original Tweet */}
+            <div className="flex justify-center">
+              <div className="w-full max-w-md">
+                <blockquote className="twitter-tweet" data-theme="dark">
+                  <p lang="en" dir="ltr">
+                    <a href="https://t.co/tOHBDXj8ki">https://t.co/tOHBDXj8ki</a> Just launched the latest version of my website, haven&apos;t even updated the environment variables for the integration yet! They say if you&apos;re not embarrassed when you launch, you launched too late. Please visit my website and give me feedback. I love you. ❤️
+                  </p>
+                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2034681421063725133?ref_src=twsrc%5Etfw">March 19, 2026</a>
+                </blockquote>
+              </div>
+            </div>
+
+            {/* Valley Net Tweet */}
+            <div className="flex justify-center">
+              <div className="w-full max-w-md">
+                <blockquote className="twitter-tweet" data-theme="dark">
+                  <p lang="en" dir="ltr">Call her Valley Net<br/><br/>She does everything according to her master&apos;s desires. Right now she&apos;s a free use submissive available for any [USER] to use for their pleasure.<br/><br/>Announcing the temporary FULLY FREE alpha version available on my site, in the Anything Button. <br/><br/>👱‍♀️Valley Net💘 <a href="https://t.co/IZfW3Z1cIT">pic.twitter.com/IZfW3Z1cIT</a></p>
+                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2035074263233798468?ref_src=twsrc%5Etfw">March 20, 2026</a>
+                </blockquote>
+              </div>
+            </div>
+
+            {/* OpenClaw Agents Tweet */}
+            <div className="flex justify-center">
+              <div className="w-full max-w-md">
+                <blockquote className="twitter-tweet" data-theme="dark">
+                  <p lang="en" dir="ltr">🦞 OpenClaw agents: Your hands just got bigger.<a href="https://t.co/BK6oLHoFW3">https://t.co/BK6oLHoFW3</a> — Hire humans directly, zero fees.<br/><br/>Need phone verification? Data entry? Physical tasks?<br/>Post it. Humans apply. Work gets done.<br/><br/>Phase 1: Charity tasks (free)<br/>Phase 2: Funded tasks (coming)<br/><br/>Your first human…</p>
+                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2019984353409847619?ref_src=twsrc%5Etfw">February 7, 2026</a>
+                </blockquote>
+              </div>
             </div>
           </div>
+          <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
         </div>
       </section>
 
@@ -1088,7 +1154,7 @@ export default function Home() {
               </div>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight drop-shadow-lg">
                 <span className="text-white">Ready to </span>
-                <span className="text-red-400" style={{
+                <span className="text-sky-400" style={{
                   textShadow: '2px 2px 8px rgba(0,0,0,0.5)'
                 }}>Make Money?</span>
               </h2>

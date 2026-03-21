@@ -174,9 +174,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <Link
                   href="/services"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   Services
                 </Link>
               </li>
@@ -184,9 +184,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <Link
                   href="/merchants"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   Merchant Services
                 </Link>
               </li>
@@ -194,9 +194,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <Link
                   href="/resumes"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   Resume Sites
                 </Link>
               </li>
@@ -204,9 +204,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <Link
                   href="/internship"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   Internships
                 </Link>
               </li>
@@ -214,9 +214,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <a
                   href="https://givegigs.com"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   GiveGigs
                 </a>
               </li>
@@ -224,9 +224,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <a
                   href="https://venturecapitalarts.com"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   VentureCapitalArts
                 </a>
               </li>
@@ -234,9 +234,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                 <a
                   href="https://cryptartist.com"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                  className="flex items-center gap-3 text-lg font-medium text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors group"
                 >
-                  <div className="w-2 h-2 rounded-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   CryptArtist
                 </a>
               </li>
@@ -261,7 +261,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                     href={controlPlane.admin.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-block mt-2 text-xs text-red-600 dark:text-red-400 hover:underline"
+                    className="inline-block mt-2 text-xs text-blue-600 dark:text-sky-400 hover:underline"
                   >
                     Open GiveGigs Admin
                   </a>
@@ -270,13 +270,13 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <p className="font-medium">Contact Us</p>
               <a
                 href="tel:+16039999420"
-                className="block mt-1 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                className="block mt-1 hover:text-blue-600 dark:hover:text-sky-400 transition-colors"
               >
                 (603) 999-9420
               </a>
               <a
                 href="mailto:Matt@MattyJacks.com"
-                className="block mt-1 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                className="block mt-1 hover:text-blue-600 dark:hover:text-sky-400 transition-colors"
               >
                 Matt@MattyJacks.com
               </a>

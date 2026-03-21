@@ -26,7 +26,7 @@ export default function ManualPage() {
         {/* Header */}
         <div ref={headerRef} className="mb-12">
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
-            <span className="text-red-600 dark:text-red-500">Worker</span>
+            <span className="text-blue-600 dark:text-sky-500">Worker</span>
             <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
               {" "}Manual
             </span>
@@ -64,7 +64,7 @@ export default function ManualPage() {
                     href="https://www.irs.gov/pub/irs-pdf/fw8ben.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-shrink-0 inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-red-500 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+                    className="flex-shrink-0 inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-sky-500 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
                     IRS Form
@@ -83,7 +83,7 @@ export default function ManualPage() {
                     href="https://www.adobe.com/acrobat/online/sign-pdf.html"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-shrink-0 inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-red-500 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+                    className="flex-shrink-0 inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-sky-500 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Open Adobe
@@ -109,7 +109,7 @@ export default function ManualPage() {
                 href="https://toggl.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
+                className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors underline decoration-emerald-500 hover:decoration-sky-500"
               >
                 Toggl Track
               </a>
@@ -122,7 +122,7 @@ export default function ManualPage() {
             <div className="mb-6">
               <button
                 onClick={() => setShowListView(!showListView)}
-                className="flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                className="flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors"
               >
                 {showListView ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 {showListView ? "Hide" : "Show"} View Comparison
@@ -266,7 +266,7 @@ export default function ManualPage() {
                     href="https://invoice.mattyjacks.com" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
+                    className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors underline decoration-emerald-500 hover:decoration-sky-500"
                   >
                     invoice.mattyjacks.com
                   </a>
@@ -284,7 +284,7 @@ export default function ManualPage() {
                       href="https://invoice.mattyjacks.com" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-red-600 dark:hover:text-red-400 transition-colors underline decoration-emerald-500 hover:decoration-red-500"
+                      className="font-semibold text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 transition-colors underline decoration-emerald-500 hover:decoration-sky-500"
                     >
                       invoice.mattyjacks.com
                     </a>
@@ -338,7 +338,7 @@ export default function ManualPage() {
                     <li>Once sent, crypto payments cannot be reversed.</li>
                     <li>Make sure your preferred coin/token is supported by the client.</li>
                   </ul>
-                  <p className="font-semibold text-red-600 dark:text-red-400">
+                  <p className="font-semibold text-blue-600 dark:text-sky-400">
                     Any incorrect wallet address will result in permanent loss of funds. You&apos;re responsible for ensuring the address is accurate.
                   </p>
                 </div>

@@ -74,7 +74,7 @@ export default function WorkerFeedbackCarousel() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-2">
-            What <span className="font-bold text-red-600 dark:text-red-500">Workers</span> Say
+            What <span className="font-bold text-blue-600 dark:text-sky-500">Workers</span> Say
           </p>
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">
             Worker Feedback
@@ -102,13 +102,13 @@ export default function WorkerFeedbackCarousel() {
                 key={`${feedback.id}-${index}`}
                 className="flex-shrink-0 w-[85vw] sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] group"
               >
-                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 h-full hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-300 dark:hover:border-red-500 transition-all duration-300">
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-950 h-full hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-300 dark:hover:border-sky-500 transition-all duration-300">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                       {feedback.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors duration-300">
+                      <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-sky-300 transition-colors duration-300">
                         {feedback.name}
                       </h3>
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">{feedback.role}</p>

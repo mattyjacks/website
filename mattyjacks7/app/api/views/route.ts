@@ -19,10 +19,15 @@ export async function POST(request: NextRequest) {
 
     const userAgent = request.headers.get("user-agent") || "unknown";
 
-    // Record the view
-    recordView(path, userAgent);
+    // Record the view with timeout (don't block response on Supabase)
+    Promise.race([
+      recordView(path, userAgent),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 2000))
+    ]).catch(err => {
+      console.error("View tracking background error:", err);
+    });
 
-    // Return current stats for this page
+    // Return current stats immediately (from in-memory cache)
     const pageStats = getPageStats(path);
     const siteStats = getSiteStats();
 
@@ -32,9 +37,9 @@ export async function POST(request: NextRequest) {
       siteStats,
     });
   } catch (error) {
-    console.error("View tracking error:", error);
+    console.error("View stats error:", error);
     return NextResponse.json(
-      { error: "Failed to track view" },
+      { error: "Failed to retrieve stats" },
       { status: 500 }
     );
   }

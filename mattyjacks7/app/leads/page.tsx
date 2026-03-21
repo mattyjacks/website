@@ -119,7 +119,7 @@ function SheetModal({ sheet, onClose }: { sheet: LeadSheet | null; onClose: () =
                 href={sheet.embedUrl.replace('/pubhtml?', '/pub?')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-xl bg-emerald-600 text-white shadow-lg hover:bg-red-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+                className="inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-xl bg-emerald-600 text-white shadow-lg hover:bg-sky-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
               >
                 <ExternalLink className="h-4 w-4 mr-1.5" />
                 <span>Open</span>
@@ -171,7 +171,7 @@ function LeadCard({ sheet, onClick }: { sheet: LeadSheet; onClick: () => void })
       <div className="bg-zinc-50 dark:bg-zinc-700/30 px-6 py-3 border-t border-zinc-200 dark:border-zinc-700">
         <button
           onClick={onClick}
-          className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-emerald-600 text-white shadow-lg hover:bg-red-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+          className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-emerald-600 text-white shadow-lg hover:bg-sky-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
         >
           <ExternalLink className="h-4 w-4 mr-2" />
           <span>View {formatNumber(sheet.rowCount || 0)} Leads</span>
@@ -194,7 +194,7 @@ function SummaryStats({ stats }: { stats: SummaryStats }) {
         </div>
         <div className="text-center">
           <dt className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Lead Lists</dt>
-          <dd className="mt-1 text-3xl font-semibold text-red-600 dark:text-red-400">
+          <dd className="mt-1 text-3xl font-semibold text-blue-600 dark:text-sky-400">
             {stats.totalSheets}
           </dd>
         </div>
@@ -248,7 +248,7 @@ export default function LeadsPage() {
         <div ref={headerRef} className="mb-12">
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
             <span className="text-emerald-600">Free Lead</span>{" "}
-            <span className="text-red-600">Databases</span>
+            <span className="text-blue-600">Databases</span>
           </h1>
           <p className="text-base text-zinc-600 dark:text-zinc-300">
             Browse our free lead databases to help grow your business. View and analyze the data directly in your browser.
@@ -259,18 +259,18 @@ export default function LeadsPage() {
         </div>
 
         {/* DNC Compliance Warning */}
-        <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-600 p-6 mb-8 rounded-lg shadow-md">
+        <div className="bg-sky-50 dark:bg-blue-900/20 border-l-4 border-sky-500 dark:border-blue-600 p-6 mb-8 rounded-lg shadow-md">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-6 w-6 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-6 w-6 text-sky-500 dark:text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
             <div className="ml-4">
-              <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">
+              <h3 className="text-lg font-semibold text-blue-800 dark:text-sky-300 mb-2">
                 Important Legal Disclaimer
               </h3>
-              <div className="text-sm text-red-700 dark:text-red-200 space-y-2">
+              <div className="text-sm text-blue-700 dark:text-sky-200 space-y-2">
                 <p className="font-semibold">
                   These leads have NOT been scrubbed for Federal Do-Not-Call (DNC) Registry compliance.
                 </p>
@@ -291,15 +291,15 @@ export default function LeadsPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 mb-8 rounded">
+          <div className="bg-sky-50 dark:bg-blue-900/20 border-l-4 border-sky-400 p-4 mb-8 rounded">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-5 w-5 text-sky-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+                <p className="text-sm text-blue-700 dark:text-sky-300">{error}</p>
               </div>
             </div>
           </div>
@@ -325,7 +325,7 @@ export default function LeadsPage() {
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center px-6 py-3 text-base font-medium rounded-xl shadow-lg bg-emerald-600 text-white hover:bg-red-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
+              className="inline-flex items-center px-6 py-3 text-base font-medium rounded-xl shadow-lg bg-emerald-600 text-white hover:bg-sky-500 hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
             >
               <span>Get Custom Leads</span>
               <svg className="ml-2 -mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

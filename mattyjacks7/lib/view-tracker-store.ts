@@ -1,5 +1,5 @@
-// In-memory view tracking store
-// This will be reset on server restart, but that's acceptable for this use case
+// View tracking store with Supabase persistence
+import { createClient } from "@/lib/supabase/server";
 
 export type ViewerType = "human" | "bot" | "unknown";
 
@@ -21,9 +21,36 @@ export interface PageStats {
   [path: string]: ViewStats;
 }
 
-// Global store
-const views: PageView[] = [];
-const pageStats: PageStats = {};
+// In-memory cache (synced with Supabase)
+let pageStats: PageStats = {};
+let cacheInitialized = false;
+
+// Load stats from Supabase on startup
+export async function initializeCache(): Promise<void> {
+  if (cacheInitialized) return;
+  
+  try {
+    const supabase = await createClient();
+    const { data: stats } = await supabase
+      .from("page_view_stats")
+      .select("*");
+    
+    if (stats) {
+      for (const stat of stats) {
+        pageStats[stat.path] = {
+          humans: stat.humans || 0,
+          bots: stat.bots || 0,
+          unknown: stat.unknown || 0,
+          total: stat.total || 0,
+        };
+      }
+    }
+    cacheInitialized = true;
+  } catch (error) {
+    console.error("Failed to initialize view stats cache:", error);
+    cacheInitialized = true; // Mark as initialized even on error to avoid retry loops
+  }
+}
 
 // Bot detection patterns
 const BOT_PATTERNS = [
@@ -97,30 +124,84 @@ export function detectViewerType(userAgent: string): ViewerType {
   return hasBrowserSignature ? "human" : "unknown";
 }
 
-export function recordView(path: string, userAgent: string): void {
+export async function recordView(path: string, userAgent: string): Promise<void> {
   const viewerType = detectViewerType(userAgent);
 
-  views.push({
-    path,
-    viewerType,
-    timestamp: Date.now(),
-    userAgent,
-  });
+  try {
+    const supabase = await createClient();
+    
+    // Insert into page_views table
+    await supabase.from("page_views").insert({
+      path,
+      viewer_type: viewerType,
+      user_agent: userAgent,
+      ip_address: "unknown",
+    });
 
-  // Update page stats
-  if (!pageStats[path]) {
-    pageStats[path] = { humans: 0, bots: 0, unknown: 0, total: 0 };
-  }
+    // Update page_view_stats
+    const { data: existing } = await supabase
+      .from("page_view_stats")
+      .select("*")
+      .eq("path", path)
+      .single();
 
-  const stats = pageStats[path];
-  if (viewerType === "human") {
-    stats.humans++;
-  } else if (viewerType === "bot") {
-    stats.bots++;
-  } else {
-    stats.unknown++;
+    if (existing) {
+      const updateData: Record<string, any> = {
+        total: existing.total + 1,
+      };
+      if (viewerType === "human") {
+        updateData.humans = existing.humans + 1;
+      } else if (viewerType === "bot") {
+        updateData.bots = existing.bots + 1;
+      } else {
+        updateData.unknown = existing.unknown + 1;
+      }
+      
+      await supabase
+        .from("page_view_stats")
+        .update(updateData)
+        .eq("path", path);
+    } else {
+      const newStats = {
+        path,
+        total: 1,
+        humans: viewerType === "human" ? 1 : 0,
+        bots: viewerType === "bot" ? 1 : 0,
+        unknown: viewerType === "unknown" ? 1 : 0,
+      };
+      
+      await supabase.from("page_view_stats").insert(newStats);
+    }
+
+    // Update in-memory cache
+    if (!pageStats[path]) {
+      pageStats[path] = { humans: 0, bots: 0, unknown: 0, total: 0 };
+    }
+    const stats = pageStats[path];
+    if (viewerType === "human") {
+      stats.humans++;
+    } else if (viewerType === "bot") {
+      stats.bots++;
+    } else {
+      stats.unknown++;
+    }
+    stats.total++;
+  } catch (error) {
+    console.error("Failed to record view in Supabase:", error);
+    // Fallback to in-memory only
+    if (!pageStats[path]) {
+      pageStats[path] = { humans: 0, bots: 0, unknown: 0, total: 0 };
+    }
+    const stats = pageStats[path];
+    if (viewerType === "human") {
+      stats.humans++;
+    } else if (viewerType === "bot") {
+      stats.bots++;
+    } else {
+      stats.unknown++;
+    }
+    stats.total++;
   }
-  stats.total++;
 }
 
 export function getPageStats(path: string): ViewStats {
@@ -147,5 +228,6 @@ export function getAllPageStats(): PageStats {
 }
 
 export function getViewCount(): number {
-  return views.length;
+  const stats = getSiteStats();
+  return stats.total;
 }
