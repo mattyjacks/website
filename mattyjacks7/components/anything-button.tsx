@@ -159,7 +159,8 @@ function MessageBubble({ message, onCopy }: { message: ChatMessage; onCopy: (tex
           )}
 
           <div
-            className={`px-4 py-3 sm:px-5 sm:py-4 text-[15px] leading-[1.6] overflow-hidden break-words transition-all shadow-sm ${
+            style={{ WebkitUserSelect: 'text', userSelect: 'text' }}
+            className={`px-4 py-3 sm:px-5 sm:py-4 text-[15px] leading-[1.6] overflow-hidden break-words transition-all shadow-sm select-text cursor-text ${
               isUser
                 ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-2xl rounded-tr-sm shadow-emerald-600/20"
                 : message.error
