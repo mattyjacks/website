@@ -2,9 +2,10 @@
 
 
 
+import { useRef, useState } from "react";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
-import { Rocket, Target, Briefcase, Zap, ExternalLink, MessageCircle, DollarSign, Clock, FileText } from "lucide-react";
+import { Rocket, Target, Briefcase, Zap, ExternalLink, MessageCircle, DollarSign, Clock, FileText, Play } from "lucide-react";
 import ScaledIframe from "@/components/scaled-iframe";
 
 export default function InternshipPage() {
@@ -15,6 +16,43 @@ export default function InternshipPage() {
   const portfolioRef = useScrollAnimation<HTMLDivElement>(slideInGrid);
   const videoRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
+  const videoCarouselRef = useRef<HTMLDivElement>(null);
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+
+  const videoDemos = [
+    {
+      title: "panoramic plumbing demo site creation with antigravity",
+      description: "Full walkthrough of building a client-ready plumbing site in Antigravity with Matty narrating decisions.",
+      embedUrl: "https://www.youtube.com/embed/7C3dWceVASQ",
+      duration: "18:35",
+    },
+    {
+      title: "vibecoding!",
+      description: "Long-form session showing vibe coding workflow, asset sourcing, and rapid iteration from blank page.",
+      embedUrl: "https://www.youtube.com/embed/VRhsTf-Lyzg",
+      duration: "45:24",
+    },
+    {
+      title: "vibecoding in tagalog and english",
+      description: "Bilingual build sprint where prompts, copy, and layout flip between Tagalog and English live.",
+      embedUrl: "https://www.youtube.com/embed/r1gVqn-3axA",
+      duration: "1:19:51",
+    },
+    {
+      title: "creating a taglish translator through google antigravity!",
+      description: "End-to-end creation of a Taglish translation experience using Antigravity, animations, and UX polish.",
+      embedUrl: "https://www.youtube.com/embed/eucznB_KAno",
+      duration: "1:01:54",
+    },
+  ];
+
+  const getYoutubeId = (embedUrl: string) => {
+    const parts = embedUrl.split("/");
+    const last = parts[parts.length - 1];
+    return last.split("?")[0];
+  };
+
+  const activeVideo = videoDemos[activeVideoIndex];
 
   return (
     <main className="min-h-screen flex flex-col pt-24 pb-20">
@@ -46,7 +84,7 @@ export default function InternshipPage() {
                 rel="noopener noreferrer"
                 className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-sky-600 via-blue-500 to-emerald-500 rounded-xl shadow-lg hover:shadow-xl hover:shadow-sky-500/30 transition-all duration-300 hover:scale-105 border border-white/10"
               >
-                <span className="mr-2">Here for the Internship?</span>
+                <span className="mr-2">GiveGigs Timer Login</span>
                 <ExternalLink className="w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
               </a>
               <a
@@ -183,23 +221,82 @@ export default function InternshipPage() {
 
       {/* Video Demonstration Section */}
       <section className="px-4 py-20 bg-zinc-50 dark:bg-zinc-900/20">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">See Vibe Coding in Action</h2>
-            <p className="text-lg text-zinc-600 dark:text-zinc-300">
-              Watch an example of how we use Google Antigravity to quickly build and iterate on websites. This is exactly what you&apos;ll learn during the internship.
+            <p className="text-lg text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto">
+              Watch real build sessions, polish passes, and live coaching. Each clip shows the exact pace you&apos;ll level up to during the internship.
             </p>
           </div>
 
-          <div ref={videoRef} className="rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 overflow-hidden bg-black shadow-2xl relative" style={{ paddingBottom: "56.25%" }}>
-            <iframe
-              className="absolute top-0 left-0 w-full h-full"
-              src="https://www.youtube.com/embed/7C3dWceVASQ"
-              title="Antigravity UI Vibe Coding"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            ></iframe>
+          <div ref={videoRef} className="space-y-8">
+            <div ref={videoCarouselRef} className="relative rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl bg-black">
+              <div className="relative w-full pb-[56.25%]">
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`${activeVideo.embedUrl}?rel=0`}
+                  title={activeVideo.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur text-white text-xs font-semibold uppercase tracking-[0.2em]">
+                <Play className="w-4 h-4" />
+                Live Demo
+              </div>
+              <div className="absolute top-4 right-4 text-xs font-semibold text-white/80 bg-black/60 px-3 py-1.5 rounded-full tracking-[0.18em]">
+                {String(activeVideoIndex + 1).padStart(2, "0")} · {activeVideo.duration}
+              </div>
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">{activeVideo.title}</h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto leading-relaxed">
+                {activeVideo.description}
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {videoDemos.map((video, index) => {
+                const youtubeId = getYoutubeId(video.embedUrl);
+                const isActive = index === activeVideoIndex;
+                return (
+                  <button
+                    type="button"
+                    key={video.embedUrl}
+                    onClick={() => {
+                      setActiveVideoIndex(index);
+                      videoCarouselRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }}
+                    className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 ${
+                      isActive
+                        ? "border-sky-500 shadow-xl shadow-sky-500/20 scale-[1.02]"
+                        : "border-zinc-200 dark:border-zinc-800 hover:border-sky-400 hover:shadow-lg"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    <span className="sr-only">Play {video.title}</span>
+                    <div className="relative h-36 w-full">
+                      <img
+                        src={`https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-300 ${isActive ? "opacity-90" : "opacity-70 group-hover:opacity-90"}`}></div>
+                      <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/80 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-800">
+                        <Play className="w-3 h-3" />
+                        Watch
+                      </div>
+                      <div className="absolute bottom-3 left-3 right-3 text-left">
+                        <p className="text-xs font-semibold text-white leading-tight line-clamp-2">{video.title}</p>
+                        <p className="text-[10px] text-white/70 tracking-[0.2em] mt-1">{video.duration}</p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
