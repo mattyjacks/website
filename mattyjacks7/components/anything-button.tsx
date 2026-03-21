@@ -85,6 +85,7 @@ export default function AnythingButton() {
 
   const [threeSize, setThreeSize] = useState(0);
   const [chatBounds, setChatBounds] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageTeaserIndex, setImageTeaserIndex] = useState(0);
   const [showTeaser, setShowTeaser] = useState(false);
@@ -138,7 +139,7 @@ export default function AnythingButton() {
       if (currentAudioRef.current) currentAudioRef.current.pause();
       const res = await fetch("/api/speech/synthesize", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, model: "tts-1", voice: "marin" })
+        body: JSON.stringify({ text, model: "tts-1", voice: "nova" })
       });
       if (res.ok) {
         const url = URL.createObjectURL(await res.blob());
@@ -719,12 +720,13 @@ Create a summary that another AI can use to understand the context and continue 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const isMobile = vw < 640;
-      const horizontalMargin = isMobile ? 10 : 16;
-      const verticalMargin = isMobile ? 10 : 12;
-      const w = isMobile ? vw - horizontalMargin * 2 : Math.min(520, vw - horizontalMargin * 2);
-      const h = isMobile ? vh - verticalMargin * 2 : Math.min(Math.floor(vh * 0.92), vh - verticalMargin * 2);
-      const x = isMobile ? horizontalMargin : Math.max(horizontalMargin, vw - w - horizontalMargin);
-      const y = isMobile ? verticalMargin : Math.max(verticalMargin, vh - h - verticalMargin);
+      const effectiveFull = isMobile || isFullscreen;
+      const horizontalMargin = effectiveFull ? 10 : 16;
+      const verticalMargin = effectiveFull ? 10 : 12;
+      const w = effectiveFull ? vw - horizontalMargin * 2 : Math.min(520, vw - horizontalMargin * 2);
+      const h = effectiveFull ? vh - verticalMargin * 2 : Math.min(Math.floor(vh * 0.92), vh - verticalMargin * 2);
+      const x = effectiveFull ? horizontalMargin : Math.max(horizontalMargin, vw - w - horizontalMargin);
+      const y = effectiveFull ? verticalMargin : Math.max(verticalMargin, vh - h - verticalMargin);
       setChatBounds({ x, y, width: w, height: h });
     };
 
@@ -739,7 +741,7 @@ Create a summary that another AI can use to understand the context and continue 
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isFullscreen]);
 
   useEffect(() => {
     triggerWobble();
@@ -1342,6 +1344,32 @@ Create a summary that another AI can use to understand the context and continue 
     setIsSidebarOpen(false);
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if modifier keys are pressed
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      
+      // Prevent scrolling if user is typing in input, textarea, or contenteditable
+      const activeEl = document.activeElement;
+      const isInput = activeEl?.tagName === 'INPUT' || activeEl?.tagName === 'TEXTAREA' || activeEl?.hasAttribute('contenteditable');
+      if (isInput) return;
+
+      if (!scrollAreaRef.current) return;
+
+      const scrollAmount = 100; // Fast scroll
+      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
+        scrollAreaRef.current.scrollBy({ top: -scrollAmount, behavior: 'auto' });
+      } else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
+        scrollAreaRef.current.scrollBy({ top: scrollAmount, behavior: 'auto' });
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [isOpen]);
+
   return (
     <>
       {/* Floating launcher with torus border (hidden while chat is open) */}
@@ -1399,7 +1427,7 @@ Create a summary that another AI can use to understand the context and continue 
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
             style={{ position: 'fixed', left: chatBounds.x, top: chatBounds.y, width: chatBounds.width, height: chatBounds.height, zIndex: 110 }}
-            className="flex flex-col rounded-2xl border border-zinc-200/80 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
+            className={`flex flex-col border border-zinc-200/80 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-300 ${isFullscreen ? 'rounded-none' : 'rounded-2xl'}`}
           >
             {/* Header */}
             <div className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0">
@@ -1446,6 +1474,9 @@ Create a summary that another AI can use to understand the context and continue 
               <div className="hidden sm:flex items-center text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-50 border border-emerald-400/30">
                 Online
               </div>
+              <button onClick={() => setIsFullscreen(!isFullscreen)} className="hidden sm:inline-flex text-white font-bold text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-md transition-colors ml-2 whitespace-nowrap relative z-50">
+                {isFullscreen ? "Minimize" : "Fullscreen"}
+              </button>
               <button onClick={() => setIsOpen(false)} className="text-white font-bold text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-md transition-colors ml-1 whitespace-nowrap relative z-50">
                 Close Chat
               </button>
