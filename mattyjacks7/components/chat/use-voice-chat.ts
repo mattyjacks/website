@@ -3,10 +3,11 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 export interface UseVoiceChatProps {
   onTranscript: (text: string) => void;
   onCommandCommand?: (command: 'stop' | 'regen' | 'pause' | 'go') => void;
+  onError?: (errorMessage: string) => void;
   autoProcessSilenceMs?: number;
 }
 
-export function useVoiceChat({ onTranscript, onCommandCommand, autoProcessSilenceMs = 1500 }: UseVoiceChatProps) {
+export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProcessSilenceMs = 1500 }: UseVoiceChatProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -64,6 +65,7 @@ export function useVoiceChat({ onTranscript, onCommandCommand, autoProcessSilenc
       }
     } catch (error) {
       console.error("Whisper transcription error:", error);
+      onError?.("Transcription failed. Try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -126,12 +128,21 @@ export function useVoiceChat({ onTranscript, onCommandCommand, autoProcessSilenc
       
       checkSilence();
       
-    } catch (err) {
+    } catch (err: any) {
       console.error("Microphone access error:", err);
+      // Give the user a clear explanation
+      const msg = err.message || "Unknown error";
+      if (!navigator.mediaDevices) {
+        onError?.("Microphone API is disabled. This usually happens if you're not on HTTPS (Secure Context).");
+      } else if (msg.includes("Permission denied") || msg.includes("NotAllowedError")) {
+        onError?.("Microphone permission was denied. Please allow it in your browser settings.");
+      } else {
+        onError?.(`Microphone Error: ${msg}`);
+      }
       setIsProcessing(false);
       setIsRecording(false);
     }
-  }, [autoProcessSilenceMs, stopRecordingAndTranscribe]);
+  }, [autoProcessSilenceMs, stopRecordingAndTranscribe, onError]);
 
   const toggleRecording = useCallback(() => {
     if (isRecording) {

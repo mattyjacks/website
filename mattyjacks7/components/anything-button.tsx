@@ -116,6 +116,10 @@ export default function AnythingButton() {
 
   const { isRecording, isProcessing, toggleRecording, startRecording } = useVoiceChat({
     autoProcessSilenceMs: isAliveMode ? 1500 : 3000,
+    onError: (msg) => {
+      setError(msg);
+      setIsAliveMode(false);
+    },
     onTranscript: (text) => {
       setInput(text);
       if (isAliveMode) sendMessage(text);
@@ -1136,7 +1140,7 @@ Create a summary that another AI can use to understand the context and continue 
   }, [isTurboMode]);
 
   useEffect(() => {
-    if (!isTurboMode || isLoading || isLimitReached || !chatReady) return;
+    if (!isTurboMode || isLoading || isLimitReached) return;
     let isActive = true;
     const runTurbo = async () => {
       await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
@@ -1155,7 +1159,7 @@ Create a summary that another AI can use to understand the context and continue 
     const lastMsgRole = messages.length > 0 ? messages[messages.length - 1].role : null;
     if (lastMsgRole !== 'user') runTurbo();
     return () => { isActive = false; };
-  }, [isTurboMode, isLoading, messages, isLimitReached, chatReady, turboFantasy, nickname, sendMessage]);
+  }, [isTurboMode, isLoading, messages, isLimitReached, turboFantasy, nickname, sendMessage]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -1340,7 +1344,15 @@ Create a summary that another AI can use to understand the context and continue 
                       className="object-cover"
                     />
                   </button>
-                  <h3 className="text-white font-bold tracking-wide text-base whitespace-nowrap">Valley Net <span className="text-[14px]">💘</span></h3>
+                  <h3 
+                    onClick={() => {
+                      setImageTeaserIndex(Math.floor(Math.random() * TEASER_PHRASES.length));
+                      setShowImageModal(true);
+                    }}
+                    className="text-white font-bold tracking-wide text-base whitespace-nowrap cursor-pointer hover:opacity-80 transition-opacity"
+                  >
+                    Valley Net <span className="text-[14px]">💘</span>
+                  </h3>
                   {chatMode === 'wicked' && (
                     <span className="ml-1 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-rose-600 text-white rounded-md animate-pulse">Wicked</span>
                   )}
