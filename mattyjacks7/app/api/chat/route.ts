@@ -20,35 +20,30 @@ const MODEL_PRICING = {
 
 // Wicked Mode - uncensored models via OpenRouter
 const WICKED_MODELS = {
-  'dolphin-mixtral': {
-    id: 'cognitivecomputations/dolphin-mixtral-8x22b',
-    name: 'Dolphin Mixtral 8x22B',
-    description: 'Uncensored MOE mixtral variant',
-  },
-  'dolphin-mixtral-free': {
-    id: 'cognitivecomputations/dolphin-mixtral-8x22b:free',
-    name: 'Dolphin Mixtral 8x22B (free)',
-    description: 'Free uncensored MOE mixtral variant',
-  },
-  'dolphin-llama3': {
-    id: 'cognitivecomputations/dolphin-llama-3-70b',
-    name: 'Dolphin Llama 3 70B',
-    description: 'Uncensored Llama3-based model',
+  'hermes-3-free': {
+    id: 'nousresearch/hermes-3-llama-3.1-405b:free',
+    name: 'Hermes 3 405B (free)',
+    description: 'Powerful uncensored Hermes variant',
   },
   'venice-free': {
     id: 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
     name: 'Venice Uncensored (free)',
     description: 'Free uncensored Venice edition',
   },
-  'nous-mixtral-free': {
-    id: 'nousresearch/nous-hermes-2-mixtral-8x7b:free',
-    name: 'Nous Hermes 2 Mixtral 8x7B (free)',
-    description: 'Uncensored nous hermes mixtral variant',
+  'hermes-4-70b': {
+    id: 'nousresearch/hermes-4-70b',
+    name: 'Hermes 4 70B',
+    description: 'Uncensored Hermes 4 model',
   },
-  'uncensored-generic': {
-    id: 'openrouter/uncensored:free',
-    name: 'OpenRouter Uncensored (free)',
-    description: 'Generic uncensored fallback',
+  'magnum-v4': {
+    id: 'anthracite-org/magnum-v4-72b',
+    name: 'Magnum v4 72B',
+    description: 'Uncensored Magnum model',
+  },
+  'wizardlm-2': {
+    id: 'microsoft/wizardlm-2-8x22b',
+    name: 'WizardLM 2 8x22B',
+    description: 'Highly capable uncensored model',
   },
 } as const;
 

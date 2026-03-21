@@ -1587,9 +1587,11 @@ Create a summary that another AI can use to understand the context and continue 
                               className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-rose-300 dark:border-rose-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-500"
                             >
                               <option value="random">Random (surprise me)</option>
-                              <option value="cognitivecomputations/dolphin3.0-r1-mistral-24b">Dolphin 3.0 R1 (reasoning)</option>
-                              <option value="cognitivecomputations/dolphin3.0-mistral-24b">Dolphin 3.0 (general)</option>
+                              <option value="nousresearch/hermes-3-llama-3.1-405b:free">Hermes 3 405B (free)</option>
                               <option value="cognitivecomputations/dolphin-mistral-24b-venice-edition:free">Venice Uncensored (free)</option>
+                              <option value="nousresearch/hermes-4-70b">Hermes 4 70B</option>
+                              <option value="anthracite-org/magnum-v4-72b">Magnum v4 72B</option>
+                              <option value="microsoft/wizardlm-2-8x22b">WizardLM 2 8x22B</option>
                             </select>
                             <div className="p-2.5 rounded-lg bg-rose-50/60 dark:bg-rose-900/20 border border-rose-200/60 dark:border-rose-800/50">
                               <p className="text-[11px] text-rose-700 dark:text-rose-300 font-medium leading-relaxed">Wicked Mode uses uncensored open-source models. No content filters. No refusals. Use responsibly.</p>
