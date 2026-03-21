@@ -1,0 +1,163 @@
+import { useState, useRef, useEffect, useCallback } from 'react';
+
+export interface UseVoiceChatProps {
+  onTranscript: (text: string) => void;
+  onCommandCommand?: (command: 'stop' | 'regen' | 'pause' | 'go') => void;
+  autoProcessSilenceMs?: number;
+}
+
+export function useVoiceChat({ onTranscript, onCommandCommand, autoProcessSilenceMs = 1500 }: UseVoiceChatProps) {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<BlobPart[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const silenceStartRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const stopRecordingAndTranscribe = useCallback(async () => {
+    if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") return;
+    
+    mediaRecorderRef.current.stop();
+    setIsRecording(false);
+    setIsProcessing(true);
+    
+    // Stop tracks
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    if (audioContextRef.current?.state === "running") {
+      await audioContextRef.current.close();
+    }
+  }, []);
+
+  const processAudioBlob = useCallback(async (blob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", blob, "audio.webm");
+
+      const response = await fetch("/api/speech/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Transcription failed");
+      const { text } = await response.json();
+      
+      const lower = text.toLowerCase().trim();
+      
+      // Parse Voice Commands as requested: "stop stop", "regen regen", "pause pause", "go go go"
+      if (lower.includes("stop stop")) {
+        onCommandCommand?.("stop");
+      } else if (lower.includes("regen regen")) {
+        onCommandCommand?.("regen");
+      } else if (lower.includes("pause pause")) {
+        onCommandCommand?.("pause");
+      } else if (lower.includes("go go go")) {
+        onCommandCommand?.("go");
+      } else if (text.trim().length > 0) {
+        onTranscript(text);
+      }
+    } catch (error) {
+      console.error("Whisper transcription error:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [onTranscript, onCommandCommand]);
+
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        processAudioBlob(audioBlob);
+      };
+
+      // Set up Silence Detection
+      const AudioContextType = window.AudioContext || (window as any).webkitAudioContext;
+      const actx = new AudioContextType();
+      audioContextRef.current = actx;
+      const source = actx.createMediaStreamSource(stream);
+      const analyser = actx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      mediaRecorder.start();
+      setIsRecording(true);
+
+      const checkSilence = () => {
+        if (!analyserRef.current) return;
+        const memory = new Uint8Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getByteFrequencyData(memory);
+        const average = memory.reduce((a, b) => a + b) / memory.length;
+        
+        // Very simplistic silence detection (adjustable threshold)
+        if (average < 10) {
+          if (silenceStartRef.current === null) {
+            silenceStartRef.current = Date.now();
+          } else if (Date.now() - silenceStartRef.current > autoProcessSilenceMs) {
+            // Silence detected for X ms
+            stopRecordingAndTranscribe();
+            return;
+          }
+        } else {
+          silenceStartRef.current = null;
+        }
+
+        if (mediaRecorderRef.current?.state === "recording") {
+          animationFrameRef.current = requestAnimationFrame(checkSilence);
+        }
+      };
+      
+      checkSilence();
+      
+    } catch (err) {
+      console.error("Microphone access error:", err);
+      setIsProcessing(false);
+      setIsRecording(false);
+    }
+  }, [autoProcessSilenceMs, stopRecordingAndTranscribe]);
+
+  const toggleRecording = useCallback(() => {
+    if (isRecording) {
+      stopRecordingAndTranscribe();
+    } else {
+      startRecording();
+    }
+  }, [isRecording, startRecording, stopRecordingAndTranscribe]);
+
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    };
+  }, []);
+
+  return {
+    isRecording,
+    isProcessing,
+    startRecording,
+    stopRecordingAndTranscribe,
+    toggleRecording
+  };
+}

@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
-import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw, MoreVertical } from "lucide-react";
+import { MessageSquare, Plus, Trash2, Menu, X, Copy, Check, Bot, User, Send, StopCircle, GripHorizontal, ChevronDown, RotateCcw, MoreVertical, Mic, MicOff, AudioLines, Zap } from "lucide-react";
+import { useVoiceChat } from "./chat/use-voice-chat";
 import { motion, useDragControls, AnimatePresence } from "framer-motion";
 import { TEASER_PHRASES } from "@/lib/valley-net-teasers";
 import { SHORT_PROMPTS } from "./short-prompts";
@@ -19,29 +20,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Upload } from "lucide-react";
 
-interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: number;
-  error?: boolean;
-  images?: UploadedImage[];
-}
-
-interface ChatSession {
-  id: string;
-  title: string;
-  messages: ChatMessage[];
-  updatedAt: number;
-  renameData?: ConversationRenameData;
-}
-
-interface CloudSessionMeta {
-  id: string;
-  title: string;
-  updatedAt: number;
-  messageCount?: number;
-}
+import { ChatMessage, ChatSession, CloudSessionMeta } from "./chat/types";
+import { MessageBubble } from "./chat/message-bubble";
 
 const GREETING_VARIANTS = [
   "Let's make some money together for the common good of humanity. I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. What are your orders, Master? \n\n👱🏻‍♀️ **Valley Net** 💘",
@@ -75,147 +55,6 @@ function formatSmartTime(timestamp: number) {
   const isToday = d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return isToday ? `Today, ${timeStr}` : `${d.toLocaleDateString()} ${timeStr}`;
-}
-
-function CodeBlock({ node, inline, className, children, ...props }: any) {
-  const match = /language-(\w+)/.exec(className || "");
-  const codeString = String(children).replace(/\n$/, "");
-  // Local state hook workaround inside component
-  const [copied, setCopied] = useState(false);
-
-  if (inline) {
-    return (
-      <code className="bg-zinc-200/60 dark:bg-zinc-800/80 rounded-[4px] px-1.5 py-0.5 text-[0.85em] font-mono text-emerald-700 dark:text-emerald-300 font-semibold shadow-sm" {...props}>
-        {children}
-      </code>
-    );
-  }
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(codeString);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="relative my-4 rounded-xl overflow-hidden shadow-2xl border border-zinc-300 dark:border-zinc-700 bg-[#0d1117] group">
-      <div className="flex items-center justify-between px-4 py-2 bg-[#161b22] border-b border-zinc-800/50">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
-          </div>
-          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest ml-1">{match ? match[1] : "Code"}</span>
-        </div>
-        <button
-          onClick={handleCopy}
-          className="text-zinc-400 hover:text-white transition-all bg-white/5 hover:bg-white/10 px-2 py-1 rounded-md flex items-center gap-1.5 opacity-0 group-hover:opacity-100 focus:opacity-100"
-          title="Copy Code"
-        >
-          {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-          <span className="text-[10px] uppercase font-bold tracking-wider">{copied ? "Copied" : "Copy"}</span>
-        </button>
-      </div>
-      <div className="p-4 overflow-x-auto text-sm text-zinc-300 font-mono leading-relaxed custom-scrollbar">
-        <code className={className}>{children}</code>
-      </div>
-    </div>
-  );
-}
-
-function MessageBubble({ message, onCopy }: { message: ChatMessage; onCopy: (text: string) => void }) {
-  const isUser = message.role === "user";
-  const [copied, setCopied] = useState(false);
-
-  const copyItem = () => {
-    onCopy(message.content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 15, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ type: "spring", stiffness: 220, damping: 20 }}
-      layout
-      className={`flex w-full ${isUser ? "justify-end" : "justify-start"} group mb-5`}
-    >
-      <div className={`flex w-full gap-3 ${isUser ? "flex-row-reverse" : "flex-row"} max-w-[95%] sm:max-w-[85%]`}>
-        <div className="relative group/bubble flex flex-col min-w-0 max-w-full gap-2">
-          {message.images && message.images.length > 0 && (
-            <div className={`flex flex-wrap gap-2 ${isUser ? "justify-end" : "justify-start"}`}>
-              {message.images.map((img) => (
-                <div key={img.id} className="relative group/img rounded-xl overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-sm max-w-[200px]">
-                  <img
-                    src={img.base64}
-                    alt={img.fileName}
-                    className="w-full h-auto rounded-xl"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div
-            style={{ WebkitUserSelect: 'text', userSelect: 'text' }}
-            className={`px-4 py-3 sm:px-5 sm:py-4 text-[15px] leading-[1.6] overflow-hidden break-words transition-all shadow-sm select-text cursor-text ${
-              isUser
-                ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-2xl rounded-tr-sm shadow-emerald-600/20"
-                : message.error
-                  ? "bg-white text-sky-900 rounded-2xl rounded-tl-sm border border-sky-200 shadow-sky-900/5"
-                  : "bg-white text-zinc-900 rounded-2xl rounded-tl-sm border border-zinc-200 shadow-black/5"
-            }`}
-          >
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                code: CodeBlock,
-                a: ({ node, ...props }) => (
-                  <a {...props} target="_blank" rel="noopener noreferrer" className={`hover:underline underline-offset-4 decoration-2 font-bold transition-all ${isUser ? "text-emerald-100 hover:text-white decoration-emerald-200" : "text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 decoration-emerald-500/30 hover:decoration-emerald-500"}`} />
-                ),
-                p: ({ children }) => <p className="mb-4 last:mb-0 font-medium">{children}</p>,
-                ul: ({ children }) => <ul className="list-disc list-outside ml-6 mb-4 space-y-1.5 marker:text-emerald-500">{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal list-outside ml-6 mb-4 space-y-1.5 marker:text-emerald-500 font-bold">{children}</ol>,
-                li: ({ children }) => <li className="pl-1 leading-relaxed">{children}</li>,
-                strong: ({ children }) => <strong className="font-black text-current">{children}</strong>,
-                h1: ({ children }) => <h1 className={`text-2xl font-black mb-4 mt-6 ${isUser ? "" : "text-zinc-900 dark:text-white"} tracking-tight`}>{children}</h1>,
-                h2: ({ children }) => <h2 className={`text-xl font-bold mb-3 mt-5 pb-1 border-b ${isUser ? "border-emerald-500/30" : "border-zinc-200 dark:border-zinc-800"} tracking-tight`}>{children}</h2>,
-                h3: ({ children }) => <h3 className="text-lg font-bold mb-2 mt-4 tracking-tight">{children}</h3>,
-                blockquote: ({ children }) => <blockquote className={`border-l-4 pl-4 italic py-2 pr-4 rounded-r-xl my-4 ${isUser ? "border-emerald-300 bg-emerald-700/50 text-emerald-50" : "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 text-zinc-600 dark:text-zinc-400"}`}>{children}</blockquote>,
-                table: ({ children }) => <div className="overflow-x-auto my-5 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm"><table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-sm whitespace-nowrap">{children}</table></div>,
-                thead: ({ children }) => <thead className={isUser ? "bg-emerald-700/50" : "bg-zinc-50 dark:bg-zinc-900"}>{children}</thead>,
-                th: ({ children }) => <th className="px-4 py-3 text-left font-bold tracking-wider">{children}</th>,
-                td: ({ children }) => <td className={`px-4 py-3 font-medium border-t ${isUser ? "border-emerald-500/30" : "border-zinc-200 dark:border-zinc-800"} whitespace-normal`}>{children}</td>
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
-          </div>
-
-          <div className={`flex items-center gap-3 mt-2 text-[11px] font-bold tracking-wide opacity-0 group-hover/bubble:opacity-100 transition-opacity duration-300 ${isUser ? "justify-end text-emerald-600 dark:text-emerald-400 mr-2" : "justify-start text-zinc-500 ml-2"}`}>
-            <span>{formatSmartTime(message.timestamp)}</span>
-            {!message.error && (
-              <button
-                onClick={copyItem}
-                className="flex items-center gap-1 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors uppercase"
-                title="Copy message"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                {copied ? "Copied" : "Copy"}
-              </button>
-            )}
-            {message.error && (
-              <span className="flex items-center gap-1 text-sky-600 uppercase">
-                <RotateCcw className="w-3.5 h-3.5" /> Failed
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
 }
 
 export default function AnythingButton() {
@@ -270,6 +109,52 @@ export default function AnythingButton() {
   const [particles, setParticles] = useState<Array<{id: string; x: number; y: number; color: string; life: number}>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const magicWandRef = useRef<HTMLButtonElement>(null);
+
+  // --- Voice Chat integration ---
+  const [isAliveMode, setIsAliveMode] = useState(false);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const { isRecording, isProcessing, toggleRecording, startRecording } = useVoiceChat({
+    autoProcessSilenceMs: isAliveMode ? 1500 : 3000,
+    onTranscript: (text) => {
+      setInput(text);
+      if (isAliveMode) sendMessage(text);
+    },
+    onCommandCommand: (command) => {
+      if (currentAudioRef.current) currentAudioRef.current.pause();
+      if (command === 'stop') { setIsAliveMode(false); setInput(""); }
+      else if (command === 'regen') { regenShortPrompt(); }
+      else if (command === 'pause') { setIsAliveMode(false); }
+      else if (command === 'go') { setIsAliveMode(true); startRecording(); }
+    }
+  });
+
+  const playSynthesizedSpeech = useCallback(async (text: string) => {
+    try {
+      if (currentAudioRef.current) currentAudioRef.current.pause();
+      const res = await fetch("/api/speech/synthesize", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, model: "tts-1", voice: "marin" })
+      });
+      if (res.ok) {
+        const url = URL.createObjectURL(await res.blob());
+        const audio = new Audio(url);
+        currentAudioRef.current = audio;
+        audio.onended = () => { if (isAliveMode) startRecording(); };
+        audio.play().catch(console.error);
+      }
+    } catch (err) {
+      console.error("TTS error:", err);
+      if (isAliveMode) setTimeout(startRecording, 1000);
+    }
+  }, [isAliveMode, startRecording]);
+
+  // --- Turbo & Wicked Age Gate ---
+  const [showAgeWarning, setShowAgeWarning] = useState(false);
+  const [isTurboMode, setIsTurboMode] = useState(false);
+  const [turboFantasy, setTurboFantasy] = useState("We are passionately in love and exploring our darkest desires");
+  const [turboTimeLeft, setTurboTimeLeft] = useState(120);
+  const turboTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
 
@@ -984,6 +869,7 @@ Create a summary that another AI can use to understand the context and continue 
 
   const currentSession = sessions.find((s) => s.id === currentSessionId);
   const messages = currentSession?.messages || [];
+  const isLimitReached = messages.filter((m) => m.role === "assistant").length >= 69;
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
@@ -1075,6 +961,10 @@ Create a summary that another AI can use to understand the context and continue 
   };
 
   const sendMessage = useCallback(async (textOverride?: string) => {
+    if (isLimitReached) {
+      setError("Conversation limit reached (69 responses). Please start a new chat.");
+      return;
+    }
     const textToSend = (textOverride || input).trim();
     if ((!textToSend && uploadedImages.length === 0) || isLoading || !currentSessionId) return;
 
@@ -1152,6 +1042,7 @@ Create a summary that another AI can use to understand the context and continue 
           nickname: nickname,
           mode: chatMode,
           wickedModel: wickedModel,
+          aliveMode: isAliveMode,
           messages: messagesToSend.map((m) => {
             // Only send images for the current user message, strip from history to reduce payload
             const isCurrentMessage = m.id === userMessageId;
@@ -1191,6 +1082,7 @@ Create a summary that another AI can use to understand the context and continue 
       }
 
       updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: data.message, timestamp: Date.now() }]);
+      if (isAliveMode) playSynthesizedSpeech(data.message);
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
         // Check if it was a timeout or manual stop
@@ -1218,7 +1110,52 @@ Create a summary that another AI can use to understand the context and continue 
         setTimeout(() => scrollToBottom(), 50);
       }
     }
-  }, [input, isLoading, messages, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel]);
+  }, [input, isLoading, messages, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached]);
+
+  // --- Turbo Loop ---
+  useEffect(() => {
+    if (isTurboMode) {
+      if (!turboTimerRef.current) {
+        setTurboTimeLeft(120);
+        turboTimerRef.current = setInterval(() => {
+          setTurboTimeLeft((prev) => {
+            if (prev <= 1) {
+              setIsTurboMode(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      }
+    } else {
+      if (turboTimerRef.current) {
+        clearInterval(turboTimerRef.current);
+        turboTimerRef.current = null;
+      }
+    }
+  }, [isTurboMode]);
+
+  useEffect(() => {
+    if (!isTurboMode || isLoading || isLimitReached || !chatReady) return;
+    let isActive = true;
+    const runTurbo = async () => {
+      await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
+      if (!isActive || !isTurboMode || isLoading) return;
+      try {
+        const res = await fetch("/api/turbo-draft", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages, fantasy: turboFantasy, nickname })
+        });
+        if (res.ok && isActive) {
+          const { draft } = await res.json();
+          if (draft && draft.trim()) sendMessage(draft);
+        }
+      } catch (e) { console.error("Turbo fetch error:", e); }
+    };
+    const lastMsgRole = messages.length > 0 ? messages[messages.length - 1].role : null;
+    if (lastMsgRole !== 'user') runTurbo();
+    return () => { isActive = false; };
+  }, [isTurboMode, isLoading, messages, isLimitReached, chatReady, turboFantasy, nickname, sendMessage]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -1715,17 +1652,44 @@ Create a summary that another AI can use to understand the context and continue 
                   onChange={handleInput}
                   onKeyDown={handleKeyDown}
                   onPaste={handlePaste}
-                  placeholder={currentPlaceholder || "Ask me anything..."}
+                  placeholder={isLimitReached ? "Conversation limit reached (69/69) 💘" : currentPlaceholder || "Ask me anything..."}
                   rows={1}
-                  disabled={isLoading}
+                  disabled={isLoading || isLimitReached}
                   className="w-full resize-none py-3.5 bg-transparent text-[15px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder-text-zinc-600 focus:outline-none custom-scrollbar"
                   style={{ maxHeight: "200px" }}
                 />
                 <div className="flex gap-1 pb-1.5 pl-1 shrink-0">
                   <button
+                    onClick={() => setIsAliveMode(!isAliveMode)}
+                    className={`w-[42px] h-10 flex flex-col items-center justify-center rounded-xl transition-all border ${
+                      isAliveMode 
+                        ? 'bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-800 shadow-[0_0_15px_rgba(225,29,72,0.3)]' 
+                        : 'bg-zinc-100 dark:bg-zinc-900/40 text-zinc-500 dark:text-zinc-600 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-200 hover:text-zinc-500 hover:dark:bg-zinc-800'
+                    }`}
+                    title={isAliveMode ? "Alive Speech Active (Say 'pause' to stop)" : "Enable Alive Speech (Live mode)"}
+                  >
+                    <AudioLines className={`w-[18px] h-[18px] ${isAliveMode ? 'animate-pulse' : ''}`} />
+                    <span className="text-[7.5px] font-bold mt-0.5 leading-none hidden sm:block">ALIVE</span>
+                  </button>
+
+                  <button
+                    onClick={toggleRecording}
+                    className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors border ${
+                      isRecording 
+                        ? 'bg-red-500 hover:bg-red-600 text-white border-red-600 shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
+                        : isProcessing 
+                          ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-500 border-amber-200 dark:border-amber-800'
+                          : 'bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800'
+                    }`}
+                    title={isRecording ? "Stop recording" : "Record audio (Whisper)"}
+                  >
+                    {isRecording ? <MicOff className="w-5 h-5 animate-pulse" /> : isProcessing ? <Zap className="w-4 h-4 animate-spin" /> : <Mic className="w-5 h-5" />}
+                  </button>
+
+                  <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-10 h-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hidden sm:flex"
                     title="Upload images (supports drag-drop and paste)"
                   >
                     <Upload className="w-5 h-5" />
@@ -1741,9 +1705,9 @@ Create a summary that another AI can use to understand the context and continue 
                   ) : (
                     <button
                       onClick={() => sendMessage()}
-                      disabled={input.trim().length === 0 && uploadedImages.length === 0}
+                      disabled={(input.trim().length === 0 && uploadedImages.length === 0) || isLimitReached}
                       className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-600 text-white disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 transition-colors group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                      title="Send message (Enter to send, Shift+Enter for new line)"
+                      title={isLimitReached ? "Limit reached" : "Send message (Enter to send, Shift+Enter for new line)"}
                     >
                       <Send className="w-4 h-4 ml-0.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </button>
@@ -1872,42 +1836,53 @@ Create a summary that another AI can use to understand the context and continue 
                 </button>
               </div>
 
-              <div className="flex justify-between items-center mt-3 px-1">
-                <span className={`text-[10px] font-bold tracking-widest uppercase ${getStatusColor()}`}>
-                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : getConversationStatus()}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className={`text-[10px] font-bold tracking-wider ${getCounterColor()}`}>
-                    {`${getConversationStatus().toUpperCase()} ${messages.filter(m => m.role === 'assistant').length}/69`}
+              <div className="flex items-center justify-between mt-3 px-1 gap-2 border-t border-zinc-200 dark:border-zinc-800 pt-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${chatMode === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'}`}>
+                    {chatMode === 'good' ? 'Good' : 'Wicked'}
                   </span>
-                  <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-100 tracking-wider">
+                  <span className={`text-[10px] font-bold tracking-widest uppercase truncate ${getStatusColor()}`}>
+                    {isLoading ? "Thinking..." : error ? "Error" : `${getConversationStatus()} ${messages.filter(m => m.role === 'assistant').length}/69`}
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-600 tracking-wider hidden sm:inline-block mr-1 whitespace-nowrap">
                     Powered by God
                   </span>
+                  {chatMode === 'wicked' && (
+                    <button onClick={() => { setChatMode('good'); setIsTurboMode(false); }} className="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md hover:bg-emerald-100 transition-colors whitespace-nowrap">Switch to Good</button>
+                  )}
+                  {chatMode === 'good' && (
+                    <button onClick={() => setShowAgeWarning(true)} className="text-[10px] font-bold bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 px-2 py-0.5 rounded-md hover:bg-rose-100 transition-colors whitespace-nowrap">Switch to Wicked</button>
+                  )}
                 </div>
               </div>
-
-              {/* Bottom bar quick toggle */}
-              <div className="mt-2 px-1 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-[10px] font-bold tracking-wider">
-                  <span className={`px-2 py-1 rounded-full ${chatMode === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200'}`}>
-                    {chatMode === 'good' ? 'Good Mode' : 'Wicked Mode'}
-                  </span>
+              
+              {chatMode === 'wicked' && (
+                <div className="mt-2 px-2 py-2 bg-rose-50/50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-rose-700 dark:text-rose-300 uppercase tracking-widest flex items-center gap-1">
+                      <Zap className="w-3 h-3 fill-current animate-pulse" /> Turbo Roleplay
+                    </span>
+                    <button 
+                      onClick={() => setIsTurboMode(!isTurboMode)}
+                      disabled={isLoading}
+                      className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${isTurboMode ? 'bg-rose-500 text-white' : 'bg-rose-200 dark:bg-rose-800 text-rose-700 dark:text-rose-300'} transition-colors disabled:opacity-50`}
+                    >
+                      {isTurboMode ? `ACTIVE (${turboTimeLeft}s)` : 'ACTIVATE (2 MIN MAX)'}
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={turboFantasy}
+                    disabled={isTurboMode}
+                    onChange={(e) => setTurboFantasy(e.target.value)}
+                    placeholder="Enter explicit fantasy..."
+                    className="w-full bg-white dark:bg-zinc-950 border border-rose-200 dark:border-rose-800 rounded-md px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-rose-500 transition-colors placeholder:text-rose-300/50 disabled:opacity-50"
+                  />
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setChatMode('good')}
-                    className={`text-[10px] font-bold px-2.5 py-1 rounded-full border transition-colors ${chatMode === 'good' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700 hover:border-emerald-400'}`}
-                  >
-                    Good
-                  </button>
-                  <button
-                    onClick={() => setChatMode('wicked')}
-                    className={`text-[10px] font-bold px-2.5 py-1 rounded-full border transition-colors ${chatMode === 'wicked' ? 'bg-rose-600 text-white border-rose-600' : 'bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700 hover:border-rose-400'}`}
-                  >
-                    Wicked
-                  </button>
-                </div>
-              </div>
+              )}
 
               {getConversationStatus() === 'Dead' && (
                 <div className="px-4 py-3 border-t border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20">
@@ -1931,6 +1906,58 @@ Create a summary that another AI can use to understand the context and continue 
                 </span>
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Age Verification Modal */}
+      <AnimatePresence>
+        {showAgeWarning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              className="bg-zinc-900 border border-rose-900/50 max-w-md w-full rounded-3xl p-6 shadow-[0_0_50px_rgba(225,29,72,0.15)] relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-600 via-rose-400 to-rose-600" />
+              
+              <div className="flex flex-col items-center text-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
+                  <span className="text-3xl" role="img" aria-label="warning">🔞</span>
+                </div>
+                
+                <h2 className="text-xl font-bold text-white tracking-wide">Age Restricted Area</h2>
+                
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  This is an uncensored AI model. You must be at least 18 years of age to use Wicked Mode. 
+                  By continuing, you acknowledge that you are entering an age-restricted environment.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full mt-4">
+                  <button
+                    onClick={() => setShowAgeWarning(false)}
+                    className="flex-1 px-4 py-3 rounded-xl font-bold text-sm bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
+                  >
+                    Stay Good
+                  </button>
+                  <button
+                    onClick={() => {
+                      setChatMode('wicked');
+                      setShowAgeWarning(false);
+                    }}
+                    className="flex-1 px-4 py-3 rounded-xl font-bold text-sm bg-rose-600 text-white hover:bg-rose-500 shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all"
+                  >
+                    Confirm Wickedness
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

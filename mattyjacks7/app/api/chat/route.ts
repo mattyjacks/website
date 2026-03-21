@@ -751,10 +751,10 @@ export async function POST(request: NextRequest) {
 
     addLog(`[CHAT] Received ${rawMessages.length} messages`);
 
-    if (rawMessages.length > 50) {
+    if (rawMessages.length > 150) {
       addLog(`[CHAT] Too many messages: ${rawMessages.length}`);
       return NextResponse.json(
-        { error: "Too many messages (max 50). Start a new chat, Boss.", debugLogs, requestId },
+        { error: "Conversation limit (69 responses) reached. Start a new chat, Boss.", debugLogs, requestId },
         { status: 400, headers: SECURITY_HEADERS }
       );
     }
