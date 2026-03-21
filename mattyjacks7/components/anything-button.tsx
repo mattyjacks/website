@@ -1062,31 +1062,71 @@ Create a summary that another AI can use to understand the context and continue 
 
       clearTimeout(timeoutId);
 
-      // Parse response body once (handles both success and error)
-      const data = await res.json().catch(() => null);
-
-      // Always log debug info from backend
-      if (consoleDebugEnabled && data?.debugLogs && Array.isArray(data.debugLogs)) {
-        console.group('%c[Valley Net Debug Logs]', 'color: #10b981; font-weight: bold');
-        data.debugLogs.forEach((log: string) => console.log(log));
-        console.groupEnd();
-      }
-
       if (!res.ok) {
+        // Non-streaming error response
+        const data = await res.json().catch(() => null);
+        if (consoleDebugEnabled && data?.debugLogs) {
+          console.group('%c[Valley Net Debug Logs]', 'color: #10b981; font-weight: bold');
+          data.debugLogs.forEach((log: string) => console.log(log));
+          console.groupEnd();
+        }
         const errMsg = data?.error || `Request failed (${res.status})`;
-        // Show last few debug log entries in the error bubble for diagnosis
         const lastLogs = data?.debugLogs?.slice(-5) || [];
         const debugSuffix = lastLogs.length > 0 ? '\n\n---\n**Debug trail:**\n' + lastLogs.map((l: string) => '`' + l + '`').join('\n') : '';
         throw new Error(errMsg + debugSuffix);
       }
 
-      if (!data?.message) {
-        const lastLogs = data?.debugLogs?.slice(-3) || [];
-        throw new Error("No response from AI." + (lastLogs.length ? '\n\nDebug: ' + lastLogs.join(' | ') : ''));
+      // --- SSE streaming reader ---
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No response body to read.");
+
+      const decoder = new TextDecoder();
+      const streamMsgId = generateId();
+      let streamedText = '';
+      let streamDone = false;
+
+      // Add a placeholder assistant message immediately
+      updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: '▍', timestamp: Date.now() }]);
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const raw = decoder.decode(value, { stream: true });
+        const lines = raw.split('\n');
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const parsed = JSON.parse(line.slice(6));
+            if (parsed.type === 'delta') {
+              streamedText += parsed.delta;
+              // Update the message content as chunks stream in, with cursor
+              updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: streamedText + '▍', timestamp: Date.now() }]);
+            } else if (parsed.type === 'done') {
+              // Final message — remove cursor
+              updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: streamedText, timestamp: Date.now() }]);
+              if (consoleDebugEnabled && parsed.debugLogs) {
+                console.group('%c[Valley Net Debug Logs]', 'color: #10b981; font-weight: bold');
+                parsed.debugLogs.forEach((log: string) => console.log(log));
+                console.groupEnd();
+              }
+              streamDone = true;
+              if (isAliveMode) playSynthesizedSpeech(streamedText);
+            } else if (parsed.type === 'error') {
+              throw new Error(parsed.error || 'Stream error');
+            }
+          } catch (parseErr) {
+            // Skip malformed lines
+          }
+        }
       }
 
-      updateCurrentSession([...newMessages, { id: generateId(), role: "assistant", content: data.message, timestamp: Date.now() }]);
-      if (isAliveMode) playSynthesizedSpeech(data.message);
+      if (!streamDone && streamedText) {
+        // Stream ended without done event — use what we have
+        updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: streamedText, timestamp: Date.now() }]);
+        if (isAliveMode) playSynthesizedSpeech(streamedText);
+      }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
         // Check if it was a timeout or manual stop

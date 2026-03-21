@@ -928,21 +928,53 @@ export async function POST(request: NextRequest) {
         isWickedMode = false; // fall through to good-mode flow below
       }
 
+      let wickedStreamText = '';
+      let wickedUsedModel = '';
+
       if (wickedSuccess) {
-        // Wicked mode doesn't support tool calls - return directly
-        const wickedContent = response!.choices[0]?.message?.content || `No response from the wicked AI, ${nickname}. Try again!`;
-        const totalMs = Date.now() - startTime;
+        // Stream wicked mode response
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+          async start(controller) {
+            const enqueue = (obj: object) =>
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(obj)}\n\n`));
 
-        // Track costs (free models = $0)
-        const inputTokens = response!.usage?.prompt_tokens || 0;
-        const outputTokens = response!.usage?.completion_tokens || 0;
-        trackApiCall(usedModel, inputTokens, outputTokens, false);
+            try {
+              const streamResponse = await openrouter.chat.completions.create({
+                model: usedModel,
+                messages: chatMessages,
+                max_tokens: 2000,
+                stream: true,
+              });
+              wickedUsedModel = usedModel;
 
-        addLog(`[CHAT] WICKED SUCCESS in ${totalMs}ms, ${wickedContent.length} chars, model: ${usedModel}`);
-        return NextResponse.json(
-          { message: wickedContent.slice(0, 8000), model: usedModel, mode: 'wicked', toolCalls: 0, responseTimeMs: totalMs, debugLogs, requestId },
-          { headers: { ...SECURITY_HEADERS, "X-Response-Time": `${totalMs}ms` } }
-        );
+              for await (const chunk of streamResponse) {
+                const delta = chunk.choices[0]?.delta?.content || '';
+                if (delta) {
+                  wickedStreamText += delta;
+                  enqueue({ type: 'delta', delta });
+                }
+              }
+
+              // Track costs (free models = $0)
+              trackApiCall(wickedUsedModel, 0, wickedStreamText.split(' ').length, false);
+              enqueue({ type: 'done', model: wickedUsedModel, mode: 'wicked', toolCalls: 0, responseTimeMs: Date.now() - startTime, debugLogs, requestId });
+            } catch (err) {
+              enqueue({ type: 'error', error: getErrorResponse(err, isAdmin, String(nickname)) });
+            } finally {
+              controller.close();
+            }
+          }
+        });
+
+        return new Response(stream, {
+          headers: {
+            ...SECURITY_HEADERS,
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+          }
+        });
       }
     }
 
@@ -1051,7 +1083,7 @@ export async function POST(request: NextRequest) {
       assistantMessage = response.choices[0]?.message;
     }
 
-    const content = assistantMessage?.content || "Sorry Boss, I hit a snag. The AI didn't return a response. Try again!";
+    const content = assistantMessage?.content || `Sorry ${nickname}. I hit a snag. The AI didn't return a response. Try again!`;
     const totalMs = Date.now() - startTime;
     
     // Track API costs
@@ -1069,7 +1101,6 @@ export async function POST(request: NextRequest) {
     
     // Categorize prompt and track categorized costs
     const categorization = await categorizePrompt(userPromptText);
-    // Get pricing for the model used
     const pricing = getModelPricing(response.model);
     const inputCost = (inputTokens / 1000000) * pricing.input;
     const outputCost = (outputTokens / 1000000) * pricing.output;
@@ -1088,10 +1119,43 @@ export async function POST(request: NextRequest) {
     }
     
     addLog(`[CHAT] SUCCESS in ${totalMs}ms, ${content.length} chars, model: ${response.model}, tools: ${toolCallDepth}`);
-    return NextResponse.json(
-      { message: finalMessage.slice(0, 8000), model: response.model, mode: 'good', toolCalls: toolCallDepth, responseTimeMs: totalMs, debugLogs, requestId },
-      { headers: { ...SECURITY_HEADERS, "X-Response-Time": `${totalMs}ms` } }
-    );
+
+    // Stream the final good-mode response
+    const encoder = new TextEncoder();
+    const goodStream = new ReadableStream({
+      start(controller) {
+        const enqueue = (obj: object) =>
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(obj)}\n\n`));
+        // Emit the full text in one shot (tools already ran synchronously above)
+        // Simulate streaming by chunking into ~5-char pieces for visual effect
+        const words = finalMessage.slice(0, 8000).split('');
+        let i = 0;
+        const CHUNK = 4;
+        const flush = () => {
+          const piece = words.slice(i, i + CHUNK).join('');
+          if (piece) enqueue({ type: 'delta', delta: piece });
+          i += CHUNK;
+          if (i < words.length) {
+            // Use setTimeout(0) to yield to the event loop between chunks
+            setTimeout(flush, 0);
+          } else {
+            enqueue({ type: 'done', model: response.model, mode: 'good', toolCalls: toolCallDepth, responseTimeMs: totalMs, debugLogs, requestId });
+            controller.close();
+          }
+        };
+        flush();
+      }
+    });
+
+    return new Response(goodStream, {
+      headers: {
+        ...SECURITY_HEADERS,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'X-Response-Time': `${totalMs}ms`,
+      }
+    });
   } catch (error: unknown) {
     const totalMs = Date.now() - startTime;
     addLog(`[CHAT] FATAL ERROR in ${totalMs}ms: ${error instanceof Error ? error.message.slice(0, 200) : String(error)}`);

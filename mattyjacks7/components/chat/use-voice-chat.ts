@@ -17,6 +17,7 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
   const silenceStartRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const recordingStartRef = useRef<number | null>(null); // track recording start time
 
   const stopRecordingAndTranscribe = useCallback(async () => {
     if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") return;
@@ -86,7 +87,13 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
 
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        processAudioBlob(audioBlob);
+        // Only send if we have meaningful audio (at least 8KB)
+        if (audioBlob.size > 8000) {
+          processAudioBlob(audioBlob);
+        } else {
+          setIsProcessing(false);
+          console.warn('[Voice] Skipped tiny/silent blob:', audioBlob.size, 'bytes');
+        }
       };
 
       // Set up Silence Detection
@@ -101,6 +108,8 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
 
       mediaRecorder.start();
       setIsRecording(true);
+      recordingStartRef.current = Date.now();
+      silenceStartRef.current = null;
 
       const checkSilence = () => {
         if (!analyserRef.current) return;
@@ -108,8 +117,11 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
         analyserRef.current.getByteFrequencyData(memory);
         const average = memory.reduce((a, b) => a + b) / memory.length;
         
-        // Very simplistic silence detection (adjustable threshold)
-        if (average < 10) {
+        // Silence detection — threshold 20 and require at least 800ms of recording before stopping
+        const minRecordMs = 800;
+        const hasMinRecording = recordingStartRef.current !== null && (Date.now() - recordingStartRef.current) > minRecordMs;
+        
+        if (average < 20 && hasMinRecording) {
           if (silenceStartRef.current === null) {
             silenceStartRef.current = Date.now();
           } else if (Date.now() - silenceStartRef.current > autoProcessSilenceMs) {
@@ -117,7 +129,7 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
             stopRecordingAndTranscribe();
             return;
           }
-        } else {
+        } else if (average >= 20) {
           silenceStartRef.current = null;
         }
 

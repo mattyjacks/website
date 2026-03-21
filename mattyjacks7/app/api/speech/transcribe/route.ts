@@ -21,6 +21,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No audio file provided" }, { status: 400, headers: SECURITY_HEADERS });
     }
 
+    // Reject tiny/silent blobs before hitting Whisper (saves API cost and prevents spam)
+    if (file.size < 5000) {
+      return NextResponse.json({ text: "" }, { headers: SECURITY_HEADERS });
+    }
+
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const buffer = Buffer.from(await file.arrayBuffer());
     // Create a File-like object required by openai package

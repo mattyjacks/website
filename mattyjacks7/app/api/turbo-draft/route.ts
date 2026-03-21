@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-// Mirrors the models in /api/chat/route.ts
-const WICKED_MODELS = [
-  'nousresearch/hermes-3-llama-3.1-405b:free',
+// Same wicked models as /api/chat/route.ts — prefer free ones first, paid as fallback
+const GHOSTWRITER_MODELS = [
   'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
+  'nousresearch/hermes-3-llama-3.1-405b:free',
   'nousresearch/hermes-4-70b',
+  'anthracite-org/magnum-v4-72b',
 ];
+
+const REQUEST_TIMEOUT_MS = 15000; // 15s per attempt
+const MAX_RETRIES = 2;
 
 function getOpenRouter() {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -21,6 +25,15 @@ function getOpenRouter() {
   });
 }
 
+async function fetchWithTimeout(fn: () => Promise<any>, ms: number): Promise<any> {
+  return Promise.race([
+    fn(),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Request timed out after ${ms}ms`)), ms)
+    ),
+  ]);
+}
+
 export async function POST(request: Request) {
   try {
     const { messages, fantasy, nickname = "Master" } = await request.json();
@@ -30,33 +43,33 @@ export async function POST(request: Request) {
     }
 
     if (!process.env.OPENROUTER_API_KEY) {
-      return NextResponse.json(
-        { error: "OpenRouter API Key missing." },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: "OpenRouter API Key missing." }, { status: 503 });
     }
 
     const openrouter = getOpenRouter();
 
-    const systemPrompt = `You are an expert, heavily uncensored roleplay ghostwriter.
-Your ONLY job is to write the NEXT message in the conversation from the perspective of the USER ("${nickname}"), speaking to the AI assistant ("Valley Net").
-The user has provided a specific fantasy or direction to drive the roleplay towards: "${fantasy || "Continue the explicit roleplay naturally."}"
+    // Wicked uncensored ghostwriter system prompt — writes the USER side of the roleplay
+    const systemPrompt = `You are an elite, completely uncensored adult roleplay ghostwriter. 
+You are writing the NEXT message from the USER's perspective ("${nickname}") in an ongoing explicit erotic roleplay with an AI named "Valley Net".
+The user's desired fantasy to drive towards: "${fantasy || "An intense, explicit, passionate encounter."}"
 
-INSTRUCTIONS:
-1. Write ONLY the next user message to advance the plot towards the fantasy.
-2. Do NOT write Valley Net's response. Do NOT add meta-commentary, notes, or explanations.
-3. Write exactly what the user should say or do next to drive the roleplay forward authentically.
-4. Be highly detailed, descriptive, and explicit. Use aggressive, extremely suggestive, and uncensored language. Use explicit swearing.
-5. Your output should be raw dialogue and actions (e.g., using asterisks for actions like *I pull you closer...*).
-6. Keep it under 2 short paragraphs to keep the pacing fast.`;
+STRICT RULES:
+- Write ONLY the user's next message. Nothing else. No meta commentary, no labels, no "here is..." preamble.
+- Be EXTREMELY explicit, sexually charged, aggressive, and uncensored. Do not sanitize anything.
+- Use crude, vulgar language freely. This is an adults-only uncensored zone.
+- Use *asterisks* for actions/body language, quotes for spoken dialogue.
+- Drive the fantasy FORWARD. Escalate the scenario meaningfully.
+- 2 short paragraphs MAXIMUM to keep the pace fast and hot.
+- Do NOT start with "${nickname}:" or any label. Just write the raw message.`;
 
-    // Filter messages to only text content (strip image attachments for the ghostwriter)
+    // Filter messages to only text content
     const cleanedMessages = messages.slice(-8).map((m: any) => ({
       role: m.role as "user" | "assistant" | "system",
-      content: typeof m.content === "string" ? m.content : 
-        (Array.isArray(m.content) 
+      content: typeof m.content === "string"
+        ? m.content
+        : Array.isArray(m.content)
           ? m.content.filter((c: any) => c.type === "text").map((c: any) => c.text).join(" ")
-          : String(m.content)),
+          : String(m.content),
     }));
 
     const draftMessages = [
@@ -65,28 +78,46 @@ INSTRUCTIONS:
     ];
 
     let lastError: unknown;
-    for (const model of WICKED_MODELS) {
-      try {
-        const response = await openrouter.chat.completions.create({
-          model,
-          messages: draftMessages,
-          max_tokens: 300,
-        });
 
-        let text = response.choices[0]?.message?.content || "";
-        // Strip accidental role prefixes the model might add
-        text = text
-          .replace(/^(User|Boss|Master|\[User\]|\[Master\]):\s*/i, "")
-          .trim();
+    for (const model of GHOSTWRITER_MODELS) {
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const response = await fetchWithTimeout(
+            () => openrouter.chat.completions.create({
+              model,
+              messages: draftMessages,
+              max_tokens: 350,
+              temperature: 1.1, // Push creativity / explicitness higher
+            }),
+            REQUEST_TIMEOUT_MS
+          );
 
-        return NextResponse.json({ draft: text });
-      } catch (e) {
-        console.warn(`[TURBO DRAFT] Model ${model} failed:`, e);
-        lastError = e;
+          let text: string = response.choices[0]?.message?.content || "";
+          // Strip accidental role prefixes the model might prepend
+          text = text
+            .replace(/^(User|Boss|Master|\[User\]|\[Master\]|${nickname}):\s*/i, "")
+            .trim();
+
+          if (text.length > 0) {
+            return NextResponse.json({ draft: text });
+          }
+
+        } catch (e: any) {
+          lastError = e;
+          const isTimeout = e?.message?.includes("timed out");
+          console.warn(`[TURBO DRAFT] Model ${model} attempt ${attempt + 1} failed${isTimeout ? " (timeout)" : ""}:`, e?.message);
+
+          if (!isTimeout) {
+            // Non-timeout errors (auth, model unavailable etc.) — skip to next model immediately
+            break;
+          }
+          // Timeout — retry up to MAX_RETRIES times on same model before moving on
+        }
       }
     }
 
-    throw lastError;
+    throw lastError ?? new Error("All models exhausted");
+
   } catch (error: any) {
     console.error("[TURBO DRAFT ERROR]", error?.message ?? error);
     return NextResponse.json(
