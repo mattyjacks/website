@@ -194,8 +194,7 @@ export default function AnythingButton() {
   const [showAgeWarning, setShowAgeWarning] = useState(false);
   const [isTurboMode, setIsTurboMode] = useState(false);
   const [turboFantasy, setTurboFantasy] = useState("We are passionately in love and exploring our darkest desires");
-  const [turboTimeLeft, setTurboTimeLeft] = useState(120);
-  const turboTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [turboMessagesLeft, setTurboMessagesLeft] = useState(5);
 
   const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
 
@@ -911,6 +910,8 @@ Create a summary that another AI can use to understand the context and continue 
 
   const currentSession = sessions.find((s) => s.id === currentSessionId);
   const messages = currentSession?.messages || [];
+  const messagesRef = useRef(messages);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
   const isLimitReached = messages.filter((m) => m.role === "assistant").length >= 69;
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -1003,7 +1004,8 @@ Create a summary that another AI can use to understand the context and continue 
   };
 
   const sendMessage = useCallback(async (textOverride?: string) => {
-    if (isLimitReached) {
+    const currentMsgs = messagesRef.current;
+    if (currentMsgs.filter(m => m.role === "assistant").length >= 69) {
       setError("Conversation limit reached (69 responses). Please start a new chat.");
       return;
     }
@@ -1042,8 +1044,8 @@ Create a summary that another AI can use to understand the context and continue 
       images: uploadedImages.length > 0 ? uploadedImages : undefined
     };
 
-    const newMessages = [...messages, userMessage];
-    const isFirstUserMsg = messages.filter(m => m.role === "user").length === 0;
+    const newMessages = [...currentMsgs, userMessage];
+    const isFirstUserMsg = currentMsgs.filter(m => m.role === "user").length === 0;
     const newTitle = isFirstUserMsg ? textToSend.slice(0, 30) + (textToSend.length > 30 ? "..." : "") || `Images (${uploadedImages.length})` : undefined;
 
     updateCurrentSession(newMessages, newTitle);
@@ -1194,34 +1196,15 @@ Create a summary that another AI can use to understand the context and continue 
         setTimeout(() => scrollToBottom(), 50);
       }
     }
-  }, [input, isLoading, messages, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached]);
+  }, [input, isLoading, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached, isTurboMode, chatMode, wickedModel, nickname, updateCurrentSession]);
 
   // --- Turbo Loop ---
-  useEffect(() => {
-    if (isTurboMode) {
-      if (!turboTimerRef.current) {
-        setTurboTimeLeft(120);
-        turboTimerRef.current = setInterval(() => {
-          setTurboTimeLeft((prev) => {
-            if (prev <= 1) {
-              setIsTurboMode(false);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-      }
-    } else {
-      if (turboTimerRef.current) {
-        clearInterval(turboTimerRef.current);
-        turboTimerRef.current = null;
-      }
-    }
-  }, [isTurboMode]);
 
   useEffect(() => {
-    if (!isTurboMode || isLoading || isLimitReached) return;
+    if (!isTurboMode || isLoading || isLimitReached || turboMessagesLeft <= 0) return;
     let isActive = true;
+    const controller = new AbortController();
+    
     const runTurbo = async () => {
       // WAIT FOR LIVE SPEECH TO AVERT OVERLAPPING AUDIO
       while (isSpeakingRef.current && isActive) {
@@ -1233,7 +1216,8 @@ Create a summary that another AI can use to understand the context and continue 
       try {
         const res = await fetch("/api/turbo-draft", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages, fantasy: turboFantasy, nickname })
+          body: JSON.stringify({ messages: messagesRef.current, fantasy: turboFantasy, nickname }),
+          signal: controller.signal
         });
         
         if (res.ok && res.body && isActive) {
@@ -1244,7 +1228,7 @@ Create a summary that another AI can use to understand the context and continue 
           let sseBuffer = "";
           const tempId = `turbo_user_${Date.now()}`;
           
-          while (!streamDone) {
+          while (!streamDone && isActive) {
             const { done, value } = await reader.read();
             if (done) break;
             
@@ -1271,7 +1255,7 @@ Create a summary that another AI can use to understand the context and continue 
             }
           }
           
-          if (currentDraft.trim()) {
+          if (currentDraft.trim() && isActive) {
             const finalDraft = currentDraft.replace(/^(User|Boss|Master|\[User\]|\[Master\]|.*?:)\s*/i, "").trimStart();
             setSessions(prev => prev.map(s => {
               if (s.id !== currentSessionId) return s;
@@ -1279,14 +1263,27 @@ Create a summary that another AI can use to understand the context and continue 
               return { ...s, messages: [...cMsgs] };
             }));
             sendMessage(finalDraft);
+            setTurboMessagesLeft(prev => {
+              const next = prev - 1;
+              if (next <= 0) setIsTurboMode(false);
+              return next;
+            });
           }
         }
-      } catch (e) { console.error("Turbo fetch error:", e); }
+      } catch (e: any) {
+        if (e.name !== 'AbortError') console.error("Turbo fetch error:", e);
+      }
     };
-    const lastMsgRole = messages.length > 0 ? messages[messages.length - 1].role : null;
+    
+    const currentMsgs = messagesRef.current;
+    const lastMsgRole = currentMsgs.length > 0 ? currentMsgs[currentMsgs.length - 1].role : null;
     if (lastMsgRole !== 'user') runTurbo();
-    return () => { isActive = false; };
-  }, [isTurboMode, isLoading, messages, isLimitReached, turboFantasy, nickname, sendMessage]);
+    
+    return () => { 
+      isActive = false; 
+      controller.abort(); 
+    };
+  }, [isTurboMode, isLoading, isLimitReached, turboFantasy, nickname, sendMessage, turboMessagesLeft]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -2037,11 +2034,17 @@ Create a summary that another AI can use to understand the context and continue 
                       <Zap className="w-3 h-3 fill-current animate-pulse" /> Turbo Roleplay
                     </span>
                     <button 
-                      onClick={() => setIsTurboMode(!isTurboMode)}
-                      disabled={isLoading}
+                      onClick={() => {
+                        if (!isTurboMode) {
+                          setTurboMessagesLeft(5);
+                          setIsTurboMode(true);
+                        } else {
+                          setIsTurboMode(false);
+                        }
+                      }}
                       className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${isTurboMode ? 'bg-rose-500 text-white' : 'bg-rose-200 dark:bg-rose-800 text-rose-700 dark:text-rose-300'} transition-colors disabled:opacity-50`}
                     >
-                      {isTurboMode ? `ACTIVE (${turboTimeLeft}s)` : 'ACTIVATE (2 MIN MAX)'}
+                      {isTurboMode ? `STOP (${turboMessagesLeft} LEFT)` : 'ACTIVATE (5 MSGS MAX)'}
                     </button>
                   </div>
                   <input
