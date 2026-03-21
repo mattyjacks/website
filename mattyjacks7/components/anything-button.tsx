@@ -1617,11 +1617,6 @@ Create a summary that another AI can use to understand the context and continue 
                   </div>
                 </motion.div>
               )}
-              <div className="flex justify-between items-center mt-3 px-1">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-400">
-                  {isLoading ? "Thinking... (30s timeout)" : error ? "Error - tap to retry" : `Ready (${messages.length}/50)`}
-                </span>
-              </div>
             </div>
             {/* Input */}
             <div 
