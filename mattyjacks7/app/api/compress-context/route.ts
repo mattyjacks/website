@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const openai = getOpenAI();
 
     const response = await openai.chat.completions.create({
-      model: "gpt-5-mini-2025-08-07", // GPT-5.4 nano equivalent
+      model: "gpt-5.4-mini-2026-03-17", // Primary robust model for MattyJacks
       messages: [
         {
           role: "system",
