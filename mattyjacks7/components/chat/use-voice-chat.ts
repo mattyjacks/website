@@ -53,12 +53,17 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
     }
 
     try {
-      const formData = new FormData();
-      formData.append('file', blob, 'audio.webm');
+      const base64Audio = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
 
       const response = await fetch('/api/speech/transcribe', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileBase64: base64Audio }),
       });
 
       if (!response.ok) {
