@@ -42,14 +42,27 @@ export function isPostListed(status: PostStatus) {
 
 async function fetchGitTree() {
   const url = `https://api.github.com/repos/${CONTENT_OWNER}/${CONTENT_REPO}/git/trees/${CONTENT_REF}?recursive=1`;
+  
+  const headers: HeadersInit = {
+    Accept: "application/vnd.github+json",
+  };
+  
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+
   const res = await fetch(url, {
     next: { revalidate: 60 },
-    headers: {
-      Accept: "application/vnd.github+json",
-    },
+    headers,
   });
 
   if (!res.ok) {
+    if (res.status === 403 || res.status === 429) {
+      console.warn(`[posts-content] GitHub API Rate Limit Exceeded: ${res.status} ${res.statusText}`);
+      console.warn(`[posts-content] Add GITHUB_TOKEN to environment variables to increase rate limits.`);
+      // Return empty tree on rate limit to prevent breaking the entire build
+      return { tree: [] };
+    }
     throw new Error(`Failed to fetch git tree: ${res.status} ${res.statusText}`);
   }
 
