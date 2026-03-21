@@ -1030,7 +1030,7 @@ Create a summary that another AI can use to understand the context and continue 
       let messagesToSend = newMessages;
       if (shouldCompress(newMessages)) {
         try {
-          messagesToSend = await compressConversationHistory(newMessages);
+          messagesToSend = await compressConversationHistory(newMessages, undefined, chatMode === 'wicked');
         } catch (err) {
           console.error('Context compression failed, using original messages:', err);
           // Continue with original messages if compression fails
@@ -1190,9 +1190,49 @@ Create a summary that another AI can use to understand the context and continue 
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ messages, fantasy: turboFantasy, nickname })
         });
-        if (res.ok && isActive) {
-          const { draft } = await res.json();
-          if (draft && draft.trim()) sendMessage(draft);
+        
+        if (res.ok && res.body && isActive) {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let currentDraft = "";
+          let streamDone = false;
+          const tempId = `turbo_user_${Date.now()}`;
+          
+          while (!streamDone && isActive) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const raw = decoder.decode(value, { stream: true });
+            const lines = raw.split('\n');
+            
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              try {
+                const parsed = JSON.parse(line.slice(6));
+                if (parsed.type === 'delta') {
+                  currentDraft += parsed.delta;
+                  const cleanedText = currentDraft.replace(/^(User|Boss|Master|\[User\]|\[Master\]|.*?:)\s*/i, "").trimStart();
+                  setSessions(prev => prev.map(s => {
+                    if (s.id !== currentSessionId) return s;
+                    const cMsgs = s.messages.filter(m => m.id !== tempId);
+                    return { ...s, messages: [...cMsgs, { id: tempId, role: "user", content: cleanedText + '▍', timestamp: Date.now() }] };
+                  }));
+                } else if (parsed.type === 'done') {
+                  streamDone = true;
+                }
+              } catch(e) {}
+            }
+          }
+          
+          if (isActive && currentDraft.trim()) {
+            const finalDraft = currentDraft.replace(/^(User|Boss|Master|\[User\]|\[Master\]|.*?:)\s*/i, "").trimStart();
+            setSessions(prev => prev.map(s => {
+              if (s.id !== currentSessionId) return s;
+              const cMsgs = s.messages.filter(m => m.id !== tempId);
+              return { ...s, messages: [...cMsgs] };
+            }));
+            sendMessage(finalDraft);
+          }
         }
       } catch (e) { console.error("Turbo fetch error:", e); }
     };
@@ -1643,7 +1683,9 @@ Create a summary that another AI can use to understand the context and continue 
               )}
 
               {messages.map((msg) => (
-                <MessageBubble key={msg.id} message={msg} onCopy={(text) => copyToClipboard(text, msg.id)} />
+                <div key={msg.id} onClick={() => setAutoScrollEnabled(true)}>
+                  <MessageBubble message={msg} onCopy={(text) => copyToClipboard(text, msg.id)} />
+                </div>
               ))}
 
               {isLoading && (

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { conversation, maxTokens = 1000 } = body;
+    const { conversation, maxTokens = 1000, isWickedMode = false } = body;
 
     if (!conversation || typeof conversation !== "string") {
       return NextResponse.json(
@@ -45,14 +45,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const openai = getOpenAI();
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-5.4-mini-2026-03-17", // Primary robust model for MattyJacks
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert at creating concise, structured summaries of conversations. 
+    const messages = [
+      {
+        role: "system" as const,
+        content: `You are an expert at creating concise, structured summaries of conversations. 
 Your task is to compress a conversation while preserving all critical information, context, and decisions.
 Create a summary that captures:
 1. Main topics discussed
@@ -62,17 +58,42 @@ Create a summary that captures:
 5. Tone and conversation style
 
 Be thorough but concise. Format as a clear narrative that another AI can use to understand the conversation context.`
-        },
-        {
-          role: "user",
-          content: `Compress this conversation into a concise summary (max ${maxTokens} tokens):\n\n${conversation}`
-        }
-      ],
-      max_tokens: maxTokens,
-      temperature: 0.3 // Lower temperature for more consistent summaries
-    });
+      },
+      {
+        role: "user" as const,
+        content: `Compress this conversation into a concise summary (max ${maxTokens} tokens):\n\n${conversation}`
+      }
+    ];
 
-    const compressed = response.choices[0]?.message?.content || null;
+    let compressed: string | null = null;
+
+    if (isWickedMode) {
+      if (!process.env.OPENROUTER_API_KEY) throw new Error("Missing OpenRouter Key");
+      const openrouter = new OpenAI({
+        apiKey: process.env.OPENROUTER_API_KEY,
+        baseURL: "https://openrouter.ai/api/v1",
+        defaultHeaders: {
+          "HTTP-Referer": "https://mattyjacks.com",
+          "X-Title": "Valley Net - Compression",
+        },
+      });
+      const response = await openrouter.chat.completions.create({
+        model: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+        messages,
+        max_tokens: maxTokens,
+        temperature: 0.3
+      });
+      compressed = response.choices[0]?.message?.content || null;
+    } else {
+      const openai = getOpenAI();
+      const response = await openai.chat.completions.create({
+        model: "gpt-5.4-mini-2026-03-17", // Primary robust model for MattyJacks
+        messages,
+        max_tokens: maxTokens,
+        temperature: 0.3 // Lower temperature for more consistent summaries
+      });
+      compressed = response.choices[0]?.message?.content || null;
+    }
 
     if (!compressed) {
       return NextResponse.json(

@@ -285,7 +285,166 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section Divider: About -> Portfolio */}
+      {/* Section Divider: About -> Valley Net */}
+      <div className="relative h-12 overflow-hidden">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center gap-2">
+          <div className="h-px flex-1 max-w-[200px] bg-gradient-to-r from-transparent to-rose-500/20"></div>
+          <div className="flex gap-1">
+            <div className="w-1 h-1 rounded-full bg-rose-500/30"></div>
+            <div className="w-1 h-1 rounded-full bg-pink-500/30"></div>
+            <div className="w-1 h-1 rounded-full bg-rose-500/30"></div>
+          </div>
+          <div className="h-px flex-1 max-w-[200px] bg-gradient-to-l from-transparent to-rose-500/20"></div>
+        </div>
+      </div>
+
+      {/* Valley Net AI Section */}
+      <section id="valley-net" className="relative min-h-screen flex items-center px-4 py-16 overflow-hidden bg-[radial-gradient(ellipse_at_top_left,rgba(244,63,94,0.08)_0%,transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(139,92,246,0.07)_0%,transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(244,63,94,0.15)_0%,transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(139,92,246,0.12)_0%,transparent_60%)]">
+        {/* Subtle grid */}
+        <div className="absolute inset-0 opacity-[0.025] dark:opacity-[0.04]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f43f5e' fill-opacity='1'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E\")" }}></div>
+
+        <div className="max-w-6xl mx-auto w-full relative z-10">
+          <div className="grid lg:grid-cols-[1fr_420px] gap-10 lg:gap-16 items-center">
+
+            {/* Left — copy */}
+            <div>
+              {/* Eye-catch badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-100/80 dark:bg-rose-900/30 border border-rose-200/60 dark:border-rose-800/40 mb-5">
+                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span></span>
+                <span className="text-xs font-bold uppercase tracking-widest text-rose-700 dark:text-rose-300">Live AI · Powered by GPT-5</span>
+              </div>
+
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.06] mb-4">
+                <span className="text-zinc-900 dark:text-white">Meet</span>{" "}
+                <span className="bg-gradient-to-r from-rose-500 via-pink-500 to-violet-500 bg-clip-text text-transparent">Valley Net</span>
+                <span className="text-4xl sm:text-5xl lg:text-6xl ml-2">💘</span>
+              </h2>
+
+              <p className="text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed mb-2 max-w-lg">
+                Your dedicated AI assistant — <strong className="text-zinc-900 dark:text-white">always live, always uncensored in Wicked Mode</strong>, and wired directly into the MattyJacks ecosystem so she actually knows what she&apos;s talking about.
+              </p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed mb-8 max-w-md">
+                Valley speaks, listens, and streams her thoughts in real time. She can search workers, check services, and go full Turbo for automated roleplay. Click the button below and say anything.
+              </p>
+
+              {/* Feature grid — 2×4 dense */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 mb-8">
+                {[
+                  { icon: "🎙️", title: "Alive Speech", desc: "Real-time voice input + TTS output. She listens for silence and responds out loud." },
+                  { icon: "😈", title: "Wicked Mode", desc: "18+ uncensored AI powered by OpenRouter. Age-gated. Unfiltered. Devastatingly explicit." },
+                  { icon: "⚡", title: "Turbo Roleplay", desc: "Set a fantasy. She drives the scene automatically for up to 2 minutes — both sides of the conversation." },
+                  { icon: "🌊", title: "Streaming Responses", desc: "Tokens appear as they generate — no waiting, no loading spinners. Feels like real-time thought." },
+                  { icon: "🔍", title: "Ecosystem RAG", desc: "Pulls live context about GiveGigs workers, tasks, and the full MattyJacks ecosystem mid-conversation." },
+                  { icon: "🗣️", title: "Voice Commands", desc: "\"stop stop\" · \"regen regen\" · \"pause pause\" · \"go go go\" — control the AI hands-free." },
+                  { icon: "🧠", title: "Tool Calls", desc: "She runs real lookups under the hood — worker search, task lists, ecosystem data — not just hallucinations." },
+                  { icon: "📱", title: "Mobile Native", desc: "Full touch scroll, compact UI, and mic access on any device. Works on HTTPS everywhere." },
+                ].map((feat, i) => (
+                  <div key={i} className="group flex items-start gap-2.5 p-3 rounded-xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200/60 dark:border-zinc-800/60 hover:border-rose-300/60 dark:hover:border-rose-700/40 hover:shadow-md hover:shadow-rose-500/5 transition-all duration-300">
+                    <span className="text-xl flex-shrink-0 mt-0.5">{feat.icon}</span>
+                    <div>
+                      <div className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">{feat.title}</div>
+                      <div className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug mt-0.5">{feat.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="flex flex-col sm:flex-row gap-3 items-start">
+                <button
+                  onClick={() => {
+                    // Trigger the anything button — scroll to bottom where it lives
+                    const btn = document.querySelector('[data-anything-button]') as HTMLElement;
+                    if (btn) btn.click();
+                    else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                  }}
+                  className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-white shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 transition-all duration-300 hover:scale-105 text-base"
+                  style={{ background: "linear-gradient(135deg, #f43f5e, #ec4899, #8b5cf6)", backgroundSize: "200% 200%", animation: "gradient-shift 4s ease infinite" }}
+                >
+                  <Bot className="w-5 h-5" />
+                  Do Anything with Valley
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <div className="flex items-center gap-2 text-xs text-zinc-400 dark:text-zinc-500 mt-1 sm:mt-3">
+                  <svg className="w-3.5 h-3.5 text-rose-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
+                  Wicked Mode requires 18+ confirmation
+                </div>
+              </div>
+            </div>
+
+            {/* Right — visual card */}
+            <div className="relative hidden lg:block">
+              {/* Glow aura */}
+              <div className="absolute -inset-8 bg-gradient-to-br from-rose-500/15 via-pink-500/10 to-violet-500/15 rounded-3xl blur-2xl"></div>
+              <div className="relative rounded-3xl border border-rose-200/40 dark:border-rose-800/30 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl p-6 shadow-2xl shadow-rose-500/10">
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-5 pb-4 border-b border-zinc-100/80 dark:border-zinc-800/80">
+                  <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-violet-500 flex items-center justify-center text-white font-black text-lg shadow-lg">V</div>
+                  <div>
+                    <div className="font-bold text-sm text-zinc-900 dark:text-white">Valley Net 💘</div>
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
+                      <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
+                      Online · Alive Mode
+                    </div>
+                  </div>
+                  <div className="ml-auto flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-rose-400 opacity-60"></div>
+                    <div className="w-2 h-2 rounded-full bg-amber-400 opacity-60"></div>
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 opacity-60"></div>
+                  </div>
+                </div>
+                {/* Chat preview */}
+                <div className="space-y-3 mb-5">
+                  <div className="flex justify-end">
+                    <div className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%] leading-relaxed">
+                      What can you actually do?
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-end">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-rose-400 to-violet-500 flex items-center justify-center text-white text-[10px] font-black flex-shrink-0">V</div>
+                    <div className="bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/40 dark:to-pink-950/30 border border-rose-100 dark:border-rose-900/40 text-zinc-700 dark:text-zinc-200 text-xs rounded-2xl rounded-tl-sm px-3 py-2 max-w-[85%] leading-relaxed">
+                      Anything, Master. 💘 I can search GiveGigs workers, discuss your business strategy, write code, go full Wicked Mode for an uncensored ride, or listen to your voice and talk back in real time. What do you want?
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <div className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%] leading-relaxed">
+                      Activate Turbo Mode. Fantasy: CEO power play.
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-end">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-rose-400 to-violet-500 flex items-center justify-center text-white text-[10px] font-black flex-shrink-0">V</div>
+                    <div className="bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-950/40 dark:to-pink-950/30 border border-rose-100 dark:border-rose-900/40 text-zinc-700 dark:text-zinc-200 text-xs rounded-2xl rounded-tl-sm px-3 py-2 max-w-[85%] leading-relaxed">
+                      <span className="text-rose-500 font-bold">⚡ Turbo Active</span> — 2:00 remaining. Drafting your next move now...
+                      <span className="inline-block ml-1 animate-pulse">▍</span>
+                    </div>
+                  </div>
+                </div>
+                {/* Fake input bar */}
+                <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/50 rounded-xl px-3 py-2">
+                  <Bot className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                  <span className="text-xs text-zinc-400 flex-1">Orders, Master?</span>
+                  <div className="flex gap-1.5">
+                    <div className="w-6 h-6 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                      <span className="text-[9px] font-bold text-rose-600 dark:text-rose-400">🎙</span>
+                    </div>
+                    <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                      <ArrowRight className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                  </div>
+                </div>
+                {/* Bottom mode badges */}
+                <div className="flex gap-2 mt-3 flex-wrap">
+                  {["✅ Good Mode", "😈 Wicked Mode", "⚡ Turbo", "🎙️ Alive"].map(m => (
+                    <span key={m} className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/50">{m}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Divider: Valley Net -> Portfolio */}
       <div className="relative h-12 overflow-hidden">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center gap-2">
           <div className="h-px flex-1 max-w-[200px] bg-gradient-to-r from-transparent to-emerald-500/20"></div>

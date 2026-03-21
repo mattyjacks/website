@@ -17,66 +17,96 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
   const silenceStartRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const recordingStartRef = useRef<number | null>(null); // track recording start time
+  const recordingStartRef = useRef<number | null>(null);
+  const isProcessingRef = useRef(false); // Ref mirror for guards inside async closures
 
-  const stopRecordingAndTranscribe = useCallback(async () => {
-    if (!mediaRecorderRef.current || mediaRecorderRef.current.state === "inactive") return;
-    
-    mediaRecorderRef.current.stop();
-    setIsRecording(false);
-    setIsProcessing(true);
-    
-    // Stop tracks
+  const stopTracks = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
     }
-    
-    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    if (audioContextRef.current?.state === "running") {
-      await audioContextRef.current.close();
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
   }, []);
 
+  const stopRecordingAndTranscribe = useCallback(async () => {
+    if (!mediaRecorderRef.current || mediaRecorderRef.current.state === 'inactive') return;
+    mediaRecorderRef.current.stop();
+    setIsRecording(false);
+    setIsProcessing(true);
+    isProcessingRef.current = true;
+    stopTracks();
+    if (audioContextRef.current?.state === 'running') {
+      await audioContextRef.current.close();
+    }
+  }, [stopTracks]);
+
   const processAudioBlob = useCallback(async (blob: Blob) => {
+    // Minimum 8KB guard — anything smaller is silence/empty
+    if (blob.size < 8000) {
+      console.warn('[Voice] Skipped tiny/silent blob:', blob.size, 'bytes');
+      setIsProcessing(false);
+      isProcessingRef.current = false;
+      return;
+    }
+
     try {
       const formData = new FormData();
-      formData.append("file", blob, "audio.webm");
+      formData.append('file', blob, 'audio.webm');
 
-      const response = await fetch("/api/speech/transcribe", {
-        method: "POST",
+      const response = await fetch('/api/speech/transcribe', {
+        method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Transcription failed");
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Transcription HTTP ${response.status}`);
+      }
       const { text } = await response.json();
-      
-      const lower = text.toLowerCase().trim();
-      
-      // Parse Voice Commands as requested: "stop stop", "regen regen", "pause pause", "go go go"
-      if (lower.includes("stop stop")) {
-        onCommandCommand?.("stop");
-      } else if (lower.includes("regen regen")) {
-        onCommandCommand?.("regen");
-      } else if (lower.includes("pause pause")) {
-        onCommandCommand?.("pause");
-      } else if (lower.includes("go go go")) {
-        onCommandCommand?.("go");
+      const lower = (text ?? '').toLowerCase().trim();
+
+      if (lower.includes('stop stop')) {
+        onCommandCommand?.('stop');
+      } else if (lower.includes('regen regen')) {
+        onCommandCommand?.('regen');
+      } else if (lower.includes('pause pause')) {
+        onCommandCommand?.('pause');
+      } else if (lower.includes('go go go')) {
+        onCommandCommand?.('go');
       } else if (text.trim().length > 0) {
         onTranscript(text);
       }
-    } catch (error) {
-      console.error("Whisper transcription error:", error);
-      onError?.("Transcription failed. Try again.");
+    } catch (error: any) {
+      const msg = error?.message ?? String(error);
+      console.error('[Voice] Whisper transcription error:', msg);
+      // Only surface the error to the user if it's not just a silent/empty blob rejection
+      if (!msg.includes('Transcription HTTP 200')) {
+        onError?.(`Transcription error: ${msg}`);
+      }
     } finally {
       setIsProcessing(false);
+      isProcessingRef.current = false;
     }
-  }, [onTranscript, onCommandCommand]);
+  }, [onTranscript, onCommandCommand, onError]);
 
   const startRecording = useCallback(async () => {
+    // Don't start a new recording if already processing or already recording
+    if (isProcessingRef.current) {
+      console.warn('[Voice] startRecording skipped — still processing previous audio');
+      return;
+    }
+    if (mediaRecorderRef.current?.state === 'recording') {
+      console.warn('[Voice] startRecording skipped — already recording');
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-      
+
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -86,17 +116,12 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        // Only send if we have meaningful audio (at least 8KB)
-        if (audioBlob.size > 8000) {
-          processAudioBlob(audioBlob);
-        } else {
-          setIsProcessing(false);
-          console.warn('[Voice] Skipped tiny/silent blob:', audioBlob.size, 'bytes');
-        }
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        audioChunksRef.current = [];
+        processAudioBlob(blob);
       };
 
-      // Set up Silence Detection
+      // Silence detection setup
       const AudioContextType = window.AudioContext || (window as any).webkitAudioContext;
       const actx = new AudioContextType();
       audioContextRef.current = actx;
@@ -112,20 +137,18 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
       silenceStartRef.current = null;
 
       const checkSilence = () => {
-        if (!analyserRef.current) return;
+        if (!analyserRef.current || mediaRecorderRef.current?.state !== 'recording') return;
         const memory = new Uint8Array(analyserRef.current.frequencyBinCount);
         analyserRef.current.getByteFrequencyData(memory);
         const average = memory.reduce((a, b) => a + b) / memory.length;
-        
-        // Silence detection — threshold 20 and require at least 800ms of recording before stopping
-        const minRecordMs = 800;
-        const hasMinRecording = recordingStartRef.current !== null && (Date.now() - recordingStartRef.current) > minRecordMs;
-        
+
+        const minRecordMs = 1000; // Must record at least 1 second before stopping on silence
+        const elapsed = recordingStartRef.current ? Date.now() - recordingStartRef.current : 0;
+        const hasMinRecording = elapsed > minRecordMs;
+
         if (average < 20 && hasMinRecording) {
-          if (silenceStartRef.current === null) {
-            silenceStartRef.current = Date.now();
-          } else if (Date.now() - silenceStartRef.current > autoProcessSilenceMs) {
-            // Silence detected for X ms
+          if (!silenceStartRef.current) silenceStartRef.current = Date.now();
+          else if (Date.now() - silenceStartRef.current > autoProcessSilenceMs) {
             stopRecordingAndTranscribe();
             return;
           }
@@ -133,54 +156,37 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
           silenceStartRef.current = null;
         }
 
-        if (mediaRecorderRef.current?.state === "recording") {
-          animationFrameRef.current = requestAnimationFrame(checkSilence);
-        }
+        animationFrameRef.current = requestAnimationFrame(checkSilence);
       };
-      
+
       checkSilence();
-      
+
     } catch (err: any) {
-      console.error("Microphone access error:", err);
-      // Give the user a clear explanation
-      const msg = err.message || "Unknown error";
+      const msg = err?.message ?? 'Unknown error';
       if (!navigator.mediaDevices) {
-        onError?.("Microphone API is disabled. This usually happens if you're not on HTTPS (Secure Context).");
-      } else if (msg.includes("Permission denied") || msg.includes("NotAllowedError")) {
-        onError?.("Microphone permission was denied. Please allow it in your browser settings.");
+        onError?.('Microphone API disabled — must be on HTTPS (Secure Context).');
+      } else if (msg.includes('Permission denied') || msg.includes('NotAllowedError')) {
+        onError?.('Microphone permission denied. Allow it in your browser settings.');
       } else {
-        onError?.(`Microphone Error: ${msg}`);
+        onError?.(`Microphone error: ${msg}`);
       }
       setIsProcessing(false);
+      isProcessingRef.current = false;
       setIsRecording(false);
     }
-  }, [autoProcessSilenceMs, stopRecordingAndTranscribe, onError]);
+  }, [autoProcessSilenceMs, stopRecordingAndTranscribe, processAudioBlob, onError]);
 
   const toggleRecording = useCallback(() => {
-    if (isRecording) {
-      stopRecordingAndTranscribe();
-    } else {
-      startRecording();
-    }
+    if (isRecording) stopRecordingAndTranscribe();
+    else startRecording();
   }, [isRecording, startRecording, stopRecordingAndTranscribe]);
 
   useEffect(() => {
     return () => {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-        mediaRecorderRef.current.stop();
-      }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.stop();
+      stopTracks();
     };
-  }, []);
+  }, [stopTracks]);
 
-  return {
-    isRecording,
-    isProcessing,
-    startRecording,
-    stopRecordingAndTranscribe,
-    toggleRecording
-  };
+  return { isRecording, isProcessing, startRecording, stopRecordingAndTranscribe, toggleRecording };
 }

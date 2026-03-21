@@ -76,7 +76,7 @@ export function MessageBubble({ message, onCopy }: { message: ChatMessage; onCop
       initial={{ opacity: 0, y: 15, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 220, damping: 20 }}
-      layout
+      layout={!message.content.endsWith('▍')}
       className={`flex w-full ${isUser ? "justify-end" : "justify-start"} group mb-5`}
     >
       <div className={`flex w-full gap-3 ${isUser ? "flex-row-reverse" : "flex-row"} max-w-[95%] sm:max-w-[85%]`}>

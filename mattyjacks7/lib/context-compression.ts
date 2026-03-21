@@ -30,7 +30,8 @@ function estimateTokens(text: string): number {
 
 export async function compressConversationHistory(
   messages: ChatMessage[],
-  config: CompressionConfig = DEFAULT_CONFIG
+  config: CompressionConfig = DEFAULT_CONFIG,
+  isWickedMode: boolean = false
 ): Promise<ChatMessage[]> {
   // Don't compress if below threshold
   if (messages.length < config.compressionThreshold) {
@@ -53,7 +54,7 @@ export async function compressConversationHistory(
 
   try {
     // Compress old conversation history
-    const compressedSummary = await compressMessages(oldMessages);
+    const compressedSummary = await compressMessages(oldMessages, isWickedMode);
     
     if (!compressedSummary) {
       return messages; // If compression fails, return original
@@ -75,7 +76,7 @@ export async function compressConversationHistory(
   }
 }
 
-async function compressMessages(messages: ChatMessage[]): Promise<string | null> {
+async function compressMessages(messages: ChatMessage[], isWickedMode: boolean): Promise<string | null> {
   try {
     const conversationText = messages
       .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content.slice(0, 500)}`)
@@ -86,7 +87,8 @@ async function compressMessages(messages: ChatMessage[]): Promise<string | null>
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         conversation: conversationText,
-        maxTokens: DEFAULT_CONFIG.maxCompressedSummaryTokens
+        maxTokens: DEFAULT_CONFIG.maxCompressedSummaryTokens,
+        isWickedMode
       })
     });
 

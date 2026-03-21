@@ -75,6 +75,7 @@ STRICT RULES:
     const draftMessages = [
       { role: "system" as const, content: systemPrompt },
       ...cleanedMessages,
+      { role: "system" as const, content: `CRITICAL DIRECTIVE: You are now writing AS THE USER ("${nickname}"). DO NOT write as Valley Net. Generate ONLY the User's explicit response to drive the fantasy forward. Do not prefix with names.` }
     ];
 
     let lastError: unknown;
@@ -82,25 +83,50 @@ STRICT RULES:
     for (const model of GHOSTWRITER_MODELS) {
       for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
         try {
-          const response = await fetchWithTimeout(
+          // Send request with stream: true
+          const streamResponse = await fetchWithTimeout(
             () => openrouter.chat.completions.create({
               model,
               messages: draftMessages,
               max_tokens: 350,
               temperature: 1.1, // Push creativity / explicitness higher
+              stream: true,
             }),
             REQUEST_TIMEOUT_MS
           );
 
-          let text: string = response.choices[0]?.message?.content || "";
-          // Strip accidental role prefixes the model might prepend
-          text = text
-            .replace(/^(User|Boss|Master|\[User\]|\[Master\]|${nickname}):\s*/i, "")
-            .trim();
+          // We successfully started the stream. Return a ReadableStream Response
+          const encoder = new TextEncoder();
+          const stream = new ReadableStream({
+            async start(controller) {
+              const enqueue = (obj: any) =>
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify(obj)}\n\n`));
 
-          if (text.length > 0) {
-            return NextResponse.json({ draft: text });
-          }
+              try {
+                let fullText = "";
+                for await (const chunk of streamResponse) {
+                  const delta = chunk.choices[0]?.delta?.content || "";
+                  if (delta) {
+                    fullText += delta;
+                    enqueue({ type: 'delta', delta });
+                  }
+                }
+                enqueue({ type: 'done', fullText });
+              } catch (err: any) {
+                enqueue({ type: 'error', error: err.message || "Stream error" });
+              } finally {
+                controller.close();
+              }
+            }
+          });
+
+          return new Response(stream, {
+            headers: {
+              'Content-Type': 'text/event-stream',
+              'Cache-Control': 'no-cache',
+              'Connection': 'keep-alive',
+            }
+          });
 
         } catch (e: any) {
           lastError = e;
