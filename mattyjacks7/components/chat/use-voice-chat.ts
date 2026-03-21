@@ -72,6 +72,17 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
       }
       const { text } = await response.json();
       const lower = (text ?? '').toLowerCase().trim();
+      
+      const stripped = lower.replace(/[^a-z]/g, '');
+      const isHallucination = 
+        stripped === 'thankyouforwatching' ||
+        stripped === 'thanksforwatching' ||
+        stripped === 'subscribetomychannel' ||
+        stripped === 'subscribetothechannel' ||
+        stripped === 'pleasesubscribe' ||
+        stripped === 'thanksforlistening' ||
+        stripped === 'thankyou' ||
+        stripped === 'subscribe';
 
       if (lower.includes('stop stop')) {
         onCommandCommand?.('stop');
@@ -81,8 +92,10 @@ export function useVoiceChat({ onTranscript, onCommandCommand, onError, autoProc
         onCommandCommand?.('pause');
       } else if (lower.includes('go go go')) {
         onCommandCommand?.('go');
-      } else if (text.trim().length > 0) {
-        onTranscript(text);
+      } else if (text.trim().length > 0 && !isHallucination) {
+        onTranscript(text.trim());
+      } else if (isHallucination) {
+        console.warn('[Voice] Ignored Whisper hallucination:', text);
       }
     } catch (error: any) {
       const msg = error?.message ?? String(error);

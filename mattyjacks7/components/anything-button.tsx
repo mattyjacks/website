@@ -116,7 +116,7 @@ export default function AnythingButton() {
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const { isRecording, isProcessing, toggleRecording, startRecording, stopRecordingAndTranscribe } = useVoiceChat({
-    autoProcessSilenceMs: isAliveMode ? 1500 : 3000,
+    autoProcessSilenceMs: isAliveMode ? 4000 : 6000,
     onError: (msg) => {
       setError(msg);
       setIsAliveMode(false);
@@ -134,9 +134,12 @@ export default function AnythingButton() {
     }
   });
 
+  const isSpeakingRef = useRef(false);
+
   const playSynthesizedSpeech = useCallback(async (text: string) => {
     try {
       if (currentAudioRef.current) currentAudioRef.current.pause();
+      isSpeakingRef.current = true;
       const res = await fetch("/api/speech/synthesize", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, model: "tts-1", voice: "nova" })
@@ -145,11 +148,21 @@ export default function AnythingButton() {
         const url = URL.createObjectURL(await res.blob());
         const audio = new Audio(url);
         currentAudioRef.current = audio;
-        audio.onended = () => { if (isAliveMode) startRecording(); };
-        audio.play().catch(console.error);
+        audio.onended = () => { 
+          isSpeakingRef.current = false;
+          if (isAliveMode) startRecording(); 
+        };
+        audio.play().catch(e => {
+          console.error(e);
+          isSpeakingRef.current = false;
+          if (isAliveMode) startRecording();
+        });
+      } else {
+        isSpeakingRef.current = false;
       }
     } catch (err) {
       console.error("TTS error:", err);
+      isSpeakingRef.current = false;
       if (isAliveMode) setTimeout(startRecording, 1000);
     }
   }, [isAliveMode, startRecording]);
@@ -1187,6 +1200,11 @@ Create a summary that another AI can use to understand the context and continue 
     if (!isTurboMode || isLoading || isLimitReached) return;
     let isActive = true;
     const runTurbo = async () => {
+      // WAIT FOR LIVE SPEECH TO AVERT OVERLAPPING AUDIO
+      while (isSpeakingRef.current && isActive) {
+        await new Promise(r => setTimeout(r, 200));
+      }
+      
       await new Promise(r => setTimeout(r, 100)); // Start almost instantly
       if (!isActive || !isTurboMode || isLoading) return;
       try {
