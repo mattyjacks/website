@@ -135,37 +135,60 @@ export default function AnythingButton() {
   });
 
   const isSpeakingRef = useRef(false);
+  const audioQueueRef = useRef<string[]>([]);
 
-  const playSynthesizedSpeech = useCallback(async (text: string) => {
+  const processAudioQueue = useCallback(async () => {
+    if (isSpeakingRef.current || audioQueueRef.current.length === 0) return;
+    
+    isSpeakingRef.current = true;
+    const text = audioQueueRef.current.shift()!;
+    
     try {
       if (currentAudioRef.current) currentAudioRef.current.pause();
-      isSpeakingRef.current = true;
+      
       const res = await fetch("/api/speech/synthesize", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, model: "tts-1", voice: "nova" })
       });
+      
       if (res.ok) {
         const url = URL.createObjectURL(await res.blob());
         const audio = new Audio(url);
         currentAudioRef.current = audio;
+        
         audio.onended = () => { 
           isSpeakingRef.current = false;
-          if (isAliveMode) startRecording(); 
+          if (audioQueueRef.current.length > 0) {
+            processAudioQueue();
+          } else if (isAliveMode) {
+            startRecording(); 
+          }
         };
+        
         audio.play().catch(e => {
           console.error(e);
           isSpeakingRef.current = false;
-          if (isAliveMode) startRecording();
+          if (audioQueueRef.current.length > 0) processAudioQueue();
+          else if (isAliveMode) startRecording();
         });
       } else {
         isSpeakingRef.current = false;
+        if (audioQueueRef.current.length > 0) processAudioQueue();
       }
     } catch (err) {
       console.error("TTS error:", err);
       isSpeakingRef.current = false;
-      if (isAliveMode) setTimeout(startRecording, 1000);
+      if (audioQueueRef.current.length > 0) processAudioQueue();
+      else if (isAliveMode) setTimeout(startRecording, 1000);
     }
   }, [isAliveMode, startRecording]);
+
+  const playSynthesizedSpeech = useCallback((text: string) => {
+    audioQueueRef.current.push(text);
+    if (!isSpeakingRef.current) {
+      processAudioQueue();
+    }
+  }, [processAudioQueue]);
 
   // --- Turbo & Wicked Age Gate ---
   const [showAgeWarning, setShowAgeWarning] = useState(false);
