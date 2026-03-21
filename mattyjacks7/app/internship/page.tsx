@@ -2,7 +2,7 @@
 
 
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 import { Rocket, Target, Briefcase, Zap, ExternalLink, MessageCircle, DollarSign, Clock, FileText, Play } from "lucide-react";
@@ -17,34 +17,102 @@ export default function InternshipPage() {
   const videoRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const ctaRef = useScrollAnimation<HTMLDivElement>(fadeInUp);
   const videoCarouselRef = useRef<HTMLDivElement>(null);
-  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
 
-  const videoDemos = [
+  type VideoDemo = {
+    title: string;
+    description: string;
+    embedUrl: string;
+    duration: string;
+  };
+
+  type VideoSet = {
+    id: string;
+    label: string;
+    title: string;
+    summary: string;
+    videos: VideoDemo[];
+  };
+
+  const videoSetsData: VideoSet[] = [
     {
-      title: "panoramic plumbing demo site creation with antigravity",
-      description: "Full walkthrough of building a client-ready plumbing site in Antigravity with Matty narrating decisions.",
-      embedUrl: "https://www.youtube.com/embed/7C3dWceVASQ",
-      duration: "18:35",
+      id: "set-1",
+      label: "Zen's Tutorials",
+      title: "Zen's Foundations & Tooling",
+      summary: "Core lectures from Zen covering vibe coding philosophy and the Supabase stack you will build on.",
+      videos: [
+        {
+          title: "Introduction to Vibe Coding by Zen || Lecture 1",
+          description: "A complete primer on vibe coding workflow, client positioning, and how to think in motion-first design.",
+          embedUrl: "https://www.youtube.com/embed/ox_dMLNYhjw",
+          duration: "1:38:38",
+        },
+        {
+          title: "Introduction to Supabase by Zen || Lecture 2",
+          description: "Hands-on walkthrough connecting Supabase to vibe-coded frontends, auth flows, and data orchestration.",
+          embedUrl: "https://www.youtube.com/embed/obcSlMsz4Kk",
+          duration: "47:28",
+        },
+      ],
     },
     {
-      title: "vibecoding!",
-      description: "Long-form session showing vibe coding workflow, asset sourcing, and rapid iteration from blank page.",
-      embedUrl: "https://www.youtube.com/embed/VRhsTf-Lyzg",
-      duration: "45:24",
+      id: "set-2",
+      label: "Russ' Tutorials",
+      title: "Russ' Deep-Dive Build Sessions",
+      summary: "Long-form streams where Russ vibe codes production-ready experiences live, end-to-end.",
+      videos: [
+        {
+          title: "vibecoding!",
+          description: "45-minute sandbox session showcasing how to source assets, iterate layouts, and keep creative momentum.",
+          embedUrl: "https://www.youtube.com/embed/VRhsTf-Lyzg",
+          duration: "45:24",
+        },
+        {
+          title: "vibecoding in tagalog and english",
+          description: "Bilingual build sprint switching between Tagalog and English prompts to demonstrate rapid content pivots.",
+          embedUrl: "https://www.youtube.com/embed/r1gVqn-3axA",
+          duration: "1:19:51",
+        },
+        {
+          title: "creating a taglish translator through google antigravity!",
+          description: "Full product build of a Taglish translator with Antigravity, responsive polish, and micro-interactions.",
+          embedUrl: "https://www.youtube.com/embed/eucznB_KAno",
+          duration: "1:01:54",
+        },
+      ],
     },
     {
-      title: "vibecoding in tagalog and english",
-      description: "Bilingual build sprint where prompts, copy, and layout flip between Tagalog and English live.",
-      embedUrl: "https://www.youtube.com/embed/r1gVqn-3axA",
-      duration: "1:19:51",
-    },
-    {
-      title: "creating a taglish translator through google antigravity!",
-      description: "End-to-end creation of a Taglish translation experience using Antigravity, animations, and UX polish.",
-      embedUrl: "https://www.youtube.com/embed/eucznB_KAno",
-      duration: "1:01:54",
+      id: "set-3",
+      label: "Matt's Tutorials",
+      title: "Matt's Spec Work & Internship Sprint",
+      summary: "Production demos from Matty that mirror the internship grind — client spec builds and rapid-fire portfolio expansion.",
+      videos: [
+        {
+          title: "panoramic plumbing demo site creation with antigravity",
+          description: "Matty builds a plumbing company site from scratch, narrating decision-making for structure and flair.",
+          embedUrl: "https://www.youtube.com/embed/7C3dWceVASQ",
+          duration: "18:35",
+        },
+        {
+          title: "WE BUILT THIS AWESOME WEBSITE IN 30 MINUTES, join our internship plz",
+          description: "Intern sprint recording — watch the team assemble a pitch-ready landing page in under half an hour.",
+          embedUrl: "https://www.youtube.com/embed/qddHwjoGQLc",
+          duration: "33:07",
+        },
+      ],
     },
   ];
+
+  const videoSets = useMemo<VideoSet[]>(() => {
+    const sets = [...videoSetsData];
+    for (let i = sets.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [sets[i], sets[j]] = [sets[j], sets[i]];
+    }
+    return sets;
+  }, []);
+
+  const [activeSetIndex, setActiveSetIndex] = useState<number>(0);
+  const [activeVideoIndexBySet, setActiveVideoIndexBySet] = useState<number[]>(() => videoSets.map(() => 0));
 
   const getYoutubeId = (embedUrl: string) => {
     const parts = embedUrl.split("/");
@@ -52,7 +120,7 @@ export default function InternshipPage() {
     return last.split("?")[0];
   };
 
-  const activeVideo = videoDemos[activeVideoIndex];
+  const activeVideo = videoSets[activeSetIndex].videos[activeVideoIndexBySet[activeSetIndex]];
 
   return (
     <main className="min-h-screen flex flex-col pt-24 pb-20">
@@ -229,7 +297,43 @@ export default function InternshipPage() {
             </p>
           </div>
 
-          <div ref={videoRef} className="space-y-8">
+          <div ref={videoRef} className="space-y-10">
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {videoSets.map((set, index) => {
+                const isActive = index === activeSetIndex;
+                return (
+                  <button
+                    key={set.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveSetIndex(index);
+                      videoCarouselRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }}
+                    className={`relative inline-flex items-center gap-2 px-5 py-2 rounded-2xl text-sm font-semibold transition-all duration-300 border ${
+                      isActive
+                        ? "bg-gradient-to-r from-sky-600 to-emerald-500 text-white shadow-lg shadow-sky-500/25 border-transparent"
+                        : "bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800 hover:border-sky-400 hover:text-sky-500 dark:hover:text-sky-300"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    <span className="text-xs uppercase tracking-[0.24em] text-white/70">
+                      {index + 1 < 10 ? `0${index + 1}` : index + 1}
+                    </span>
+                    {set.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">
+                {videoSets[activeSetIndex].title}
+              </h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto leading-relaxed">
+                {videoSets[activeSetIndex].summary}
+              </p>
+            </div>
+
             <div ref={videoCarouselRef} className="relative rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl bg-black">
               <div className="relative w-full pb-[56.25%]">
                 <iframe
@@ -246,7 +350,7 @@ export default function InternshipPage() {
                 Live Demo
               </div>
               <div className="absolute top-4 right-4 text-xs font-semibold text-white/80 bg-black/60 px-3 py-1.5 rounded-full tracking-[0.18em]">
-                {String(activeVideoIndex + 1).padStart(2, "0")} · {activeVideo.duration}
+                {String(activeVideoIndexBySet[activeSetIndex] + 1).padStart(2, "0")} · {activeVideo.duration}
               </div>
             </div>
 
@@ -258,15 +362,19 @@ export default function InternshipPage() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {videoDemos.map((video, index) => {
+              {videoSets[activeSetIndex].videos.map((video, index) => {
                 const youtubeId = getYoutubeId(video.embedUrl);
-                const isActive = index === activeVideoIndex;
+                const isActive = index === activeVideoIndexBySet[activeSetIndex];
                 return (
                   <button
                     type="button"
                     key={video.embedUrl}
                     onClick={() => {
-                      setActiveVideoIndex(index);
+                      setActiveVideoIndexBySet((prev) => {
+                        const copy = [...prev];
+                        copy[activeSetIndex] = index;
+                        return copy;
+                      });
                       videoCarouselRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
                     }}
                     className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 ${
