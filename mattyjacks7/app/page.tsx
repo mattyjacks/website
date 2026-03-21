@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Creepster } from "next/font/google";
 import MoneyCube from "../components/money-cube";
 import AnimatedClouds from "../components/animated-clouds";
 import { ClientThemeProvider } from "../components/client-theme-mount";
@@ -13,8 +14,18 @@ import WorkerFeedbackCarousel from "@/components/worker-feedback";
 import CookieBanner from "@/components/cookie-banner";
 import ScaledIframe from "@/components/scaled-iframe";
 
+const creepster = Creepster({ subsets: ["latin"], weight: "400" });
+const DAGGER_CURSOR = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cg transform='rotate(-45%2016%2016)'%3E%3Cpath d='M16%202L12.5%2016H19.5L16%202Z' fill='%23f4f4f4' stroke='%23111' stroke-width='1.5' stroke-linejoin='round'/%3E%3Crect x='13' y='16' width='6' height='6' rx='1.2' fill='%234b5563' stroke='%23111' stroke-width='1'/%3E%3Crect x='11' y='18' width='10' height='2.6' rx='1.3' fill='%239f1239'/%3E%3Cpath d='M15%2022H17V28L16%2030L15%2028V22Z' fill='%231f2937' stroke='%23111' stroke-width='1' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E\") 6 6, auto";
+
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
+  const [isDaggerActive, setIsDaggerActive] = useState(false);
+  const [isStabbing, setIsStabbing] = useState(false);
+  const [bloodIntensity, setBloodIntensity] = useState(1);
+  const [bloodSplats, setBloodSplats] = useState<Array<{ id: number; left: number; size: number }>>([]);
+  const [stabMotion, setStabMotion] = useState({ rotateZ: 0, translateX: 0, translateY: 0 });
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stabTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Scroll animation refs with lazy loading via Intersection Observer
   const heroContentRef = useRef<HTMLDivElement>(null);
@@ -67,6 +78,56 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+      if (stabTimeoutRef.current) clearTimeout(stabTimeoutRef.current);
+    };
+  }, []);
+
+  const handleDaggerEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setIsDaggerActive(true);
+  };
+
+  const handleDaggerLeave = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(() => setIsDaggerActive(false), 120);
+  };
+
+  const handleStab = (options?: { isTouch?: boolean }) => {
+    handleDaggerEnter();
+    setIsStabbing(true);
+    setStabMotion({
+      rotateZ: (Math.random() - 0.5) * 24,
+      translateX: (Math.random() - 0.5) * 22,
+      translateY: Math.random() * 6 + 2,
+    });
+    setBloodIntensity((prev) => Math.min(prev + 0.2, 2.6));
+    setBloodSplats((prev) => {
+      const newSplat = {
+        id: Date.now(),
+        left: Math.random() * 160 - 80,
+        size: 34 + Math.random() * 38,
+      };
+      const next = [...prev, newSplat];
+      return next.slice(-8);
+    });
+    if (stabTimeoutRef.current) clearTimeout(stabTimeoutRef.current);
+    stabTimeoutRef.current = setTimeout(() => {
+      setIsStabbing(false);
+      setStabMotion({ rotateZ: 0, translateX: 0, translateY: 0 });
+      if (options?.isTouch) setIsDaggerActive(false);
+    }, 550);
+    if (options?.isTouch) {
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = setTimeout(() => setIsDaggerActive(false), 800);
+    }
+  };
+
   // Particle system disabled for performance
   useEffect(() => {
     // Particle animations disabled to fix scroll performance
@@ -106,10 +167,108 @@ export default function Home() {
                 <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
                 Holding Company &amp; Agency
               </span>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.08] text-zinc-900 dark:text-white">
-                We Build Companies.
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] text-zinc-900 dark:text-white">
+                We Do
                 <br />
-                <span className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-sky-500 bg-clip-text text-transparent">We Deploy Talent.</span>
+                <span className="text-emerald-600 dark:text-emerald-300 italic">and/or</span>
+                <br />
+                <span className="relative inline-block mt-1">
+                  <button
+                    type="button"
+                    className="relative flex items-center justify-center px-4 py-1 sm:py-1.5 rounded-xl transition-transform duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-500/40"
+                    onMouseEnter={handleDaggerEnter}
+                    onMouseLeave={handleDaggerLeave}
+                    onFocus={handleDaggerEnter}
+                    onBlur={handleDaggerLeave}
+                    onClick={() => handleStab()}
+                    onTouchStart={(event) => {
+                      event.preventDefault();
+                      handleStab({ isTouch: true });
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        handleStab();
+                      }
+                    }}
+                    aria-live="polite"
+                    aria-label={isDaggerActive ? "Dagger ready" : "Die Trying battle cry"}
+                    style={{
+                      perspective: "800px",
+                      transformStyle: "preserve-3d",
+                      transform: `translate3d(${stabMotion.translateX}px, ${stabMotion.translateY}px, 0) rotateZ(${stabMotion.rotateZ}deg) scale(${isStabbing ? 1.08 : 1})`,
+                      transition: isStabbing
+                        ? "transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1)"
+                        : "transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
+                      cursor: isDaggerActive ? DAGGER_CURSOR : "pointer",
+                    }}
+                  >
+                    <span className="relative inline-flex">
+                      <span
+                        className={`${creepster.className} drip-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-red-500 inline-block select-none`}
+                        style={{
+                          transform: isStabbing
+                            ? `rotateX(28deg) translateY(3px) rotateY(${stabMotion.translateX * 0.12}deg)`
+                            : "rotateX(14deg) rotateY(0deg)",
+                          textShadow:
+                            "0 0 2px #000, 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 1.5px 1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px -1.5px 0 #000, 0 6px 0 #7f1d1d, 0 10px 12px rgba(0,0,0,0.55), 0 24px 34px rgba(127,29,29,0.35)",
+                          letterSpacing: "0.04em",
+                          transition: "transform 0.2s ease, filter 0.2s ease",
+                          filter: isDaggerActive ? "drop-shadow(0 12px 25px rgba(220,38,38,0.5))" : "drop-shadow(0 8px 18px rgba(127,29,29,0.3))",
+                        }}
+                        data-dagger-target
+                      >
+                        DIE TRYING!!!
+                        <span aria-hidden="true" className="drip-trail">
+                          <span />
+                          <span />
+                          <span />
+                        </span>
+                      </span>
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-0 -z-10 rounded-2xl transition-all duration-500 ease-out ${isStabbing ? "blur-sm" : "blur"}`}
+                      style={{
+                        background: "radial-gradient(circle at center, rgba(239,68,68,0.65) 0%, rgba(153,27,27,0.4) 40%, transparent 70%)",
+                        opacity: Math.min(bloodIntensity, 1.2),
+                        transform: isStabbing ? "translateZ(-20px) scale(1.08)" : "translateZ(-30px) scale(0.95)",
+                      }}
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-6 -z-20 transition-all duration-500"
+                      style={{
+                        background: "radial-gradient(ellipse at center, rgba(127,29,29,0.75) 0%, rgba(63,9,9,0.58) 50%, transparent 80%)",
+                        filter: "blur(6px)",
+                        width: `${220 * bloodIntensity}px`,
+                        height: `${60 + bloodIntensity * 18}px`,
+                        left: "50%",
+                        bottom: "-30px",
+                        transform: "translateX(-50%)",
+                        opacity: Math.min(bloodIntensity * 0.8, 1),
+                      }}
+                    />
+                    <span aria-hidden="true" className="pointer-events-none absolute left-1/2 top-full" style={{ transform: "translateX(-50%)" }}>
+                      {bloodSplats.map((splat) => (
+                        <span
+                          key={splat.id}
+                          className={`absolute top-3 -translate-x-1/2 rounded-full bg-red-600/80 opacity-90 transition-transform duration-700 ${isStabbing ? "scale-115" : "scale-100"}`}
+                          style={{
+                            left: `${splat.left}px`,
+                            width: `${splat.size}px`,
+                            height: `${splat.size * 0.6}px`,
+                            filter: "blur(1px)",
+                            boxShadow: "0 10px 18px rgba(127,29,29,0.55)",
+                            animation: isStabbing
+                              ? "blood-streak 0.7s ease-out forwards"
+                              : "blood-ooze 4s ease-in-out infinite alternate",
+                          }}
+                        />
+                      ))}
+                    </span>
+                  </button>
+                </span>
               </h1>
             </div>
             <div className="mt-6 space-y-3 px-2 text-center">

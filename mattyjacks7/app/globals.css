@@ -30,6 +30,97 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
+.drip-text {
+  position: relative;
+  padding-bottom: 16px;
+}
+
+.drip-text::after,
+.drip-text::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 24px;
+  background: radial-gradient(ellipse at center, rgba(239,68,68,0.9) 0%, rgba(185,28,28,0.7) 50%, transparent 80%);
+  border-radius: 50%;
+  box-shadow: 0 12px 20px rgba(127,29,29,0.35);
+  pointer-events: none;
+  filter: blur(0.6px);
+}
+
+.drip-text::after {
+  bottom: -18px;
+  animation: drip-pulse 2.4s ease-in-out infinite;
+}
+
+.drip-text::before {
+  bottom: -12px;
+  width: 70px;
+  height: 18px;
+  opacity: 0.7;
+  animation: drip-pulse 2.9s ease-in-out infinite reverse;
+}
+
+.drip-trail {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 4px;
+  pointer-events: none;
+}
+
+.drip-trail span {
+  display: inline-block;
+  width: 10px;
+  height: 18px;
+  background: linear-gradient(to bottom, rgba(248,113,113,0.95), rgba(153,27,27,0.85));
+  border-radius: 999px;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.35);
+  animation: drip-fall 1.8s ease-in-out infinite;
+}
+
+.drip-trail span:nth-child(2) {
+  height: 24px;
+  animation-delay: 0.4s;
+}
+
+.drip-trail span:nth-child(3) {
+  height: 16px;
+  animation-delay: 0.8s;
+}
+
+@keyframes drip-pulse {
+  0%, 100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(-50%, 2px) scale(1.08, 0.94);
+    opacity: 1;
+  }
+}
+
+@keyframes drip-fall {
+  0% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0.9;
+  }
+  60% {
+    transform: translateY(8px) scaleY(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(14px) scaleY(0.85);
+    opacity: 0;
+  }
+}
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -206,9 +297,42 @@ body::-webkit-scrollbar-thumb:hover {
 
 /* Gradient text shimmer for hero */
 @keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes blood-streak {
+  0% {
+    transform: translate(-50%, -10px) scale(0.6);
+    opacity: 0.6;
+  }
+  60% {
+    transform: translate(-50%, 18px) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 30px) scale(1.05);
+    opacity: 0.85;
+  }
+}
+
+@keyframes blood-ooze {
+  0% {
+    transform: translate(-50%, 0) scaleX(1) scaleY(1);
+  }
+  50% {
+    transform: translate(-50%, 4px) scaleX(1.08) scaleY(1.02);
+  }
+  100% {
+    transform: translate(-50%, 2px) scaleX(0.95) scaleY(1.05);
+  }
 }
 
 /* Subtle float animation */
