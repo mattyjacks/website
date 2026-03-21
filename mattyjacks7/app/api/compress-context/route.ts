@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (conversation.length > 10000) {
+    if (conversation.length > 150000) {
       return NextResponse.json(
         { error: "Conversation text too long" },
         { status: 400, headers: SECURITY_HEADERS }

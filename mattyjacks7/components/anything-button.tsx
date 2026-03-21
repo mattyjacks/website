@@ -1084,6 +1084,7 @@ Create a summary that another AI can use to understand the context and continue 
       const streamMsgId = generateId();
       let streamedText = '';
       let streamDone = false;
+      let sseBuffer = '';
 
       // Add a placeholder assistant message immediately
       updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: '▍', timestamp: Date.now() }]);
@@ -1092,8 +1093,9 @@ Create a summary that another AI can use to understand the context and continue 
         const { done, value } = await reader.read();
         if (done) break;
 
-        const raw = decoder.decode(value, { stream: true });
-        const lines = raw.split('\n');
+        sseBuffer += decoder.decode(value, { stream: true });
+        const lines = sseBuffer.split('\n');
+        sseBuffer = lines.pop() || '';
 
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
@@ -1196,14 +1198,16 @@ Create a summary that another AI can use to understand the context and continue 
           const decoder = new TextDecoder();
           let currentDraft = "";
           let streamDone = false;
+          let sseBuffer = "";
           const tempId = `turbo_user_${Date.now()}`;
           
-          while (!streamDone && isActive) {
+          while (!streamDone) {
             const { done, value } = await reader.read();
             if (done) break;
             
-            const raw = decoder.decode(value, { stream: true });
-            const lines = raw.split('\n');
+            sseBuffer += decoder.decode(value, { stream: true });
+            const lines = sseBuffer.split('\n');
+            sseBuffer = lines.pop() || "";
             
             for (const line of lines) {
               if (!line.startsWith('data: ')) continue;
@@ -1224,7 +1228,7 @@ Create a summary that another AI can use to understand the context and continue 
             }
           }
           
-          if (isActive && currentDraft.trim()) {
+          if (currentDraft.trim()) {
             const finalDraft = currentDraft.replace(/^(User|Boss|Master|\[User\]|\[Master\]|.*?:)\s*/i, "").trimStart();
             setSessions(prev => prev.map(s => {
               if (s.id !== currentSessionId) return s;
