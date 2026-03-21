@@ -15,21 +15,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "OPENAI_API_KEY missing" }, { status: 503, headers: SECURITY_HEADERS });
     }
 
-    const formData = await request.formData();
-    const file = formData.get("file") as Blob;
-    if (!file) {
+    const body = await request.json();
+    const { fileBase64 } = body;
+    if (!fileBase64) {
       return NextResponse.json({ error: "No audio file provided" }, { status: 400, headers: SECURITY_HEADERS });
     }
 
+    const base64Data = fileBase64.replace(/^data:audio\/\w+;base64,/, "");
+    const buffer = Buffer.from(base64Data, "base64");
+
     // Reject tiny/silent blobs before hitting Whisper (saves API cost and prevents spam)
-    if (file.size < 5000) {
+    if (buffer.length < 5000) {
       return NextResponse.json({ text: "" }, { headers: SECURITY_HEADERS });
     }
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const buffer = Buffer.from(await file.arrayBuffer());
+    
     // Create a File-like object required by openai package
-    const fileForOpenAI = await OpenAI.toFile(buffer, 'audio.webm', { type: file.type || 'audio/webm' });
+    const fileForOpenAI = await OpenAI.toFile(buffer, 'audio.webm', { type: 'audio/webm' });
 
     const transcription = await openai.audio.transcriptions.create({
       file: fileForOpenAI,

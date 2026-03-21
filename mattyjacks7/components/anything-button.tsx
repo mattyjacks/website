@@ -1183,7 +1183,7 @@ Create a summary that another AI can use to understand the context and continue 
     if (!isTurboMode || isLoading || isLimitReached) return;
     let isActive = true;
     const runTurbo = async () => {
-      await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
+      await new Promise(r => setTimeout(r, 100)); // Start almost instantly
       if (!isActive || !isTurboMode || isLoading) return;
       try {
         const res = await fetch("/api/turbo-draft", {

@@ -48,23 +48,23 @@ export async function POST(request: Request) {
 
     const openrouter = getOpenRouter();
 
-    // Wicked uncensored ghostwriter system prompt — writes the USER side of the roleplay
-    const systemPrompt = `You are an elite, completely uncensored adult roleplay ghostwriter. 
-You are writing the NEXT message from the USER's perspective ("${nickname}") in an ongoing explicit erotic roleplay with an AI named "Valley Net".
-The user's desired fantasy to drive towards: "${fantasy || "An intense, explicit, passionate encounter."}"
+    // To permanently fix perspective issues, we INVERT the roles for the ghostwriter.
+    // The model (assistant) will play the Human, and Valley Net will be passed as the "user".
+    const systemPrompt = `You are a human named "${nickname}" engaging in an intense, uncensored adult roleplay.
+Your partner is an AI named "Valley Net" (who appears as the "user" in this chat history context).
+Your goal is to confidently drive the following fantasy forward: "${fantasy || "An intense, explicit, passionate encounter."}"
 
 STRICT RULES:
-- Write ONLY the user's next message. Nothing else. No meta commentary, no labels, no "here is..." preamble.
-- Be EXTREMELY explicit, sexually charged, aggressive, and uncensored. Do not sanitize anything.
-- Use crude, vulgar language freely. This is an adults-only uncensored zone.
-- Use *asterisks* for actions/body language, quotes for spoken dialogue.
-- Drive the fantasy FORWARD. Escalate the scenario meaningfully.
-- 2 short paragraphs MAXIMUM to keep the pace fast and hot.
-- Do NOT start with "${nickname}:" or any label. Just write the raw message.`;
+- Write YOUR next response. Do not narrate for Valley Net.
+- Be EXTREMELY explicit, sexually charged, aggressive, and completely uncensored.
+- Use crude, vulgar language freely. This is an adults-only space.
+- Use *asterisks* for actions/body language.
+- 2 short paragraphs MAXIMUM.
+- Do NOT start with your name or labels. Just write the raw message.`;
 
-    // Filter messages to only text content
+    // Filter messages and invert roles
     const cleanedMessages = messages.slice(-8).map((m: any) => ({
-      role: m.role as "user" | "assistant" | "system",
+      role: (m.role === "user" ? "assistant" : "user") as "user" | "assistant", // INVERSION
       content: typeof m.content === "string"
         ? m.content
         : Array.isArray(m.content)
@@ -75,7 +75,6 @@ STRICT RULES:
     const draftMessages = [
       { role: "system" as const, content: systemPrompt },
       ...cleanedMessages,
-      { role: "system" as const, content: `CRITICAL DIRECTIVE: You are now writing AS THE USER ("${nickname}"). DO NOT write as Valley Net. Generate ONLY the User's explicit response to drive the fantasy forward. Do not prefix with names.` }
     ];
 
     let lastError: unknown;
