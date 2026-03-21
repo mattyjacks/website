@@ -32,8 +32,9 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ text: transcription.text }, { headers: SECURITY_HEADERS });
-  } catch (error) {
-    console.error("Transcription error:", error);
-    return NextResponse.json({ error: "Transcription failed" }, { status: 500, headers: SECURITY_HEADERS });
+  } catch (error: any) {
+    const msg = error?.message ?? String(error);
+    console.error("Transcription error:", msg);
+    return NextResponse.json({ error: `Transcription failed: ${msg}` }, { status: 500, headers: SECURITY_HEADERS });
   }
 }

@@ -114,7 +114,7 @@ export default function AnythingButton() {
   const [isAliveMode, setIsAliveMode] = useState(false);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  const { isRecording, isProcessing, toggleRecording, startRecording } = useVoiceChat({
+  const { isRecording, isProcessing, toggleRecording, startRecording, stopRecordingAndTranscribe } = useVoiceChat({
     autoProcessSilenceMs: isAliveMode ? 1500 : 3000,
     onError: (msg) => {
       setError(msg);
@@ -1667,7 +1667,16 @@ Create a summary that another AI can use to understand the context and continue 
                 />
                 <div className="flex gap-1 pb-1.5 pl-1 shrink-0">
                   <button
-                    onClick={() => setIsAliveMode(!isAliveMode)}
+                    onClick={() => {
+                      const turningOn = !isAliveMode;
+                      setIsAliveMode(turningOn);
+                      if (turningOn) {
+                        startRecording();
+                      } else {
+                        if (currentAudioRef.current) currentAudioRef.current.pause();
+                        stopRecordingAndTranscribe();
+                      }
+                    }}
                     className={`w-[42px] h-10 flex flex-col items-center justify-center rounded-xl transition-all border ${
                       isAliveMode 
                         ? 'bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-800 shadow-[0_0_15px_rgba(225,29,72,0.3)]' 
