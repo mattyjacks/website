@@ -1944,7 +1944,7 @@ Create a summary that another AI can use to understand the context and continue 
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => setShowImageModal(false)}
-            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -1988,7 +1988,7 @@ Create a summary that another AI can use to understand the context and continue 
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => setShowSumUpConfirm(false)}
-            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
