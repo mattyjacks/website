@@ -108,6 +108,11 @@ export default function InternshipPage() {
       const j = Math.floor(Math.random() * (i + 1));
       [sets[i], sets[j]] = [sets[j], sets[i]];
     }
+    // Never show Zen's Tutorials as the first option
+    if (sets.length > 1 && sets[0].label === "Zen's Tutorials") {
+      const swapIdx = 1 + Math.floor(Math.random() * (sets.length - 1));
+      [sets[0], sets[swapIdx]] = [sets[swapIdx], sets[0]];
+    }
     return sets;
   }, []);
 

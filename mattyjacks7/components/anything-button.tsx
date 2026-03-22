@@ -790,6 +790,35 @@ Create a summary that another AI can use to understand the context and continue 
     setChatReady(false);
   }, [isOpen]);
 
+  // --- Back-button closes chat on mobile ---
+  // When the chat opens, push a history entry so the browser back button
+  // pops that entry instead of navigating away from the page.
+  const chatHistoryPushedRef = useRef(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Push a dummy history state so "back" has something to pop
+      window.history.pushState({ chatOpen: true }, '');
+      chatHistoryPushedRef.current = true;
+
+      const onPopState = (e: PopStateEvent) => {
+        // The user pressed the back button — close the chat
+        if (chatHistoryPushedRef.current) {
+          chatHistoryPushedRef.current = false;
+          setIsOpen(false);
+        }
+      };
+
+      window.addEventListener('popstate', onPopState);
+      return () => window.removeEventListener('popstate', onPopState);
+    } else if (chatHistoryPushedRef.current) {
+      // Chat was closed via the UI close button, so pop the extra history
+      // entry we added to keep navigation clean.
+      chatHistoryPushedRef.current = false;
+      window.history.back();
+    }
+  }, [isOpen]);
+
   // Fetch cloud (GiveGigs) chat metadata; resilient to failure
   useEffect(() => {
     let cancelled = false;
