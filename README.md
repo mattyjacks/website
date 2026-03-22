@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="mattyjacks7/app/opengraph-image.png" alt="MattyJacks Logo" width="600" />
-</p>
-
 <h1 align="center">🚀 MattyJacks.com — Official Website</h1>
 
 <p align="center">
