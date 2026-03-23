@@ -66,6 +66,8 @@ export default function AnythingButton() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
   const [input, setInput] = useState("");
+  const inputValueRef = useRef(input);
+  const turboDraftPendingRef = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -941,6 +943,12 @@ Create a summary that another AI can use to understand the context and continue 
   const messages = currentSession?.messages || [];
   const messagesRef = useRef(messages);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
+  useEffect(() => { inputValueRef.current = input; }, [input]);
+  useEffect(() => {
+    if (!isTurboMode) {
+      turboDraftPendingRef.current = false;
+    }
+  }, [isTurboMode]);
   const isLimitReached = messages.filter((m) => m.role === "assistant").length >= 69;
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -1038,8 +1046,13 @@ Create a summary that another AI can use to understand the context and continue 
       setError("Conversation limit reached (69 responses). Please start a new chat.");
       return;
     }
-    const textToSend = (textOverride || input).trim();
+    const wasTurboDraftSend = turboDraftPendingRef.current;
+    const textToSend = (textOverride || inputValueRef.current).trim();
     if ((!textToSend && uploadedImages.length === 0) || isLoading || !currentSessionId) return;
+
+    if (wasTurboDraftSend) {
+      turboDraftPendingRef.current = false;
+    }
 
     setError(null);
     const userMessageId = generateId();
@@ -1221,18 +1234,34 @@ Create a summary that another AI can use to understand the context and continue 
     } finally {
       setIsLoading(false);
       abortControllerRef.current = null;
+      if (wasTurboDraftSend) {
+        setTurboMessagesLeft(prev => {
+          const next = prev - 1;
+          if (next <= 0) setIsTurboMode(false);
+          return next;
+        });
+      }
       if (autoScrollEnabled) {
         setTimeout(() => scrollToBottom(), 50);
       }
     }
-  }, [input, isLoading, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached, isTurboMode, chatMode, wickedModel, nickname, updateCurrentSession]);
+  }, [isLoading, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached, isTurboMode, chatMode, wickedModel, nickname, updateCurrentSession, uploadedImages]);
 
   // --- Turbo Loop ---
 
   useEffect(() => {
-    if (!isTurboMode || isLoading || isLimitReached || turboMessagesLeft <= 0) return;
+    if (!isTurboMode || isLoading || isLimitReached || turboMessagesLeft <= 0 || turboDraftPendingRef.current) return;
     let isActive = true;
     const controller = new AbortController();
+
+    const syncComposerHeight = () => {
+      requestAnimationFrame(() => {
+        if (inputRef.current) {
+          inputRef.current.style.height = 'auto';
+          inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 96)}px`;
+        }
+      });
+    };
     
     const runTurbo = async () => {
       // WAIT FOR LIVE SPEECH TO AVERT OVERLAPPING AUDIO
@@ -1255,7 +1284,6 @@ Create a summary that another AI can use to understand the context and continue 
           let currentDraft = "";
           let streamDone = false;
           let sseBuffer = "";
-          const tempId = `turbo_user_${Date.now()}`;
           
           while (!streamDone && isActive) {
             const { done, value } = await reader.read();
@@ -1272,11 +1300,10 @@ Create a summary that another AI can use to understand the context and continue 
                 if (parsed.type === 'delta') {
                   currentDraft += parsed.delta;
                   const cleanedText = currentDraft.replace(/^(User|Boss|Master|\[User\]|\[Master\]|.*?:)\s*/i, "").trimStart();
-                  setSessions(prev => prev.map(s => {
-                    if (s.id !== currentSessionId) return s;
-                    const cMsgs = s.messages.filter(m => m.id !== tempId);
-                    return { ...s, messages: [...cMsgs, { id: tempId, role: "user", content: cleanedText + '▍', timestamp: Date.now() }] };
-                  }));
+                  inputValueRef.current = cleanedText;
+                  setInput(cleanedText);
+                  setCharCount(cleanedText.length);
+                  syncComposerHeight();
                 } else if (parsed.type === 'done') {
                   streamDone = true;
                 }
@@ -1286,17 +1313,11 @@ Create a summary that another AI can use to understand the context and continue 
           
           if (currentDraft.trim() && isActive) {
             const finalDraft = currentDraft.replace(/^(User|Boss|Master|\[User\]|\[Master\]|.*?:)\s*/i, "").trimStart();
-            setSessions(prev => prev.map(s => {
-              if (s.id !== currentSessionId) return s;
-              const cMsgs = s.messages.filter(m => m.id !== tempId);
-              return { ...s, messages: [...cMsgs] };
-            }));
-            sendMessage(finalDraft);
-            setTurboMessagesLeft(prev => {
-              const next = prev - 1;
-              if (next <= 0) setIsTurboMode(false);
-              return next;
-            });
+            inputValueRef.current = finalDraft;
+            setInput(finalDraft);
+            setCharCount(finalDraft.length);
+            turboDraftPendingRef.current = true;
+            syncComposerHeight();
           }
         }
       } catch (e: any) {
@@ -1312,7 +1333,7 @@ Create a summary that another AI can use to understand the context and continue 
       isActive = false; 
       controller.abort(); 
     };
-  }, [isTurboMode, isLoading, isLimitReached, turboFantasy, nickname, sendMessage, turboMessagesLeft]);
+  }, [isTurboMode, isLoading, isLimitReached, turboFantasy, nickname, turboMessagesLeft]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -1322,6 +1343,7 @@ Create a summary that another AI can use to understand the context and continue 
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    inputValueRef.current = e.target.value;
     setInput(e.target.value);
     setCharCount(e.target.value.length);
     setError(null);
