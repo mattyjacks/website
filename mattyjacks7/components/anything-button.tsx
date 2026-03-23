@@ -198,6 +198,11 @@ export default function AnythingButton() {
   const [turboFantasy, setTurboFantasy] = useState("We are passionately in love and exploring our darkest desires");
   const [turboMessagesLeft, setTurboMessagesLeft] = useState(5);
 
+  // --- Good Mode Turbo Roleplay ---
+  const [isGoodTurboMode, setIsGoodTurboMode] = useState(false);
+  const [goodTurboFantasy, setGoodTurboFantasy] = useState("We are business partners taking over the world for the good of humanity");
+  const [goodTurboMessagesLeft, setGoodTurboMessagesLeft] = useState(5);
+
   const FOOD_EMOJIS = ['🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🫐', '🥝', '🍅', '🫒', '🥥', '🍄', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🫑', '🥒', '🥬', '🥦', '🧄', '🧅', '🥜', '🫘', '🌰', '🫚', '🫛', '🍄‍', '🫜', '🍞', '🥐', '🥖', '🫓', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🦪', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕', '🫖', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'];
 
   const getRandomFoodEmojis = (count: number = 7): string => {
@@ -945,10 +950,10 @@ Create a summary that another AI can use to understand the context and continue 
   useEffect(() => { messagesRef.current = messages; }, [messages]);
   useEffect(() => { inputValueRef.current = input; }, [input]);
   useEffect(() => {
-    if (!isTurboMode) {
+    if (!isTurboMode && !isGoodTurboMode) {
       turboDraftPendingRef.current = false;
     }
-  }, [isTurboMode]);
+  }, [isTurboMode, isGoodTurboMode]);
   const isLimitReached = messages.filter((m) => m.role === "assistant").length >= 69;
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -1047,6 +1052,8 @@ Create a summary that another AI can use to understand the context and continue 
       return;
     }
     const wasTurboDraftSend = turboDraftPendingRef.current;
+    const wasWickedTurboSend = wasTurboDraftSend && isTurboMode;
+    const wasGoodTurboSend = wasTurboDraftSend && isGoodTurboMode;
     const textToSend = (textOverride || inputValueRef.current).trim();
     if ((!textToSend && uploadedImages.length === 0) || isLoading || !currentSessionId) return;
 
@@ -1234,10 +1241,16 @@ Create a summary that another AI can use to understand the context and continue 
     } finally {
       setIsLoading(false);
       abortControllerRef.current = null;
-      if (wasTurboDraftSend) {
+      if (wasWickedTurboSend) {
         setTurboMessagesLeft(prev => {
           const next = prev - 1;
           if (next <= 0) setIsTurboMode(false);
+          return next;
+        });
+      } else if (wasGoodTurboSend) {
+        setGoodTurboMessagesLeft(prev => {
+          const next = prev - 1;
+          if (next <= 0) setIsGoodTurboMode(false);
           return next;
         });
       }
@@ -1245,7 +1258,7 @@ Create a summary that another AI can use to understand the context and continue 
         setTimeout(() => scrollToBottom(), 50);
       }
     }
-  }, [isLoading, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached, isTurboMode, chatMode, wickedModel, nickname, updateCurrentSession, uploadedImages]);
+  }, [isLoading, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached, isTurboMode, isGoodTurboMode, chatMode, wickedModel, nickname, updateCurrentSession, uploadedImages]);
 
   // --- Turbo Loop ---
 
@@ -1334,6 +1347,93 @@ Create a summary that another AI can use to understand the context and continue 
       controller.abort(); 
     };
   }, [isTurboMode, isLoading, isLimitReached, turboFantasy, nickname, turboMessagesLeft]);
+
+  // --- Good Mode Turbo Loop ---
+
+  useEffect(() => {
+    if (!isGoodTurboMode || isLoading || isLimitReached || goodTurboMessagesLeft <= 0 || turboDraftPendingRef.current) return;
+    let isActive = true;
+    const controller = new AbortController();
+
+    const syncComposerHeight = () => {
+      requestAnimationFrame(() => {
+        if (inputRef.current) {
+          inputRef.current.style.height = 'auto';
+          inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 96)}px`;
+        }
+      });
+    };
+
+    const runGoodTurbo = async () => {
+      while (isSpeakingRef.current && isActive) {
+        await new Promise(r => setTimeout(r, 200));
+      }
+
+      await new Promise(r => setTimeout(r, 100));
+      if (!isActive || !isGoodTurboMode || isLoading) return;
+      try {
+        const res = await fetch("/api/turbo-draft-good", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: messagesRef.current, scenario: goodTurboFantasy, nickname }),
+          signal: controller.signal
+        });
+
+        if (res.ok && res.body && isActive) {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let currentDraft = "";
+          let streamDone = false;
+          let sseBuffer = "";
+
+          while (!streamDone && isActive) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            sseBuffer += decoder.decode(value, { stream: true });
+            const lines = sseBuffer.split('\n');
+            sseBuffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              try {
+                const parsed = JSON.parse(line.slice(6));
+                if (parsed.type === 'delta') {
+                  currentDraft += parsed.delta;
+                  const cleanedText = currentDraft.replace(/^(User|Boss|Master|\[User\]|\[Master\]|.*?:)\s*/i, "").trimStart();
+                  inputValueRef.current = cleanedText;
+                  setInput(cleanedText);
+                  setCharCount(cleanedText.length);
+                  syncComposerHeight();
+                } else if (parsed.type === 'done') {
+                  streamDone = true;
+                }
+              } catch(e) {}
+            }
+          }
+
+          if (currentDraft.trim() && isActive) {
+            const finalDraft = currentDraft.replace(/^(User|Boss|Master|\[User\]|\[Master\]|.*?:)\s*/i, "").trimStart();
+            inputValueRef.current = finalDraft;
+            setInput(finalDraft);
+            setCharCount(finalDraft.length);
+            turboDraftPendingRef.current = true;
+            syncComposerHeight();
+          }
+        }
+      } catch (e: any) {
+        if (e.name !== 'AbortError') console.error("Good Turbo fetch error:", e);
+      }
+    };
+
+    const currentMsgs = messagesRef.current;
+    const lastMsgRole = currentMsgs.length > 0 ? currentMsgs[currentMsgs.length - 1].role : null;
+    if (lastMsgRole !== 'user') runGoodTurbo();
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [isGoodTurboMode, isLoading, isLimitReached, goodTurboFantasy, nickname, goodTurboMessagesLeft]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -2109,6 +2209,37 @@ Create a summary that another AI can use to understand the context and continue 
                 </div>
               )}
 
+              {chatMode === 'good' && (
+                <div className="mt-2 px-2 py-2 bg-emerald-50/50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-widest flex items-center gap-1">
+                      <Zap className="w-3 h-3 fill-current animate-pulse" /> Turbo Roleplay
+                    </span>
+                    <button
+                      onClick={() => {
+                        if (!isGoodTurboMode) {
+                          setGoodTurboMessagesLeft(5);
+                          setIsGoodTurboMode(true);
+                        } else {
+                          setIsGoodTurboMode(false);
+                        }
+                      }}
+                      className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${isGoodTurboMode ? 'bg-emerald-500 text-white' : 'bg-emerald-200 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300'} transition-colors`}
+                    >
+                      {isGoodTurboMode ? `STOP (${goodTurboMessagesLeft} LEFT)` : 'ACTIVATE (5 MSGS MAX)'}
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={goodTurboFantasy}
+                    disabled={isGoodTurboMode}
+                    onChange={(e) => setGoodTurboFantasy(e.target.value)}
+                    placeholder="Enter roleplay scenario..."
+                    className="w-full bg-white dark:bg-zinc-950 border border-emerald-200 dark:border-emerald-800 rounded-md px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors placeholder:text-emerald-300/50 disabled:opacity-50"
+                  />
+                </div>
+              )}
+
               {getConversationStatus() === 'Dead' && (
                 <div className="px-4 py-3 border-t border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20">
                   <div className="flex items-center justify-between mb-2">
@@ -2174,6 +2305,7 @@ Create a summary that another AI can use to understand the context and continue 
                   <button
                     onClick={() => {
                       setChatMode('wicked');
+                      setIsGoodTurboMode(false);
                       setShowAgeWarning(false);
                     }}
                     className="flex-1 px-4 py-3 rounded-xl font-bold text-sm bg-rose-600 text-white hover:bg-rose-500 shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all"
