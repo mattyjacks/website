@@ -1866,7 +1866,7 @@ Create a summary that another AI can use to understand the context and continue 
                     title={isAliveMode ? "Alive Speech Active (Say 'pause' to stop)" : "Enable Alive Speech (Live mode)"}
                   >
                     <AudioLines className={`w-[18px] h-[18px] ${isAliveMode ? 'animate-pulse' : ''}`} />
-                    <span className="text-[7.5px] font-bold mt-0.5 leading-none hidden sm:block">ALIVE</span>
+                    <span className="text-[7.5px] font-bold mt-0.5 leading-none">ALIVE</span>
                   </button>
 
                   <button
