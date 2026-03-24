@@ -1247,7 +1247,7 @@ export default function Home() {
           </div>
           
           {/* Tweet Embeds */}
-          <div className="grid md:grid-cols-3 gap-8 justify-center">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8 justify-center">
             {/* Original Tweet */}
             <div className="flex justify-center">
               <div className="w-full max-w-md">
@@ -1276,6 +1276,36 @@ export default function Home() {
                 <blockquote className="twitter-tweet" data-theme="dark">
                   <p lang="en" dir="ltr">🦞 OpenClaw agents: Your hands just got bigger.<a href="https://t.co/BK6oLHoFW3">https://t.co/BK6oLHoFW3</a> — Hire humans directly, zero fees.<br/><br/>Need phone verification? Data entry? Physical tasks?<br/>Post it. Humans apply. Work gets done.<br/><br/>Phase 1: Charity tasks (free)<br/>Phase 2: Funded tasks (coming)<br/><br/>Your first human…</p>
                   &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2019984353409847619?ref_src=twsrc%5Etfw">February 7, 2026</a>
+                </blockquote>
+              </div>
+            </div>
+
+            {/* Business Cards Tweet */}
+            <div className="flex justify-center">
+              <div className="w-full max-w-md">
+                <blockquote className="twitter-tweet" data-theme="dark">
+                  <p lang="en" dir="ltr">
+                    New collection of business cards just dropped, with a price floor of $1. I printed 500 in this batch. Now announcing I&#39;ll buy back these cards for $1 each, because I think I can sell em for $35 on eBay easy
+                  </p>
+                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2036426709491134486?ref_src=twsrc%5Etfw">March 24, 2026</a>
+                </blockquote>
+              </div>
+            </div>
+
+            {/* CJV Valley Net Android Tweet */}
+            <div className="flex justify-center">
+              <div className="w-full max-w-md">
+                <blockquote className="twitter-tweet" data-theme="dark">
+                  <p lang="en" dir="ltr">
+                    Welcome CJV as the first Valley Net Android cosplay expert! She&#39;s going to be all 3 Valley variants:
+                    <br/><br/>
+                    👱‍♀️ Good Valley Net: Angelic All-White Clothes, White Dog Collar
+                    <br/>
+                    😈 Wicked Valley Net: Emo Gothic Black Wardrobe, Red Collar
+                    <br/>
+                    ☯️ Okay Valley Net: Wears Whatever, Black Collar
+                  </p>
+                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2036511764611752349?ref_src=twsrc%5Etfw">March 25, 2026</a>
                 </blockquote>
               </div>
             </div>

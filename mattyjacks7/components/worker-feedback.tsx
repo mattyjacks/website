@@ -32,6 +32,12 @@ export default function WorkerFeedbackCarousel() {
       role: 'Legal Secretary',
       content: 'Hello Everyone 👋 I\'d like to take a moment to appreciate someone who truly embodies growth and development in action. Sir Matt is truly one of the kindest and most genuine people I know. When my phone broke and I was really stuck, he didn\'t hesitate, he sent me $100 to help me sort it out. That alone meant so much to me. But beyond that, he\'s always finding tasks for me, connecting me with clients, and creating opportunities for me to grow. He doesn\'t just talk about support, he actively makes things happen. He is honestly the truest supporter of growth in every perspective, financially, professionally, and personally. He is a true gem 💎. As a young lady and a single mom of one he has gone above and beyond to ensure I\'ve got tasks to sort out my bills, even during emergencies he\'ll always chip in out of kindness. He genuinely invests in people and wants to see them win. Be immensely blessed Sir Matt🙏❤️',
     },
+    {
+      id: 4,
+      name: 'CJ Velasco',
+      role: 'Developer & Graphic Designer',
+      content: 'Wow, I\'m just a new dev here and there were many development in my journey here. I get this payment for such a flexible work that\'s perfect for my free time. Like imagine getting paid just because I have a free time to develop as a programmer and now as a graphic designer as well. Continuous payment is such a fuel for non-stop motivation. My ideas aren\'t getting shut down as well. Instead, it is getting rewarded with payment money. Waiting for the development of Matt\'s vision is getting exciting. What are we gonna see here in the future and it\'s effect on other people as well. I\'m sure this is just a start. We are all being rewarded here because that\'s what @MattyJacks believe works in order for a better working environment. And, he\'s right. The development continues...',
+    },
   ];
 
   // Triple the feedbacks for seamless infinite scroll effect
