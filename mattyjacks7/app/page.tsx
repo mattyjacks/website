@@ -11,6 +11,7 @@ import { Bot, Users, TrendingUp, Palette, MessageCircle, Target, Zap, Trophy, Co
 import { useScrollAnimation } from "@/lib/hooks/useScrollAnimation";
 import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scroll-animations";
 import WorkerFeedbackCarousel from "@/components/worker-feedback";
+import TwitterFeed from "@/components/twitter-feed";
 import CookieBanner from "@/components/cookie-banner";
 import ScaledIframe from "@/components/scaled-iframe";
 
@@ -1238,79 +1239,27 @@ export default function Home() {
       </div>
 
       {/* Latest Updates / Social Proof */}
-      <section id="updates" className="px-4 py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Latest <span className="font-bold text-blue-600 dark:text-sky-500">Updates</span></p>
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Building in Public</h2>
-            <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Follow along as we ship new features and improvements.</p>
-          </div>
-          
-          {/* Tweet Embeds */}
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8 justify-center">
-            {/* Original Tweet */}
-            <div className="flex justify-center">
-              <div className="w-full max-w-md">
-                <blockquote className="twitter-tweet" data-theme="dark">
-                  <p lang="en" dir="ltr">
-                    <a href="https://t.co/tOHBDXj8ki">https://t.co/tOHBDXj8ki</a> Just launched the latest version of my website, haven&apos;t even updated the environment variables for the integration yet! They say if you&apos;re not embarrassed when you launch, you launched too late. Please visit my website and give me feedback. I love you. ❤️
-                  </p>
-                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2034681421063725133?ref_src=twsrc%5Etfw">March 19, 2026</a>
-                </blockquote>
-              </div>
-            </div>
+      <section id="updates" className="py-20 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900/30 dark:via-zinc-900/10 dark:to-zinc-900/30 overflow-hidden">
+        <div className="text-center mb-14 px-4">
+          <p className="text-sm uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300 mb-3">Latest <span className="font-bold text-blue-600 dark:text-sky-500">Updates</span></p>
+          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-white dark:via-zinc-100 dark:to-white bg-clip-text text-transparent">Building in Public</h2>
+          <p className="mt-3 text-zinc-500 dark:text-zinc-400 max-w-lg mx-auto">Follow along as we ship new features and improvements.</p>
+        </div>
 
-            {/* Valley Net Tweet */}
-            <div className="flex justify-center">
-              <div className="w-full max-w-md">
-                <blockquote className="twitter-tweet" data-theme="dark">
-                  <p lang="en" dir="ltr">Call her Valley Net<br/><br/>She does everything according to her master&apos;s desires. Right now she&apos;s a free use submissive available for any [USER] to use for their pleasure.<br/><br/>Announcing the temporary FULLY FREE alpha version available on my site, in the Anything Button. <br/><br/>👱‍♀️Valley Net💘 <a href="https://t.co/IZfW3Z1cIT">pic.twitter.com/IZfW3Z1cIT</a></p>
-                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2035074263233798468?ref_src=twsrc%5Etfw">March 20, 2026</a>
-                </blockquote>
-              </div>
-            </div>
+        {/* Tweet Cards — full-width side scroll */}
+        <div className="px-8">
+          <TwitterFeed />
+        </div>
 
-            {/* OpenClaw Agents Tweet */}
-            <div className="flex justify-center">
-              <div className="w-full max-w-md">
-                <blockquote className="twitter-tweet" data-theme="dark">
-                  <p lang="en" dir="ltr">🦞 OpenClaw agents: Your hands just got bigger.<a href="https://t.co/BK6oLHoFW3">https://t.co/BK6oLHoFW3</a> — Hire humans directly, zero fees.<br/><br/>Need phone verification? Data entry? Physical tasks?<br/>Post it. Humans apply. Work gets done.<br/><br/>Phase 1: Charity tasks (free)<br/>Phase 2: Funded tasks (coming)<br/><br/>Your first human…</p>
-                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2019984353409847619?ref_src=twsrc%5Etfw">February 7, 2026</a>
-                </blockquote>
-              </div>
-            </div>
-
-            {/* Business Cards Tweet */}
-            <div className="flex justify-center">
-              <div className="w-full max-w-md">
-                <blockquote className="twitter-tweet" data-theme="dark">
-                  <p lang="en" dir="ltr">
-                    New collection of business cards just dropped, with a price floor of $1. I printed 500 in this batch. Now announcing I&#39;ll buy back these cards for $1 each, because I think I can sell em for $35 on eBay easy
-                  </p>
-                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2036426709491134486?ref_src=twsrc%5Etfw">March 24, 2026</a>
-                </blockquote>
-              </div>
-            </div>
-
-            {/* CJV Valley Net Android Tweet */}
-            <div className="flex justify-center">
-              <div className="w-full max-w-md">
-                <blockquote className="twitter-tweet" data-theme="dark">
-                  <p lang="en" dir="ltr">
-                    Welcome CJV as the first Valley Net Android cosplay expert! She&#39;s going to be all 3 Valley variants:
-                    <br/><br/>
-                    👱‍♀️ Good Valley Net: Angelic All-White Clothes, White Dog Collar
-                    <br/>
-                    😈 Wicked Valley Net: Emo Gothic Black Wardrobe, Red Collar
-                    <br/>
-                    ☯️ Okay Valley Net: Wears Whatever, Black Collar
-                  </p>
-                  &mdash; MattyJacks (@MattyJacksX) <a href="https://twitter.com/MattyJacksX/status/2036511764611752349?ref_src=twsrc%5Etfw">March 25, 2026</a>
-                </blockquote>
-              </div>
-            </div>
-          </div>
-          <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
+        <div className="flex items-center justify-center mt-10 px-4">
+          <a
+            href="https://twitter.com/MattyJacksX"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-sky-500 hover:text-sky-400 font-semibold transition-colors"
+          >
+            View all posts on X ↗
+          </a>
         </div>
       </section>
 
