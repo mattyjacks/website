@@ -171,6 +171,18 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           <nav className="flex-1 px-6 py-8 overflow-y-auto">
             <ul className="space-y-6">
               <li>
+                <a
+                  href="https://t.me/mattyjacks1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleLinkClick}
+                  className="flex items-center gap-3 text-lg font-bold text-sky-500 dark:text-sky-400 hover:text-sky-600 dark:hover:text-sky-300 transition-colors group"
+                >
+                  <div className="w-2 h-2 rounded-full bg-sky-500 opacity-100 group-hover:opacity-100 transition-opacity" />
+                  Telegram (18+)
+                </a>
+              </li>
+              <li>
                 <Link
                   href="/services"
                   onClick={handleLinkClick}

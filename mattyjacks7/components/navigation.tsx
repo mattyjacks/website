@@ -160,6 +160,9 @@ export default function Navigation() {
                   <div className="my-2 border-t border-zinc-200 dark:border-zinc-800"></div>
                   <div className="px-4 py-1 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Socials</div>
                   
+                  <a href="https://t.me/mattyjacks1" target="_blank" rel="noreferrer" className="block px-4 py-2 text-sm font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-sky-500 transition-colors">
+                    Telegram (18+)
+                  </a>
                   <a href="/whatsapp" target="_blank" rel="noreferrer" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-green-500 transition-colors">
                     WhatsApp
                   </a>

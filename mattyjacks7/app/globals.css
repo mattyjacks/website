@@ -454,3 +454,22 @@ body::-webkit-scrollbar-thumb:hover {
     0 0 40px rgba(16, 185, 129, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
+
+/* Emergency Telegram banner animations */
+@keyframes emergency-border-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.3), 0 0 30px rgba(239, 68, 68, 0.1); }
+  50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 0 0 50px rgba(239, 68, 68, 0.2); }
+}
+
+@keyframes emergency-siren-inline {
+  0% { transform: rotate(-6deg) scale(1); }
+  25% { transform: rotate(6deg) scale(1.12); }
+  50% { transform: rotate(-6deg) scale(1); }
+  75% { transform: rotate(6deg) scale(1.12); }
+  100% { transform: rotate(-6deg) scale(1); }
+}
+
+@keyframes emergency-flash-inline {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

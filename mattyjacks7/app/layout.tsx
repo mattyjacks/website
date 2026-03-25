@@ -507,6 +507,17 @@ export default function RootLayout({
                           </Link>
                         </li>
                         <li>
+                          <a
+                            href="https://t.me/mattyjacks1"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sky-600 dark:text-sky-400 font-semibold hover:text-sky-500 dark:hover:text-sky-300 transition-colors duration-200"
+                            aria-label="Join MattyJacks on Telegram"
+                          >
+                            Telegram (18+)
+                          </a>
+                        </li>
+                        <li>
                           <Link
                             href="/whatsapp"
                             className="text-zinc-700 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200"
