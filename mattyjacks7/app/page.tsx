@@ -13,7 +13,6 @@ import { fadeInUp, fadeInLeft, slideInGrid, scaleIn } from "@/lib/animations/scr
 import WorkerFeedbackCarousel from "@/components/worker-feedback";
 import TwitterFeed from "@/components/twitter-feed";
 import CookieBanner from "@/components/cookie-banner";
-import TelegramEmergencyPopup from "@/components/telegram-emergency-popup";
 import ScaledIframe from "@/components/scaled-iframe";
 
 const creepster = Creepster({ subsets: ["latin"], weight: "400" });
@@ -327,26 +326,7 @@ export default function Home() {
               </a>
             </div>
 
-            {/* Emergency Telegram Banner */}
-            <div className="relative z-40 mt-6 w-full max-w-lg mx-auto">
-              <a href="https://t.me/mattyjacks1" target="_blank" rel="noopener noreferrer" className="block w-full group">
-                <div className="relative overflow-hidden rounded-2xl border-2 border-red-500/60 p-4 shadow-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-red-500/30 hover:border-red-400/80" style={{ background: "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)", animation: "emergency-border-glow 2s ease-in-out infinite" }}>
-                  <div className="relative z-10 flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300 text-2xl" style={{ animation: "emergency-siren-inline 0.8s ease-in-out infinite" }}>
-                      🚨
-                    </div>
-                    <div className="text-left flex-1">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="text-white font-bold text-base group-hover:text-sky-300 transition-colors">Join Telegram (18+)</h3>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30" style={{ animation: "emergency-flash-inline 1.5s ease-in-out infinite" }}>Urgent</span>
-                      </div>
-                      <p className="text-red-200/70 text-sm m-0">WhatsApp suspended - all ops moved to Telegram</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-sky-400 group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" />
-                  </div>
-                </div>
-              </a>
-            </div>
+
 
             {/* Scroll indicator */}
             <div className="mt-10 flex justify-center">
@@ -1339,8 +1319,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Emergency Telegram Popup */}
-      <TelegramEmergencyPopup />
+
 
       {/* Cookie Consent Banner */}
       <CookieBanner />
