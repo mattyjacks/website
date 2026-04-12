@@ -95,11 +95,13 @@ export const metadata: Metadata = {
   },
   category: "business",
   classification: "Business Services",
+  appleWebApp: {
+    capable: true,
+    title: "MattyJacks",
+    statusBarStyle: "black-translucent",
+  },
   other: {
     "msapplication-TileColor": "#10b981",
-    "apple-mobile-web-app-title": "MattyJacks",
-    "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-status-bar-style": "black-translucent",
     "mobile-web-app-capable": "yes",
     "geo.region": "US-NH",
     "geo.placename": "New Hampshire",

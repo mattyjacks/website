@@ -28,6 +28,8 @@ export const ChatMessageSchema = z.object({
 export const ChatRequestSchema = z.object({
   model: z.string().optional(),
   nickname: z.string().max(50).optional(),
+  mode: z.enum(['good', 'wicked', 'okay']).optional().default('good'),
+  wickedModel: z.string().optional().default('random'),
   messages: z.array(ChatMessageSchema),
 });
 

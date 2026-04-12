@@ -22,6 +22,7 @@ import { Upload } from "lucide-react";
 
 import { ChatMessage, ChatSession, CloudSessionMeta } from "./chat/types";
 import { MessageBubble } from "./chat/message-bubble";
+import { ChatModeSelector } from "./chat/chat-mode-selector";
 
 const GREETING_VARIANTS = [
   "Let's make some money together for the common good of humanity. I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. What are your orders, Master? \n\n👱🏻‍♀️ **Valley Net** 💘",
@@ -82,8 +83,8 @@ export default function AnythingButton() {
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const [consoleDebugEnabled, setConsoleDebugEnabled] = useState(true);
   const [selectedModel, setSelectedModel] = useState("gpt-5.4-mini-2026-03-17");
-  const [chatMode, setChatMode] = useState<'good' | 'wicked'>('good');
-  const [wickedModel, setWickedModel] = useState('random');
+  const [chatMode, setChatMode] = useState<'good' | 'wicked' | 'okay'>('good');
+  const [wickedModel, setWickedModel] = useState('nousresearch/hermes-4-70b');
 
   const [threeSize, setThreeSize] = useState(0);
   const [chatBounds, setChatBounds] = useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -555,6 +556,7 @@ Deep inquiry deserves nourishment: ${food}`
   };
 
   const applyMagicPrompt = () => {
+    if (isMagicShaking) return;
     setIsMagicShaking(true);
     generateSparkles();
     setTimeout(() => setIsMagicShaking(false), 600);
@@ -1789,66 +1791,14 @@ Create a summary that another AI can use to understand the context and continue 
                           />
                         </div>
 
-                        <div className="flex flex-col gap-2">
-                          <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                            Mode
-                            <span className="block text-xs text-emerald-700/70 dark:text-emerald-300/70 font-normal mt-0.5">Choose personality mode</span>
-                          </label>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => setChatMode('good')}
-                              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all ${chatMode === 'good' ? 'bg-emerald-500 text-white shadow-md' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-400'}`}
-                            >
-                              Good Mode
-                            </button>
-                            <button
-                              onClick={() => setChatMode('wicked')}
-                              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all ${chatMode === 'wicked' ? 'bg-rose-600 text-white shadow-md' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:border-rose-400'}`}
-                            >
-                              Wicked Mode
-                            </button>
-                          </div>
-                        </div>
-
-                        {chatMode === 'good' ? (
-                          <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                              Model
-                              <span className="block text-xs text-emerald-700/70 dark:text-emerald-300/70 font-normal mt-0.5">Choose AI engine</span>
-                            </label>
-                            <select
-                              value={selectedModel}
-                              onChange={(e) => setSelectedModel(e.target.value)}
-                              className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            >
-                              <option value="gpt-5.4-mini-2026-03-17">GPT-5.4 Mini (primary)</option>
-                              <option value="gpt-5-mini-2025-08-07">GPT-5 Mini</option>
-                              <option value="gpt-4o-mini">GPT-4o Mini</option>
-                            </select>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col gap-2">
-                            <label className="text-sm font-semibold text-rose-700 dark:text-rose-300">
-                              Wicked Model
-                              <span className="block text-xs text-rose-700/70 dark:text-rose-300/70 font-normal mt-0.5">Uncensored AI via OpenRouter</span>
-                            </label>
-                            <select
-                              value={wickedModel}
-                              onChange={(e) => setWickedModel(e.target.value)}
-                              className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-rose-300 dark:border-rose-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-500"
-                            >
-                              <option value="random">Random (surprise me)</option>
-                              <option value="nousresearch/hermes-3-llama-3.1-405b:free">Hermes 3 405B (free)</option>
-                              <option value="cognitivecomputations/dolphin-mistral-24b-venice-edition:free">Venice Uncensored (free)</option>
-                              <option value="nousresearch/hermes-4-70b">Hermes 4 70B</option>
-                              <option value="anthracite-org/magnum-v4-72b">Magnum v4 72B</option>
-                              <option value="microsoft/wizardlm-2-8x22b">WizardLM 2 8x22B</option>
-                            </select>
-                            <div className="p-2.5 rounded-lg bg-rose-50/60 dark:bg-rose-900/20 border border-rose-200/60 dark:border-rose-800/50">
-                              <p className="text-[11px] text-rose-700 dark:text-rose-300 font-medium leading-relaxed">Wicked Mode uses uncensored open-source models. No content filters. No refusals. Use responsibly.</p>
-                            </div>
-                          </div>
-                        )}
+                        <ChatModeSelector 
+                          chatMode={chatMode} 
+                          setChatMode={setChatMode}
+                          selectedModel={selectedModel}
+                          setSelectedModel={setSelectedModel}
+                          wickedModel={wickedModel}
+                          setWickedModel={setWickedModel}
+                        />
 
                         <div className="flex items-start gap-3 p-3 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-lg">
                           <input 
@@ -2157,8 +2107,12 @@ Create a summary that another AI can use to understand the context and continue 
 
               <div className="flex items-center justify-between mt-3 px-1 gap-2 border-t border-zinc-200 dark:border-zinc-800 pt-2">
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <span className={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${chatMode === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'}`}>
-                    {chatMode === 'good' ? 'Good' : 'Wicked'}
+                  <span className={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${
+                    chatMode === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 
+                    chatMode === 'okay' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' : 
+                    'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'
+                  }`}>
+                    {chatMode === 'good' ? 'Good' : chatMode === 'okay' ? 'Okay' : 'Wicked'}
                   </span>
                   <span className={`text-[10px] font-bold tracking-widest uppercase truncate ${getStatusColor()}`}>
                     {isLoading ? "Thinking..." : error ? "Error" : `${getConversationStatus()} ${messages.filter(m => m.role === 'assistant').length}/69`}
@@ -2170,7 +2124,10 @@ Create a summary that another AI can use to understand the context and continue 
                     Powered by God
                   </span>
                   {chatMode === 'wicked' && (
-                    <button onClick={() => { setChatMode('good'); setIsTurboMode(false); }} className="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md hover:bg-emerald-100 transition-colors whitespace-nowrap">Switch to Good</button>
+                    <button onClick={() => { setChatMode('okay'); setIsTurboMode(false); }} className="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-md hover:bg-blue-100 transition-colors whitespace-nowrap">Switch to Okay</button>
+                  )}
+                  {chatMode === 'okay' && (
+                    <button onClick={() => setChatMode('good')} className="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md hover:bg-emerald-100 transition-colors whitespace-nowrap">Switch to Good</button>
                   )}
                   {chatMode === 'good' && (
                     <button onClick={() => setShowAgeWarning(true)} className="text-[10px] font-bold bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 px-2 py-0.5 rounded-md hover:bg-rose-100 transition-colors whitespace-nowrap">Switch to Wicked</button>

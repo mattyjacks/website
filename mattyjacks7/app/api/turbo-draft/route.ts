@@ -150,8 +150,17 @@ STRICT RULES:
 
   } catch (error: any) {
     console.error("[TURBO DRAFT ERROR]", error?.message ?? error);
+    
+    // Distinguish between OpenRouter exhaustion/timeouts vs internal crashes
+    if (error?.message?.includes("All models exhausted") || error?.message?.includes("timed out")) {
+      return NextResponse.json(
+        { error: "Draft generation failed. All wicked models are currently rate limited or timed out." },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Draft generation failed. The AI might be rate limited." },
+      { error: "Draft generation failed due to an internal server error." },
       { status: 500 }
     );
   }

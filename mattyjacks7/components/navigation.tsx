@@ -137,6 +137,9 @@ export default function Navigation() {
                 whileHover={{ scale: 1.05 }}
                 className="hover:text-blue-600 dark:hover:text-sky-400 transition-colors flex items-center gap-1 py-4"
                 onMouseDown={(e) => e.preventDefault()}
+                aria-haspopup="true"
+                aria-expanded={isMoreDropdownOpen}
+                aria-controls="more-dropdown"
               >
                 More
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +148,7 @@ export default function Navigation() {
               </motion.button>
               
               {isMoreDropdownOpen && (
-                <div className="absolute top-full right-0 mt-0 pt-3">
+                <div id="more-dropdown" className="absolute top-full right-0 mt-0 pt-3">
                   <div className="w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-xl py-2 z-[110]">
                     <Link href="/leads" className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-blue-600 dark:hover:text-sky-400 transition-colors">
                       Free Leads

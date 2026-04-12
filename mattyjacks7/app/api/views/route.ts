@@ -58,6 +58,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         pageStats,
         siteStats,
+      }, {
+        headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" }
       });
     } else {
       // Get all stats
@@ -67,6 +69,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         allStats,
         siteStats,
+      }, {
+        headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" }
       });
     }
   } catch (error) {
