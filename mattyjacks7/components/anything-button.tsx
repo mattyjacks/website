@@ -2227,14 +2227,18 @@ Create a summary that another AI can use to understand the context and continue 
                   <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-600 tracking-wider hidden sm:inline-block mr-1 whitespace-nowrap">
                     Powered by God
                   </span>
+                  {chatMode === 'good' && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 whitespace-nowrap">Switch To Mode:</span>
+                      <button onClick={() => setChatMode('okay')} className="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-md hover:bg-blue-100 transition-colors whitespace-nowrap">[Okay]</button>
+                      <button onClick={() => setShowAgeWarning(true)} className="text-[10px] font-bold bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 px-2 py-0.5 rounded-md hover:bg-rose-100 transition-colors whitespace-nowrap">[Wicked (18+)]</button>
+                    </div>
+                  )}
                   {chatMode === 'wicked' && (
                     <button onClick={() => { setChatMode('okay'); setIsTurboMode(false); }} className="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-md hover:bg-blue-100 transition-colors whitespace-nowrap">Switch to Okay</button>
                   )}
                   {chatMode === 'okay' && (
                     <button onClick={() => setChatMode('good')} className="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md hover:bg-emerald-100 transition-colors whitespace-nowrap">Switch to Good</button>
-                  )}
-                  {chatMode === 'good' && (
-                    <button onClick={() => setShowAgeWarning(true)} className="text-[10px] font-bold bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 px-2 py-0.5 rounded-md hover:bg-rose-100 transition-colors whitespace-nowrap">Switch to Wicked</button>
                   )}
                 </div>
               </div>

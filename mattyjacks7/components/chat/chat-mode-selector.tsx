@@ -26,21 +26,41 @@ export function ChatModeSelector({
             Choose personality mode
           </span>
         </label>
-        <select
-          value={chatMode}
-          onChange={(e) => setChatMode(e.target.value as 'good' | 'okay' | 'wicked')}
-          className={`w-full py-2.5 px-3 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 ${
-            chatMode === 'good'
-              ? 'bg-emerald-500 text-white focus:ring-emerald-600'
-              : chatMode === 'okay'
-              ? 'bg-blue-500 text-white focus:ring-blue-600'
-              : 'bg-rose-600 text-white focus:ring-rose-700'
-          }`}
-        >
-          <option value="good">Good</option>
-          <option value="okay">Okay</option>
-          <option value="wicked">Wicked (18+)</option>
-        </select>
+        <div className="flex gap-2 w-full">
+          <button
+            type="button"
+            onClick={() => setChatMode('good')}
+            className={`flex-1 py-2.5 px-2 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
+              chatMode === 'good'
+                ? 'bg-emerald-500 text-white border border-emerald-600'
+                : 'bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            Good
+          </button>
+          <button
+            type="button"
+            onClick={() => setChatMode('okay')}
+            className={`flex-1 py-2.5 px-2 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+              chatMode === 'okay'
+                ? 'bg-blue-500 text-white border border-blue-600'
+                : 'bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            Okay
+          </button>
+          <button
+            type="button"
+            onClick={() => setChatMode('wicked')}
+            className={`flex-1 py-2.5 px-2 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-rose-700 ${
+              chatMode === 'wicked'
+                ? 'bg-rose-600 text-white border border-rose-700'
+                : 'bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            Wicked (18+)
+          </button>
+        </div>
       </div>
 
       {chatMode === 'good' ? (
