@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Download, Copy } from "lucide-react";
+import { X, Download, Copy, FileText } from "lucide-react";
 import Image from "next/image";
 import { UploadedImage, formatFileSize } from "@/lib/image-upload-handler";
 import { useState } from "react";
@@ -13,6 +13,8 @@ interface ImagePreviewProps {
 
 export function ImagePreview({ image, onRemove, compact = false }: ImagePreviewProps) {
   const [copied, setCopied] = useState(false);
+
+  const isImage = image.mimeType.startsWith("image/");
 
   const handleCopy = async () => {
     try {
@@ -38,18 +40,25 @@ export function ImagePreview({ image, onRemove, compact = false }: ImagePreviewP
   if (compact) {
     return (
       <div className="relative inline-block group">
-        <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-sm">
-          <img
-            src={image.base64}
-            alt={image.fileName}
-            className="w-full h-full object-cover"
-          />
+        <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-sm flex items-center justify-center bg-zinc-50 dark:bg-zinc-800/50">
+          {isImage ? (
+            <img
+              src={image.base64}
+              alt={image.fileName}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-2 text-zinc-500 dark:text-zinc-400">
+              <FileText className="w-8 h-8 mb-1 opacity-80" />
+              <span className="text-[9px] font-medium truncate max-w-full px-1">{image.fileName.split('.').pop()?.toUpperCase() || 'FILE'}</span>
+            </div>
+          )}
         </div>
         {onRemove && (
           <button
             onClick={() => onRemove(image.id)}
             className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-            aria-label="Remove image"
+            aria-label="Remove item"
           >
             <X className="w-3 h-3" />
           </button>
@@ -74,26 +83,33 @@ export function ImagePreview({ image, onRemove, compact = false }: ImagePreviewP
           <button
             onClick={() => onRemove(image.id)}
             className="p-1 text-zinc-400 hover:text-red-500 transition-colors flex-shrink-0"
-            aria-label="Remove image"
+            aria-label="Remove item"
           >
             <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      <div className="relative w-full h-40 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-        <img
-          src={image.base64}
-          alt={image.fileName}
-          className="w-full h-full object-cover"
-        />
+      <div className="relative w-full h-40 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+        {isImage ? (
+          <img
+            src={image.base64}
+            alt={image.fileName}
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400">
+            <FileText className="w-16 h-16 mb-2 opacity-80" />
+            <span className="text-sm font-medium">{image.fileName.split('.').pop()?.toUpperCase() || 'FILE'} Document</span>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
         <button
           onClick={handleCopy}
           className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors"
-          title="Copy image to clipboard"
+          title="Copy to clipboard"
         >
           <Copy className="w-3.5 h-3.5" />
           {copied ? "Copied" : "Copy"}
@@ -101,7 +117,7 @@ export function ImagePreview({ image, onRemove, compact = false }: ImagePreviewP
         <button
           onClick={handleDownload}
           className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
-          title="Download image"
+          title="Download file"
         >
           <Download className="w-3.5 h-3.5" />
           Download

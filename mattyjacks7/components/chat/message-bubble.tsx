@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Copy, Check, RotateCcw } from "lucide-react";
+import { Copy, Check, RotateCcw, FileText } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ChatMessage } from "./types";
@@ -83,15 +83,25 @@ export function MessageBubble({ message, onCopy }: { message: ChatMessage; onCop
         <div className="relative group/bubble flex flex-col min-w-0 max-w-full gap-2">
           {message.images && message.images.length > 0 && (
             <div className={`flex flex-wrap gap-2 ${isUser ? "justify-end" : "justify-start"}`}>
-              {message.images.map((img) => (
-                <div key={img.fileName} className="relative group/img rounded-xl overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-sm max-w-[200px]">
-                  <img
-                    src={img.base64}
-                    alt={img.fileName}
-                    className="w-full h-auto rounded-xl"
-                  />
-                </div>
-              ))}
+              {message.images.map((img) => {
+                const isImageFile = img.mimeType?.startsWith("image/") ?? true;
+                return (
+                  <div key={img.fileName} className="relative group/img rounded-xl overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-sm max-w-[200px] flex bg-zinc-50 dark:bg-zinc-800/50">
+                    {isImageFile ? (
+                      <img
+                        src={img.base64}
+                        alt={img.fileName}
+                        className="w-full h-auto rounded-xl"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-4 min-w-[120px] text-zinc-500 dark:text-zinc-600">
+                        <FileText className="w-10 h-10 mb-2 opacity-80" />
+                        <span className="text-[10px] font-bold truncate max-w-full px-2 text-center">{img.fileName}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
 
