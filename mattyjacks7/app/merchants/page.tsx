@@ -182,6 +182,41 @@ export default function MerchantsPage() {
         </div>
       </section>
 
+      {/* Referral Link Section */}
+      <section className="px-4 py-16 bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-950/30 dark:to-sky-950/30 border-t border-blue-200 dark:border-blue-800">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-zinc-900 dark:text-white">
+            Important: Use Our Referral Link
+          </h2>
+          <p className="text-lg text-zinc-700 dark:text-zinc-300 mb-8">
+            To ensure we receive our commission and can continue supporting your business, <span className="font-bold text-blue-600 dark:text-sky-400">you MUST sign up using this link</span>. If you don't, we won't get paid and we'll be sad :(
+          </p>
+          
+          <div className="flex flex-col gap-6 mb-8">
+            <a
+              href="https://savvy.cc/?invite=mattyjacks"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex flex-col items-center justify-center px-8 py-6 text-xl font-bold text-white bg-gradient-to-r from-blue-600 to-sky-500 rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-sky-500/40 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50 break-all"
+            >
+              <span className="mb-2">Click Here to Sign Up</span>
+              <code className="text-sm font-mono bg-blue-700/50 px-4 py-2 rounded-lg">
+                https://savvy.cc/?invite=mattyjacks
+              </code>
+            </a>
+          </div>
+
+          <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-700">
+            <p className="text-base text-zinc-700 dark:text-zinc-300 mb-3">
+              <span className="font-bold text-blue-600 dark:text-sky-400">Full URL to use:</span>
+            </p>
+            <code className="block text-sm md:text-base font-mono bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg text-zinc-900 dark:text-zinc-100 break-all">
+              https://savvy.cc/?invite=mattyjacks
+            </code>
+          </div>
+        </div>
+      </section>
+
       {/* Key Benefits Section */}
       <section className="px-4 py-16 border-t border-zinc-200 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto">
@@ -506,22 +541,36 @@ export default function MerchantsPage() {
               Whether you&apos;re high-risk or low-risk, we have the solution for your USA or Canada based business. Get started today with transparent pricing and expert support.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-              <Link
-                href="/contact"
-                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-emerald-600 bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/50"
-              >
-                <span>Get Your Free Quote</span>
-                <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Link>
-              
+            <div className="flex flex-col gap-4 justify-center items-center mb-8">
               <a
-                href="tel:+16039999420"
-                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 hover:bg-sky-500 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50"
+                href="https://savvy.cc/?invite=mattyjacks"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex flex-col items-center justify-center px-8 py-6 text-xl font-bold text-emerald-600 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/50 break-all"
               >
-                <Phone className="mr-2 w-5 h-5" />
-                <span>603-999-9420</span>
+                <span className="mb-2">Sign Up with Our Referral Link</span>
+                <code className="text-sm font-mono bg-emerald-100 px-3 py-1 rounded">
+                  https://savvy.cc/?invite=mattyjacks
+                </code>
               </a>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
+                <Link
+                  href="/contact"
+                  className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-emerald-600 bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/50"
+                >
+                  <span>Get Your Free Quote</span>
+                  <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </Link>
+                
+                <a
+                  href="tel:+16039999420"
+                  className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 hover:bg-sky-500 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-500/50"
+                >
+                  <Phone className="mr-2 w-5 h-5" />
+                  <span>603-999-9420</span>
+                </a>
+              </div>
             </div>
 
             <div className="flex flex-wrap justify-center gap-6 text-emerald-50">

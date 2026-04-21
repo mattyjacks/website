@@ -108,6 +108,8 @@ export default function AnythingButton() {
   const [isDragActive, setIsDragActive] = useState(false);
   const [currentPlaceholder, setCurrentPlaceholder] = useState("");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [isBraidMode, setIsBraidMode] = useState(false);
+  const [braidDiagram, setBraidDiagram] = useState<string | null>(null);
   const [isMagicShaking, setIsMagicShaking] = useState(false);
   const [isRegenRotating, setIsRegenRotating] = useState(false);
   const [particles, setParticles] = useState<Array<{id: string; x: number; y: number; color: string; life: number}>>([]);
@@ -660,6 +662,63 @@ Deep inquiry deserves nourishment: ${food}`
     setUploadedImages((prev) => prev.filter((img) => img.id !== id));
   };
 
+  const generateBraidDiagram = (prompt: string): string => {
+    const lines = prompt.split('\n').filter(line => line.trim());
+    
+    let diagram = 'flowchart TD\n';
+    let nodeId = 'A';
+    const nodeMap: { [key: string]: string } = {};
+    
+    const getNodeId = (): string => {
+      const id = nodeId;
+      nodeId = String.fromCharCode(nodeId.charCodeAt(0) + 1);
+      return id;
+    };
+
+    diagram += `${getNodeId()}["🧬 BRAID Analysis"]\n`;
+    
+    const constraints = lines.filter(l => l.toLowerCase().includes('constraint') || l.toLowerCase().includes('require'));
+    const conditions = lines.filter(l => l.toLowerCase().includes('if') || l.toLowerCase().includes('when') || l.toLowerCase().includes('condition'));
+    const actions = lines.filter(l => l.toLowerCase().includes('then') || l.toLowerCase().includes('do') || l.toLowerCase().includes('apply'));
+    const verification = lines.filter(l => l.toLowerCase().includes('verify') || l.toLowerCase().includes('check') || l.toLowerCase().includes('validate'));
+
+    if (constraints.length > 0) {
+      const id = getNodeId();
+      diagram += `${id}["📋 Read Constraints"]\n`;
+      nodeMap['constraints'] = id;
+    }
+
+    if (conditions.length > 0) {
+      const id = getNodeId();
+      diagram += `${id}{"🔍 Check Conditions"}\n`;
+      nodeMap['conditions'] = id;
+    }
+
+    if (actions.length > 0) {
+      const id = getNodeId();
+      diagram += `${id}["⚙️ Apply Rules"]\n`;
+      nodeMap['actions'] = id;
+    }
+
+    if (verification.length > 0) {
+      const id = getNodeId();
+      diagram += `${id}["✓ Verify Solution"]\n`;
+      nodeMap['verify'] = id;
+    }
+
+    const outputId = getNodeId();
+    diagram += `${outputId}["📤 Output Result"]\n`;
+
+    let prevId = 'A';
+    for (const key in nodeMap) {
+      diagram += `${prevId} --> ${nodeMap[key]}\n`;
+      prevId = nodeMap[key];
+    }
+    diagram += `${prevId} --> ${outputId}\n`;
+
+    return diagram;
+  };
+
   const handleClearInput = () => {
     if (input.length > 100) {
       setShowClearConfirm(true);
@@ -1086,7 +1145,15 @@ Create a summary that another AI can use to understand the context and continue 
       }
     }
     
-    const messageContent = textToSend || (uploadedImages.length > 0 ? `[Sent ${uploadedImages.length} image(s)]` : "");
+    let messageContent = textToSend || (uploadedImages.length > 0 ? `[Sent ${uploadedImages.length} image(s)]` : "");
+    
+    // Convert to BRAID diagram if mode is enabled
+    if (isBraidMode && textToSend) {
+      const diagram = generateBraidDiagram(textToSend);
+      setBraidDiagram(diagram);
+      messageContent = `\`\`\`mermaid\n${diagram}\n\`\`\`\n\n**Original Prompt:**\n${textToSend}`;
+    }
+    
     const userMessage: ChatMessage = { 
       id: userMessageId, 
       role: "user", 
@@ -1260,7 +1327,7 @@ Create a summary that another AI can use to understand the context and continue 
         setTimeout(() => scrollToBottom(), 50);
       }
     }
-  }, [isLoading, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached, isTurboMode, isGoodTurboMode, chatMode, wickedModel, nickname, updateCurrentSession, uploadedImages]);
+  }, [isLoading, currentSessionId, scrollToBottom, consoleDebugEnabled, autoScrollEnabled, selectedModel, isLimitReached, isTurboMode, isGoodTurboMode, chatMode, wickedModel, nickname, updateCurrentSession, uploadedImages, isBraidMode]);
 
   // --- Turbo Loop ---
 
@@ -1988,17 +2055,17 @@ Create a summary that another AI can use to understand the context and continue 
                 ref={fileInputRef}
                 type="file"
                 multiple
-                accept="image/*"
+                accept="image/*,.pdf,.md,.markdown,.txt,.csv,.json"
                 onChange={handleFileSelect}
                 className="hidden"
-                aria-label="Upload images"
+                aria-label="Upload images and documents"
               />
 
               {isDragActive && (
                 <div className="absolute inset-0 bg-emerald-500/10 border-2 border-dashed border-emerald-500 rounded-2xl flex items-center justify-center pointer-events-none">
                   <div className="text-center">
                     <Upload className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-                    <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Drop images here</p>
+                    <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Drop images or documents here</p>
                   </div>
                 </div>
               )}
@@ -2057,6 +2124,31 @@ Create a summary that another AI can use to understand the context and continue 
               ))}
 
               <div className="mt-2 flex justify-end gap-2">
+                <input
+                  type="file"
+                  id="image-upload"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const imageData = event.target?.result as string;
+                        setInput(prev => prev + `\n[Image: ${file.name}]`);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                  className="inline-flex items-center justify-center text-[12px] font-semibold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800 rounded-full px-2 py-1 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
+                  title="Upload image"
+                >
+                  <Upload className="w-4 h-4" />
+                </button>
                 <button
                   type="button"
                   onClick={handleClearInput}
@@ -2094,6 +2186,18 @@ Create a summary that another AI can use to understand the context and continue 
                 >
                   <RotateCcw className="w-4 h-4" />
                 </motion.button>
+                <button
+                  type="button"
+                  onClick={() => setIsBraidMode(!isBraidMode)}
+                  className={`inline-flex items-center justify-center text-lg font-semibold rounded-full w-10 h-10 transition-all ${
+                    isBraidMode
+                      ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/50'
+                      : 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/50'
+                  }`}
+                  title="BRAID Mode - Convert prompts to Mermaid diagrams (35x more efficient)"
+                >
+                  🧬
+                </button>
                 <button
                   type="button"
                   onClick={addFoodReward}

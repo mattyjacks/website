@@ -12,7 +12,10 @@ export interface UploadedImage {
 }
 
 const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB for documents
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ALLOWED_DOCUMENT_TYPES = ['application/pdf', 'text/markdown', 'text/plain', 'text/csv', 'application/json'];
+const ALLOWED_EXTENSIONS = ['.pdf', '.md', '.txt', '.csv', '.json', '.markdown'];
 const MAX_DIMENSION = 1920; // Max width/height for compression
 const JPEG_QUALITY = 0.82; // Optimized quality for JPEG compression
 const MAX_COMPRESSED_SIZE = 500 * 1024; // 500KB max after compression
@@ -62,36 +65,68 @@ async function compressImage(file: File): Promise<File> {
   });
 }
 
+function isImageFile(file: File): boolean {
+  return ALLOWED_IMAGE_TYPES.includes(file.type);
+}
+
+function isDocumentFile(file: File): boolean {
+  const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+  return ALLOWED_DOCUMENT_TYPES.includes(file.type) || ALLOWED_EXTENSIONS.includes(fileExtension);
+}
+
 export async function processImageFile(file: File): Promise<UploadedImage | null> {
+  const isImage = isImageFile(file);
+  const isDocument = isDocumentFile(file);
+
   // Validate file type
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    console.error(`Invalid image type: ${file.type}`);
+  if (!isImage && !isDocument) {
+    console.error(`Invalid file type: ${file.type}`);
     return null;
   }
 
   // Validate file size
-  if (file.size > MAX_IMAGE_SIZE) {
-    console.error(`Image too large: ${file.size} bytes (max ${MAX_IMAGE_SIZE})`);
+  const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_FILE_SIZE;
+  if (file.size > maxSize) {
+    console.error(`File too large: ${file.size} bytes (max ${maxSize})`);
     return null;
   }
 
   try {
-    // Compress image to reduce payload size
-    const compressedFile = await compressImage(file);
-    const base64 = await fileToBase64(compressedFile);
-    const { width, height } = await getImageDimensions(base64);
+    let base64: string;
+    let width: number | undefined;
+    let height: number | undefined;
 
-    return {
-      id: generateImageId(),
-      base64,
-      mimeType: 'image/jpeg',
-      fileName: file.name,
-      size: compressedFile.size,
-      width,
-      height
-    };
+    if (isImage) {
+      // Compress image to reduce payload size
+      const compressedFile = await compressImage(file);
+      base64 = await fileToBase64(compressedFile);
+      const dimensions = await getImageDimensions(base64);
+      width = dimensions.width;
+      height = dimensions.height;
+
+      return {
+        id: generateImageId(),
+        base64,
+        mimeType: 'image/jpeg',
+        fileName: file.name,
+        size: compressedFile.size,
+        width,
+        height
+      };
+    } else {
+      // Handle documents (PDF, MD, TXT, etc.)
+      base64 = await fileToBase64(file);
+
+      return {
+        id: generateImageId(),
+        base64,
+        mimeType: file.type || 'text/plain',
+        fileName: file.name,
+        size: file.size
+      };
+    }
   } catch (error) {
-    console.error('Error processing image:', error);
+    console.error('Error processing file:', error);
     return null;
   }
 }
@@ -100,7 +135,10 @@ export async function processImageFiles(files: FileList | File[]): Promise<Uploa
   const results: UploadedImage[] = [];
 
   for (const file of files) {
-    if (file.type.startsWith('image/')) {
+    const isImage = isImageFile(file);
+    const isDocument = isDocumentFile(file);
+    
+    if (isImage || isDocument) {
       const processed = await processImageFile(file);
       if (processed) {
         results.push(processed);

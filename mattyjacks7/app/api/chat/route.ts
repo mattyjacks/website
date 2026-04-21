@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
+import { z } from "zod";
 import { trackApiCall, getOpenservStats } from "@/lib/api-cost-tracker";
 import { incrementOpenservCounter, getOpenservMessage } from "@/lib/openserv-counter";
 import { selectRelevantContext, isOpenservQuery } from "@/lib/openserv-rag";
