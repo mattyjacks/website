@@ -115,13 +115,14 @@ export default function AnythingButton() {
   const [particles, setParticles] = useState<Array<{id: string; x: number; y: number; color: string; life: number}>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const magicWandRef = useRef<HTMLButtonElement>(null);
+  const [showOptions, setShowOptions] = useState(true);
 
   // --- Voice Chat integration ---
   const [isAliveMode, setIsAliveMode] = useState(false);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const { isRecording, isProcessing, toggleRecording, startRecording, stopRecordingAndTranscribe } = useVoiceChat({
-    autoProcessSilenceMs: isAliveMode ? 4000 : 6000,
+    autoProcessSilenceMs: isAliveMode ? 1200 : 4000,
     onError: (msg) => {
       setError(msg);
       setIsAliveMode(false);
@@ -1149,9 +1150,28 @@ Create a summary that another AI can use to understand the context and continue 
     
     // Convert to BRAID diagram if mode is enabled
     if (isBraidMode && textToSend) {
-      const diagram = generateBraidDiagram(textToSend);
-      setBraidDiagram(diagram);
-      messageContent = `\`\`\`mermaid\n${diagram}\n\`\`\`\n\n**Original Prompt:**\n${textToSend}`;
+      setIsLoading(true);
+      try {
+        const diagramRes = await fetch("/api/braid-diagram", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: textToSend })
+        });
+        if (diagramRes.ok) {
+          const { diagram } = await diagramRes.json();
+          setBraidDiagram(diagram);
+          messageContent = `\`\`\`mermaid\n${diagram}\n\`\`\`\n\n**Original Prompt:**\n${textToSend}`;
+        } else {
+          console.warn("Failed to generate BRAID diagram via API");
+          // Fallback if needed
+          const fallback = generateBraidDiagram(textToSend);
+          setBraidDiagram(fallback);
+          messageContent = `\`\`\`mermaid\n${fallback}\n\`\`\`\n\n**Original Prompt:**\n${textToSend}`;
+        }
+      } catch (err) {
+        console.error("Error calling BRAID diagram API:", err);
+      }
+      setIsLoading(false);
     }
     
     const userMessage: ChatMessage = { 
@@ -1243,6 +1263,7 @@ Create a summary that another AI can use to understand the context and continue 
       let streamedText = '';
       let streamDone = false;
       let sseBuffer = '';
+      let lastTtsIndex = 0;
 
       // Add a placeholder assistant message immediately
       updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: '▍', timestamp: Date.now() }]);
@@ -1261,6 +1282,25 @@ Create a summary that another AI can use to understand the context and continue 
             const parsed = JSON.parse(line.slice(6));
             if (parsed.type === 'delta') {
               streamedText += parsed.delta;
+              
+              if (isAliveMode) {
+                const punctuationRegex = /([.!?\n]+(?:\s|$))/g;
+                let match;
+                let lastMatchIndex = -1;
+                let searchString = streamedText.slice(lastTtsIndex);
+                while ((match = punctuationRegex.exec(searchString)) !== null) {
+                  lastMatchIndex = match.index + match[0].length;
+                }
+                if (lastMatchIndex > 0) {
+                  const chunkEndIndex = lastTtsIndex + lastMatchIndex;
+                  const chunk = streamedText.slice(lastTtsIndex, chunkEndIndex).trim();
+                  if (chunk.length > 0) {
+                    playSynthesizedSpeech(chunk);
+                  }
+                  lastTtsIndex = chunkEndIndex;
+                }
+              }
+
               // Update the message content as chunks stream in, with cursor
               updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: streamedText + '▍', timestamp: Date.now() }]);
             } else if (parsed.type === 'done') {
@@ -1272,7 +1312,10 @@ Create a summary that another AI can use to understand the context and continue 
                 console.groupEnd();
               }
               streamDone = true;
-              if (isAliveMode) playSynthesizedSpeech(streamedText);
+              if (isAliveMode && lastTtsIndex < streamedText.length) {
+                const finalChunk = streamedText.slice(lastTtsIndex).trim();
+                if (finalChunk.length > 0) playSynthesizedSpeech(finalChunk);
+              }
             } else if (parsed.type === 'error') {
               throw new Error(parsed.error || 'Stream error');
             }
@@ -1285,7 +1328,10 @@ Create a summary that another AI can use to understand the context and continue 
       if (!streamDone && streamedText) {
         // Stream ended without done event — use what we have
         updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: streamedText, timestamp: Date.now() }]);
-        if (isAliveMode) playSynthesizedSpeech(streamedText);
+        if (isAliveMode && lastTtsIndex < streamedText.length) {
+          const finalChunk = streamedText.slice(lastTtsIndex).trim();
+          if (finalChunk.length > 0) playSynthesizedSpeech(finalChunk);
+        }
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
@@ -2025,7 +2071,7 @@ Create a summary that another AI can use to understand the context and continue 
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
-                    className="w-10 h-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hidden sm:flex"
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Upload images (supports drag-drop and paste)"
                   >
                     <Upload className="w-5 h-5" />
@@ -2123,33 +2169,20 @@ Create a summary that another AI can use to understand the context and continue 
                 />
               ))}
 
-              <div className="mt-2 flex justify-end gap-2">
-                <input
-                  type="file"
-                  id="image-upload"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        const imageData = event.target?.result as string;
-                        setInput(prev => prev + `\n[Image: ${file.name}]`);
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                  className="hidden"
-                />
+              <div className="flex justify-center mt-2 mb-1">
                 <button
-                  type="button"
-                  onClick={() => document.getElementById('image-upload')?.click()}
-                  className="inline-flex items-center justify-center text-[12px] font-semibold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-800 rounded-full px-2 py-1 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
-                  title="Upload image"
+                  onClick={() => setShowOptions(!showOptions)}
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-lg"
+                  title={showOptions ? "Hide options" : "Show options"}
                 >
-                  <Upload className="w-4 h-4" />
+                  {showOptions ? "👇" : "👆"}
                 </button>
-                <button
+              </div>
+
+              {showOptions && (
+                <>
+                  <div className="mt-2 flex justify-end gap-2">
+                    <button
                   type="button"
                   onClick={handleClearInput}
                   disabled={input.length === 0}
@@ -2319,6 +2352,8 @@ Create a summary that another AI can use to understand the context and continue 
                     Sum Up & Revive
                   </button>
                 </div>
+              )}
+              </>
               )}
 
               <div className="px-4 py-2 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
