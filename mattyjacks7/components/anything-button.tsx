@@ -1284,7 +1284,7 @@ Create a summary that another AI can use to understand the context and continue 
               streamedText += parsed.delta;
               
               if (isAliveMode) {
-                const punctuationRegex = /([.!?\n]+(?:\s|$))/g;
+                const punctuationRegex = /(\n+)/g;
                 let match;
                 let lastMatchIndex = -1;
                 let searchString = streamedText.slice(lastTtsIndex);
