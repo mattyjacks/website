@@ -23,6 +23,10 @@ import { Upload } from "lucide-react";
 import { ChatMessage, ChatSession, CloudSessionMeta } from "./chat/types";
 import { MessageBubble } from "./chat/message-bubble";
 import { ChatModeSelector } from "./chat/chat-mode-selector";
+import { ChatHeader } from "./chat/chat-header";
+import { ChatSidebar } from "./chat/chat-sidebar";
+import { ChatComposer } from "./chat/chat-composer";
+import { ChatModals } from "./chat/chat-modals";
 
 const GREETING_VARIANTS = [
   "Let's make some money together for the common good of humanity. I'll help you with ANY idea, no matter how wild, naturally as God intended with Artificial Intelligence. What are your orders, Master? \n\n👱🏻‍♀️ **Valley Net** 💘",
@@ -116,6 +120,8 @@ export default function AnythingButton() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const magicWandRef = useRef<HTMLButtonElement>(null);
   const [showOptions, setShowOptions] = useState(true);
+  const [showEmbedCode, setShowEmbedCode] = useState(false);
+  const [embedCopied, setEmbedCopied] = useState(false);
 
   // --- Voice Chat integration ---
   const [isAliveMode, setIsAliveMode] = useState(false);
@@ -847,14 +853,28 @@ Create a summary that another AI can use to understand the context and continue 
     return () => window.removeEventListener('resize', handleResize);
   }, [isFullscreen]);
 
+  // --- Embed mode: auto-open when signaled ---
+  useEffect(() => {
+    const handleEmbedOpen = () => {
+      setIsOpen(true);
+      setIsFullscreen(true);
+    };
+    window.addEventListener('valley-net-embed-open', handleEmbedOpen);
+    return () => window.removeEventListener('valley-net-embed-open', handleEmbedOpen);
+  }, []);
+
   useEffect(() => {
     triggerWobble();
     if (isOpen) {
       setMorphTarget(1);
+      // Signal parent iframe to expand
+      try { window.parent.postMessage('valley-net-open', '*'); } catch (_) {}
       // Delay showing the chat window so the morph animation plays
       const timer = setTimeout(() => setChatReady(true), 600);
       return () => clearTimeout(timer);
     }
+    // Signal parent iframe to shrink
+    try { window.parent.postMessage('valley-net-close', '*'); } catch (_) {}
     setMorphTarget(0);
     setChatReady(false);
   }, [isOpen]);
@@ -1754,216 +1774,53 @@ Create a summary that another AI can use to understand the context and continue 
             className={`flex flex-col border border-zinc-200/80 bg-white shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-300 ${isFullscreen ? 'rounded-none' : 'rounded-2xl'}`}
           >
             {/* Header */}
-            <div className="drag-handle flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 z-20 cursor-move touch-none relative shrink-0">
-              <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="text-white/80 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/20"
-                aria-label="History"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-
-              <div className="flex flex-col flex-1 min-w-0">
-                <div className="flex items-center justify-start gap-2">
-                  <button 
-                    onClick={() => {
-                      setImageTeaserIndex(Math.floor(Math.random() * TEASER_PHRASES.length));
-                      setShowImageModal(true);
-                    }}
-                    className="w-7 h-7 relative shrink-0 rounded-[6px] overflow-hidden shadow-sm border border-black/10 hover:scale-110 hover:shadow-md transition-all pointer-events-auto cursor-pointer"
-                    aria-label="View Valley Net v23.2"
-                  >
-                    <Image 
-                      src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
-                      alt="Valley Net"
-                      fill
-                      className="object-cover"
-                    />
-                  </button>
-                  <h3 
-                    onClick={() => {
-                      setImageTeaserIndex(Math.floor(Math.random() * TEASER_PHRASES.length));
-                      setShowImageModal(true);
-                    }}
-                    className="text-white font-bold tracking-wide text-base whitespace-nowrap cursor-pointer hover:opacity-80 transition-opacity"
-                  >
-                    Valley Net <span className="text-[14px]">💘</span>
-                  </h3>
-                  {chatMode === 'wicked' && (
-                    <span className="ml-1 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-rose-600 text-white rounded-md animate-pulse">Wicked</span>
-                  )}
-                </div>
-              </div>
-
-              <button onClick={() => setIsFullscreen(!isFullscreen)} className="hidden sm:inline-flex text-white font-bold text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-md transition-colors ml-2 whitespace-nowrap relative z-50">
-                {isFullscreen ? "Minimize" : "Fullscreen"}
-              </button>
-              <button onClick={() => setIsOpen(false)} className="text-white font-bold text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-md transition-colors ml-1 whitespace-nowrap relative z-50">
-                Close Chat
-              </button>
-            </div>
+            <ChatHeader
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+              isFullscreen={isFullscreen}
+              setIsFullscreen={setIsFullscreen}
+              setIsOpen={setIsOpen}
+              chatMode={chatMode}
+              setImageTeaserIndex={setImageTeaserIndex}
+              setShowImageModal={setShowImageModal}
+            />
 
             {/* Sidebar */}
-            <div className={`absolute top-[60px] bottom-0 left-0 w-[50vw] sm:w-[40vw] lg:w-[35vw] min-w-[300px] max-w-[550px] bg-zinc-50/95 dark:bg-zinc-900/95 backdrop-blur-xl border-r border-zinc-200 dark:border-white/10 z-30 flex flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full opacity-0'}`}>
-              <div className="p-4 border-b border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-black/20 shrink-0">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-bold text-base text-zinc-800 dark:text-zinc-200 uppercase tracking-widest">Chat Menu</h4>
-                  <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-white flex-shrink-0"><X className="w-5 h-5" /></button>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {/* Improvement 5: Better button sizing for mobile */}
-                  <button onClick={createNewSession} className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-500 text-white border border-emerald-600 dark:bg-emerald-600 dark:border-emerald-700 transition-all hover:shadow-sm hover:bg-emerald-600 dark:hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900" aria-label="Create new conversation"><Plus className="w-3 h-3 inline mr-1" />New</button>
-                  <button onClick={() => setShowSettings(!showSettings)} className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900" aria-label="Toggle chat settings">Settings</button>
-                  <button onClick={() => setShowSumUpMenu(!showSumUpMenu)} className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800/50 transition-all hover:shadow-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-900" aria-label="Toggle sum up conversations">Sum Up</button>
-                </div>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-                {showSumUpMenu ? (
-                  <div className="p-4 rounded-2xl bg-white/70 dark:bg-black/30 border border-purple-200 dark:border-purple-800 shadow-sm space-y-3">
-                    <h5 className="text-xs font-bold uppercase tracking-widest text-purple-700 dark:text-purple-300">Sum Up Conversations</h5>
-                    <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
-                      {sessions.length === 0 ? (
-                        <div className="text-xs text-zinc-500 py-2">No conversations to sum up.</div>
-                      ) : (
-                        sessions.map((session) => (
-                          <div key={session.id} className="p-3 rounded-lg bg-purple-50/50 dark:bg-purple-900/20 border border-purple-200/50 dark:border-purple-800/50 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">{session.title}</span>
-                              <span className="text-[10px] text-zinc-500">({session.messages.length} msgs)</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <button onClick={() => downloadSummary(session.id, 'markdown')} className="px-2 py-1.5 text-[11px] font-bold rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors">📄 Markdown</button>
-                              <button onClick={() => downloadSummary(session.id, 'text')} className="px-2 py-1.5 text-[11px] font-bold rounded bg-slate-600 text-white hover:bg-slate-700 transition-colors">📝 Text</button>
-                              <button onClick={() => copySummaryToClipboard(session.id)} className="px-2 py-1.5 text-[11px] font-bold rounded bg-green-600 text-white hover:bg-green-700 transition-colors">📋 Copy</button>
-                              <button onClick={() => startNewChatWithSummary(session.id)} className="px-2 py-1.5 text-[11px] font-bold rounded bg-purple-600 text-white hover:bg-purple-700 transition-colors">✨ New Chat</button>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <h5 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Local Conversations</h5>
-                        <button onClick={createNewSession} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black text-[11px] font-bold shadow-sm hover:scale-[1.02] transition-transform"><Plus className="w-3.5 h-3.5" /> New</button>
-                      </div>
-                      <div className="space-y-1 max-h-[240px] overflow-y-auto custom-scrollbar pr-1">
-                        {sessions.length === 0 && (
-                          <div className="text-xs text-zinc-500 py-2">No local conversations yet.</div>
-                        )}
-                        {sessions.map((session) => (
-                          <div key={session.id} className={`group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm transition-all ${currentSessionId === session.id ? "bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold" : "hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-transparent font-medium"}`}>
-                            <div className="flex items-center gap-2 truncate flex-1" onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); }}>
-                              <MessageSquare className={`w-4 h-4 flex-shrink-0 ${currentSessionId === session.id ? 'text-emerald-500' : 'opacity-60'}`} />
-                              <span className="truncate">{session.title}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] text-zinc-400">{session.messages.length}</span>
-                              <div className="relative">
-                                <button onClick={() => setOpenMenuId(openMenuId === session.id ? null : session.id)} className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-md transition-colors" title="More options">
-                                  <MoreVertical className="w-3.5 h-3.5" />
-                                </button>
-                                {openMenuId === session.id && (
-                                  <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-50 py-1">
-                                    <button onClick={() => { setCurrentSessionId(session.id); setIsSidebarOpen(false); setOpenMenuId(null); }} className="w-full text-left px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">Go To</button>
-                                    <button onClick={() => { renameSessionAuto(session.id); }} className="w-full text-left px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">Rename Auto</button>
-                                    <button onClick={() => { sumUpSession(session.id); }} className="w-full text-left px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">Sum Up</button>
-                                    <button onClick={() => { deleteSession(session.id); }} className="w-full text-left px-3 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Delete</button>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-2xl bg-white/70 dark:bg-black/30 border border-purple-200 dark:border-purple-800 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
-                        <h5 className="text-xs font-bold uppercase tracking-widest text-purple-700 dark:text-purple-300">Cloud Conversations</h5>
-                        {cloudLoading && <span className="text-[11px] text-purple-500 font-semibold">Loading…</span>}
-                        {cloudError && !cloudLoading && <span className="text-[11px] text-rose-500 font-semibold">{cloudError}</span>}
-                      </div>
-                      <div className="space-y-1 max-h-[200px] overflow-y-auto custom-scrollbar pr-1">
-                        {cloudSessions.length === 0 && !cloudLoading && !cloudError && (
-                          <div className="text-xs text-zinc-500 py-2">No cloud conversations found.</div>
-                        )}
-                        {cloudSessions.map((session) => (
-                          <div key={session.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm bg-purple-50/70 dark:bg-purple-900/20 border border-purple-200/70 dark:border-purple-800/70 text-purple-800 dark:text-purple-200">
-                            <div className="flex items-center gap-2 truncate">
-                              <MessageSquare className="w-4 h-4 flex-shrink-0 text-purple-500" />
-                              <span className="truncate">{session.title}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-[11px] text-purple-600 dark:text-purple-300">
-                              {session.messageCount !== undefined && <span>{session.messageCount}</span>}
-                              <span>{new Date(session.updatedAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-white/80 dark:bg-black/30 border border-emerald-200 dark:border-emerald-800 shadow-sm space-y-4">
-                      <div className="flex items-center justify-between pb-2 border-b border-emerald-200/50 dark:border-emerald-800/50">
-                        <h5 className="text-sm font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Settings</h5>
-                        <span className="text-xs font-bold text-emerald-500">Valley Net</span>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex flex-col gap-2">
-                          <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                            Nickname
-                            <span className="block text-xs text-emerald-700/70 dark:text-emerald-300/70 font-normal mt-0.5">Your name in chat</span>
-                          </label>
-                          <input
-                            value={nickname}
-                            onChange={(e) => setNickname(e.target.value)}
-                            className="w-full text-sm font-semibold bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                          />
-                        </div>
-
-                        <ChatModeSelector 
-                          chatMode={chatMode} 
-                          setChatMode={setChatMode}
-                          selectedModel={selectedModel}
-                          setSelectedModel={setSelectedModel}
-                          wickedModel={wickedModel}
-                          setWickedModel={setWickedModel}
-                        />
-
-                        <div className="flex items-start gap-3 p-3 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-lg">
-                          <input 
-                            type="checkbox" 
-                            checked={autoScrollEnabled} 
-                            onChange={(e) => setAutoScrollEnabled(e.target.checked)} 
-                            className="h-5 w-5 mt-0.5 flex-shrink-0 cursor-pointer"
-                          />
-                          <div className="flex flex-col gap-1">
-                            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Auto-scroll on replies</span>
-                            <span className="text-xs text-emerald-700/70 dark:text-emerald-300/70">Keeps the newest message in view</span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-3 p-3 bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/50 rounded-lg">
-                          <input 
-                            type="checkbox" 
-                            checked={consoleDebugEnabled} 
-                            onChange={(e) => setConsoleDebugEnabled(e.target.checked)} 
-                            className="h-5 w-5 mt-0.5 flex-shrink-0 cursor-pointer"
-                          />
-                          <div className="flex flex-col gap-1">
-                            <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Console debug logs</span>
-                            <span className="text-xs text-emerald-700/70 dark:text-emerald-300/70">Show backend debug trail in DevTools</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <ChatSidebar
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+              showSettings={showSettings}
+              setShowSettings={setShowSettings}
+              showSumUpMenu={showSumUpMenu}
+              setShowSumUpMenu={setShowSumUpMenu}
+              sessions={sessions}
+              currentSessionId={currentSessionId}
+              setCurrentSessionId={setCurrentSessionId}
+              createNewSession={createNewSession}
+              deleteSession={deleteSession}
+              renameSessionAuto={renameSessionAuto}
+              sumUpSession={sumUpSession}
+              nickname={nickname}
+              setNickname={setNickname}
+              chatMode={chatMode}
+              setChatMode={setChatMode}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
+              wickedModel={wickedModel}
+              setWickedModel={setWickedModel}
+              autoScrollEnabled={autoScrollEnabled}
+              setAutoScrollEnabled={setAutoScrollEnabled}
+              consoleDebugEnabled={consoleDebugEnabled}
+              setConsoleDebugEnabled={setConsoleDebugEnabled}
+              cloudSessions={cloudSessions}
+              cloudLoading={cloudLoading}
+              cloudError={cloudError}
+              downloadSummary={downloadSummary}
+              copySummaryToClipboard={copySummaryToClipboard}
+              startNewChatWithSummary={startNewChatWithSummary}
+              openMenuId={openMenuId}
+              setOpenMenuId={setOpenMenuId}
+            />
 
             {/* Messages */}
             <div 
@@ -2005,570 +1862,96 @@ Create a summary that another AI can use to understand the context and continue 
               )}
             </div>
             {/* Input */}
-            <div 
-              className="p-4 border-t border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-zinc-900/40 backdrop-blur-xl shrink-0 z-20"
-              onDragEnter={handleDragEnter}
-              onDragLeave={handleDragLeave}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              {uploadedImages.length > 0 && (
-                <div className="mb-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
-                  <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-2">Attached Images ({uploadedImages.length})</p>
-                  <div className="flex flex-wrap gap-2">
-                    {uploadedImages.map((img) => (
-                      <div key={img.id} className="relative group">
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-sm">
-                          <img
-                            src={img.base64}
-                            alt={img.fileName}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <button
-                          onClick={() => removeImage(img.id)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-                          aria-label="Remove image"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className={`relative flex items-end gap-2 bg-white dark:bg-zinc-950 border-2 rounded-2xl shadow-sm transition-all p-1 pl-3 pr-1.5 ${isDragActive ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20' : 'border-zinc-300 dark:border-zinc-800 focus-within:border-emerald-500 dark:focus-within:border-emerald-500/50'}`}>
-                <textarea
-                  ref={inputRef}
-                  value={input}
-                  onChange={handleInput}
-                  onKeyDown={handleKeyDown}
-                  onPaste={handlePaste}
-                  placeholder={isLimitReached ? "Conversation limit reached (69/69) 💘" : currentPlaceholder || "Ask me anything..."}
-                  rows={1}
-                  disabled={isLoading || isLimitReached}
-                  className="w-full resize-none py-3.5 bg-transparent text-[15px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder-text-zinc-600 focus:outline-none custom-scrollbar"
-                  style={{ maxHeight: "200px" }}
-                />
-                <div className="flex gap-1 pb-1.5 pl-1 shrink-0">
-                  <button
-                    onClick={() => {
-                      const turningOn = !isAliveMode;
-                      setIsAliveMode(turningOn);
-                      if (turningOn) {
-                        startRecording();
-                      } else {
-                        if (currentAudioRef.current) currentAudioRef.current.pause();
-                        stopRecordingAndTranscribe();
-                      }
-                    }}
-                    className={`w-[42px] h-10 flex flex-col items-center justify-center rounded-xl transition-all border ${
-                      isAliveMode 
-                        ? 'bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-800 shadow-[0_0_15px_rgba(225,29,72,0.3)]' 
-                        : 'bg-zinc-100 dark:bg-zinc-900/40 text-zinc-500 dark:text-zinc-600 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-200 hover:text-zinc-500 hover:dark:bg-zinc-800'
-                    }`}
-                    title={isAliveMode ? "Alive Speech Active (Say 'pause' to stop)" : "Enable Alive Speech (Live mode)"}
-                  >
-                    <AudioLines className={`w-[18px] h-[18px] ${isAliveMode ? 'animate-pulse' : ''}`} />
-                    <span className="text-[7.5px] font-bold mt-0.5 leading-none">ALIVE</span>
-                  </button>
-
-                  <button
-                    onClick={toggleRecording}
-                    className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors border ${
-                      isRecording 
-                        ? 'bg-red-500 hover:bg-red-600 text-white border-red-600 shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
-                        : isProcessing 
-                          ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-500 border-amber-200 dark:border-amber-800'
-                          : 'bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800'
-                    }`}
-                    title={isRecording ? "Stop recording" : "Record audio (Whisper)"}
-                  >
-                    {isRecording ? <MicOff className="w-5 h-5 animate-pulse" /> : isProcessing ? <Zap className="w-4 h-4 animate-spin" /> : <Mic className="w-5 h-5" />}
-                  </button>
-
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isLoading}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Upload images (supports drag-drop and paste)"
-                  >
-                    <Upload className="w-5 h-5" />
-                  </button>
-                  {isLoading ? (
-                    <button
-                      onClick={stopGeneration}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 transition-colors"
-                      title="Stop generating"
-                    >
-                      <StopCircle className="w-5 h-5 fill-current" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => sendMessage()}
-                      disabled={(input.trim().length === 0 && uploadedImages.length === 0) || isLimitReached}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-600 text-white disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 transition-colors group focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                      title={isLimitReached ? "Limit reached" : "Send message (Enter to send, Shift+Enter for new line)"}
-                    >
-                      <Send className="w-4 h-4 ml-0.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*,.pdf,.md,.markdown,.txt,.csv,.json"
-                onChange={handleFileSelect}
-                className="hidden"
-                aria-label="Upload images and documents"
-              />
-
-              {isDragActive && (
-                <div className="absolute inset-0 bg-emerald-500/10 border-2 border-dashed border-emerald-500 rounded-2xl flex items-center justify-center pointer-events-none">
-                  <div className="text-center">
-                    <Upload className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-                    <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Drop images or documents here</p>
-                  </div>
-                </div>
-              )}
-
-              {showClearConfirm && (
-                <div className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center backdrop-blur-sm z-50">
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.9, opacity: 0 }}
-                    className="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 max-w-sm mx-4"
-                  >
-                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">Clear FR FR, no cap?</h3>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
-                      You're about to clear {input.length} characters of text. This action cannot be undone.
-                    </p>
-                    <div className="flex gap-3 justify-end">
-                      <button
-                        onClick={cancelClear}
-                        className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
-                      >
-                        No
-                      </button>
-                      <button
-                        onClick={confirmClear}
-                        className="px-4 py-2 rounded-lg bg-orange-600 text-white font-semibold hover:bg-orange-700 transition-colors"
-                      >
-                        Yes
-                      </button>
-                    </div>
-                  </motion.div>
-                </div>
-              )}
-
-              {particles.map((particle) => (
-                <motion.div
-                  key={particle.id}
-                  initial={{ x: particle.x, y: particle.y, opacity: 1, scale: 1 }}
-                  animate={{
-                    x: particle.x + (Math.random() - 0.5) * 200,
-                    y: particle.y - Math.random() * 150,
-                    opacity: 0,
-                    scale: 0
-                  }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="fixed pointer-events-none"
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: particle.color,
-                    boxShadow: `0 0 8px ${particle.color}`,
-                    zIndex: 40
-                  }}
-                />
-              ))}
-
-              <div className="flex justify-center mt-2 mb-1">
-                <button
-                  onClick={() => setShowOptions(!showOptions)}
-                  className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-lg"
-                  title={showOptions ? "Hide options" : "Show options"}
-                >
-                  {showOptions ? "👇" : "👆"}
-                </button>
-              </div>
-
-              {showOptions && (
-                <>
-                  <div className="mt-2 flex justify-end gap-2">
-                    <button
-                  type="button"
-                  onClick={handleClearInput}
-                  disabled={input.length === 0}
-                  className="inline-flex items-center justify-center text-[12px] font-semibold text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 rounded-full px-2 py-1 hover:bg-orange-100 dark:hover:bg-orange-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Clear input"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                <motion.button
-                  ref={magicWandRef}
-                  type="button"
-                  onClick={applyMagicPrompt}
-                  className="inline-flex items-center justify-center text-4xl font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-full w-10 h-10 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
-                  title="Magic prompt - tap to shake!"
-                >
-                  <motion.span
-                    role="img"
-                    aria-label="magic wand"
-                    animate={isMagicShaking ? { rotate: [-5, 5, -5, 5, -5, 5, 0] } : { rotate: 0 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                    style={{ originX: 0, originY: 1, display: 'inline-block' }}
-                  >
-                    🪄
-                  </motion.span>
-                </motion.button>
-                <motion.button
-                  type="button"
-                  onClick={regenShortPrompt}
-                  disabled={isRegenRotating}
-                  animate={isRegenRotating ? { rotate: 360 } : { rotate: 0 }}
-                  transition={{ duration: 1, ease: "linear" }}
-                  className="inline-flex items-center justify-center text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/30 border border-sky-200 dark:border-sky-800 rounded-full w-10 h-10 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Regenerate a random short prompt"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </motion.button>
-                <button
-                  type="button"
-                  onClick={() => setIsBraidMode(!isBraidMode)}
-                  className={`inline-flex items-center justify-center text-lg font-semibold rounded-full w-10 h-10 transition-all ${
-                    isBraidMode
-                      ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/50'
-                      : 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/50'
-                  }`}
-                  title="BRAID Mode - Convert prompts to Mermaid diagrams (35x more efficient)"
-                >
-                  🧬
-                </button>
-                <button
-                  type="button"
-                  onClick={addFoodReward}
-                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-full px-3 py-1 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
-                  title="Add a random food emoji reward"
-                >
-                  <span role="img" aria-label="food reward" className="text-lg leading-none">{currentRewardEmoji}</span>
-                  Reward
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between mt-3 px-1 gap-2 border-t border-zinc-200 dark:border-zinc-800 pt-2">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${
-                    chatMode === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 
-                    chatMode === 'okay' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' : 
-                    'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'
-                  }`}>
-                    {chatMode === 'good' ? 'Good' : chatMode === 'okay' ? 'Okay' : 'Wicked'}
-                  </span>
-                  <span className={`text-[10px] font-bold tracking-widest uppercase truncate ${getStatusColor()}`}>
-                    {isLoading ? "Thinking..." : error ? "Error" : `${getConversationStatus()} ${messages.filter(m => m.role === 'assistant').length}/69`}
-                  </span>
-                </div>
-                
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-600 tracking-wider hidden sm:inline-block mr-1 whitespace-nowrap">
-                    Powered by God
-                  </span>
-                  {chatMode === 'good' && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 whitespace-nowrap">Switch To Mode:</span>
-                      <button onClick={() => setChatMode('okay')} className="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-md hover:bg-blue-100 transition-colors whitespace-nowrap">[Okay]</button>
-                      <button onClick={() => setShowAgeWarning(true)} className="text-[10px] font-bold bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 px-2 py-0.5 rounded-md hover:bg-rose-100 transition-colors whitespace-nowrap">[Wicked (18+)]</button>
-                    </div>
-                  )}
-                  {chatMode === 'wicked' && (
-                    <button onClick={() => { setChatMode('okay'); setIsTurboMode(false); }} className="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-md hover:bg-blue-100 transition-colors whitespace-nowrap">Switch to Okay</button>
-                  )}
-                  {chatMode === 'okay' && (
-                    <button onClick={() => setChatMode('good')} className="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-md hover:bg-emerald-100 transition-colors whitespace-nowrap">Switch to Good</button>
-                  )}
-                </div>
-              </div>
-              
-              {chatMode === 'wicked' && (
-                <div className="mt-2 px-2 py-2 bg-rose-50/50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl flex flex-col gap-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-rose-700 dark:text-rose-300 uppercase tracking-widest flex items-center gap-1">
-                      <Zap className="w-3 h-3 fill-current animate-pulse" /> Turbo Roleplay
-                    </span>
-                    <button 
-                      onClick={() => {
-                        if (!isTurboMode) {
-                          setTurboMessagesLeft(5);
-                          setIsTurboMode(true);
-                        } else {
-                          setIsTurboMode(false);
-                        }
-                      }}
-                      className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${isTurboMode ? 'bg-rose-500 text-white' : 'bg-rose-200 dark:bg-rose-800 text-rose-700 dark:text-rose-300'} transition-colors disabled:opacity-50`}
-                    >
-                      {isTurboMode ? `STOP (${turboMessagesLeft} LEFT)` : 'ACTIVATE (5 MSGS MAX)'}
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    value={turboFantasy}
-                    disabled={isTurboMode}
-                    onChange={(e) => setTurboFantasy(e.target.value)}
-                    placeholder="Enter explicit fantasy..."
-                    className="w-full bg-white dark:bg-zinc-950 border border-rose-200 dark:border-rose-800 rounded-md px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-rose-500 transition-colors placeholder:text-rose-300/50 disabled:opacity-50"
-                  />
-                </div>
-              )}
-
-              {chatMode === 'good' && (
-                <div className="mt-2 px-2 py-2 bg-emerald-50/50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl flex flex-col gap-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-widest flex items-center gap-1">
-                      <Zap className="w-3 h-3 fill-current animate-pulse" /> Turbo Roleplay
-                    </span>
-                    <button
-                      onClick={() => {
-                        if (!isGoodTurboMode) {
-                          setGoodTurboMessagesLeft(5);
-                          setIsGoodTurboMode(true);
-                        } else {
-                          setIsGoodTurboMode(false);
-                        }
-                      }}
-                      className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${isGoodTurboMode ? 'bg-emerald-500 text-white' : 'bg-emerald-200 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300'} transition-colors`}
-                    >
-                      {isGoodTurboMode ? `STOP (${goodTurboMessagesLeft} LEFT)` : 'ACTIVATE (5 MSGS MAX)'}
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    value={goodTurboFantasy}
-                    disabled={isGoodTurboMode}
-                    onChange={(e) => setGoodTurboFantasy(e.target.value)}
-                    placeholder="Enter roleplay scenario..."
-                    className="w-full bg-white dark:bg-zinc-950 border border-emerald-200 dark:border-emerald-800 rounded-md px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-emerald-500 transition-colors placeholder:text-emerald-300/50 disabled:opacity-50"
-                  />
-                </div>
-              )}
-
-              {getConversationStatus() === 'Dead' && (
-                <div className="px-4 py-3 border-t border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold text-red-700 dark:text-red-300 uppercase tracking-widest">
-                      💀 Revive Valley Net with Sum Up
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => { setShowSumUpMenu(true); setIsSidebarOpen(true); }}
-                    className="w-full px-3 py-2 text-xs font-bold rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
-                  >
-                    Sum Up & Revive
-                  </button>
-                </div>
-              )}
-              </>
-              )}
-
-              <div className="px-4 py-2 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
-                <span className="text-[9px] font-mono text-zinc-500 dark:text-zinc-400 tracking-widest">
-                  -+OUTPUT_NOT_100%_TRUE+-
-                </span>
-              </div>
-            </div>
+            <ChatComposer
+              input={input}
+              setInput={setInput}
+              isLoading={isLoading}
+              sendMessage={sendMessage}
+              stopGeneration={stopGeneration}
+              handleKeyDown={handleKeyDown}
+              handleInput={handleInput}
+              handlePaste={handlePaste}
+              handleDragEnter={handleDragEnter}
+              handleDragLeave={handleDragLeave}
+              handleDragOver={handleDragOver}
+              handleDrop={handleDrop}
+              handleFileSelect={handleFileSelect}
+              handleClearInput={handleClearInput}
+              cancelClear={cancelClear}
+              confirmClear={confirmClear}
+              showClearConfirm={showClearConfirm}
+              showOptions={showOptions}
+              setShowOptions={setShowOptions}
+              isBraidMode={isBraidMode}
+              setIsBraidMode={setIsBraidMode}
+              isRecording={isRecording}
+              isProcessing={isProcessing}
+              toggleRecording={toggleRecording}
+              isAliveMode={isAliveMode}
+              setIsAliveMode={setIsAliveMode}
+              startRecording={startRecording}
+              stopRecordingAndTranscribe={stopRecordingAndTranscribe}
+              currentAudioRef={currentAudioRef}
+              uploadedImages={uploadedImages}
+              removeImage={removeImage}
+              fileInputRef={fileInputRef}
+              inputRef={inputRef}
+              isDragActive={isDragActive}
+              chatMode={chatMode}
+              setChatMode={setChatMode}
+              isTurboMode={isTurboMode}
+              setIsTurboMode={setIsTurboMode}
+              turboFantasy={turboFantasy}
+              setTurboFantasy={setTurboFantasy}
+              turboMessagesLeft={turboMessagesLeft}
+              setTurboMessagesLeft={setTurboMessagesLeft}
+              isGoodTurboMode={isGoodTurboMode}
+              setIsGoodTurboMode={setIsGoodTurboMode}
+              goodTurboFantasy={goodTurboFantasy}
+              setGoodTurboFantasy={setGoodTurboFantasy}
+              goodTurboMessagesLeft={goodTurboMessagesLeft}
+              setGoodTurboMessagesLeft={setGoodTurboMessagesLeft}
+              messages={messages}
+              isLimitReached={isLimitReached}
+              error={error}
+              currentPlaceholder={currentPlaceholder}
+              getConversationStatus={getConversationStatus}
+              getStatusColor={getStatusColor}
+              applyMagicPrompt={applyMagicPrompt}
+              regenShortPrompt={regenShortPrompt}
+              addFoodReward={addFoodReward}
+              currentRewardEmoji={currentRewardEmoji}
+              setShowAgeWarning={setShowAgeWarning}
+              setShowSumUpMenu={setShowSumUpMenu}
+              setIsSidebarOpen={setIsSidebarOpen}
+              particles={particles}
+              isMagicShaking={isMagicShaking}
+              isRegenRotating={isRegenRotating}
+              magicWandRef={magicWandRef}
+            />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Age Verification Modal */}
-      <AnimatePresence>
-        {showAgeWarning && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              className="bg-zinc-900 border border-rose-900/50 max-w-md w-full rounded-3xl p-6 shadow-[0_0_50px_rgba(225,29,72,0.15)] relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-600 via-rose-400 to-rose-600" />
-              
-              <div className="flex flex-col items-center text-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
-                  <span className="text-3xl" role="img" aria-label="warning">🔞</span>
-                </div>
-                
-                <h2 className="text-xl font-bold text-white tracking-wide">Age Restricted Area</h2>
-                
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  This is an uncensored AI model. You must be at least 18 years of age to use Wicked Mode. 
-                  By continuing, you acknowledge that you are entering an age-restricted environment.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3 w-full mt-4">
-                  <button
-                    onClick={() => setShowAgeWarning(false)}
-                    className="flex-1 px-4 py-3 rounded-xl font-bold text-sm bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700 transition-colors"
-                  >
-                    Stay Good
-                  </button>
-                  <button
-                    onClick={() => {
-                      setChatMode('wicked');
-                      setIsGoodTurboMode(false);
-                      setShowAgeWarning(false);
-                    }}
-                    className="flex-1 px-4 py-3 rounded-xl font-bold text-sm bg-rose-600 text-white hover:bg-rose-500 shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all"
-                  >
-                    Confirm Wickedness
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Full-size image modal */}
-      <AnimatePresence>
-        {showImageModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setShowImageModal(false)}
-            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-w-full max-h-full"
-            >
-              <button
-                onClick={() => setShowImageModal(false)}
-                className="absolute -top-10 right-0 text-white hover:text-zinc-300 transition-colors p-2 z-50"
-                aria-label="Close image"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <div className="relative w-full max-w-screen max-h-[90vh]">
-                <Image
-                  src="/images/valley%20net%20v23.2%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png"
-                  alt="Valley Net v23.2"
-                  width={1024}
-                  height={1024}
-                  className="w-full h-auto max-h-[90vh] object-contain"
-                  priority
-                />
-              </div>
-              <div className="mt-4 text-center text-white text-sm sm:text-base font-semibold italic drop-shadow-lg px-4">
-                “{TEASER_PHRASES[imageTeaserIndex]}”
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Sum Up Confirmation Dialog */}
-      <AnimatePresence>
-        {showSumUpConfirm && selectedSumUpSession && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setShowSumUpConfirm(false)}
-            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-purple-200 dark:border-purple-800"
-            >
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">Sum Up Conversation?</h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
-                This will create a markdown summary of the conversation and save it for future reference. The summary will be downloaded automatically.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowSumUpConfirm(false)}
-                  className="flex-1 px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    if (selectedSumUpSession) {
-                      summarizeConversation(selectedSumUpSession);
-                      setShowSumUpConfirm(false);
-                      setShowSumUpMenu(false);
-                    }
-                  }}
-                  className="flex-1 px-4 py-2 rounded-lg bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors"
-                >
-                  Sum Up
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Teaser popup */}
-      <AnimatePresence>
-        {showTeaser && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-[130px] right-6 sm:right-10 z-[70] w-[320px] max-w-[90vw] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl overflow-hidden"
-          >
-            <div className="p-4 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-emerald-200 dark:border-emerald-900 shadow-sm">
-                <Image src="/images/valley%20net%20512%20face%20mattyjacks%202023-2026%20blonde%20lady%20girl%20red%20eyes%20ai%20generated%20edited.png" alt="Valley Net" width={40} height={40} className="object-cover w-full h-full" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="text-sm font-bold text-zinc-900 dark:text-white">Valley Net 💘</h4>
-                  <button onClick={() => setShowTeaser(false)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200" aria-label="Close teaser">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <p className="text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed whitespace-pre-line">{currentTeaser}</p>
-              </div>
-            </div>
-            <div className="px-4 pb-4">
-              <button
-                onClick={() => {
-                  setShowTeaser(false);
-                  setIsOpen(true);
-                }}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 text-white text-sm font-bold py-2.5 shadow-sm hover:bg-emerald-700 transition-colors"
-              >
-                Open Chat <Send className="w-4 h-4" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Modals */}
+      <ChatModals
+        showAgeWarning={showAgeWarning}
+        setShowAgeWarning={setShowAgeWarning}
+        setChatMode={setChatMode}
+        setIsGoodTurboMode={setIsGoodTurboMode}
+        showImageModal={showImageModal}
+        setShowImageModal={setShowImageModal}
+        imageTeaserIndex={imageTeaserIndex}
+        showSumUpConfirm={showSumUpConfirm}
+        setShowSumUpConfirm={setShowSumUpConfirm}
+        selectedSumUpSession={selectedSumUpSession}
+        summarizeConversation={summarizeConversation}
+        setShowSumUpMenu={setShowSumUpMenu}
+        showTeaser={showTeaser}
+        setShowTeaser={setShowTeaser}
+        currentTeaser={currentTeaser}
+        setIsOpen={setIsOpen}
+      />
     </>
   );
 }
