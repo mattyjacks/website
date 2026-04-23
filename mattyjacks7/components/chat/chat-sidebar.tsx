@@ -230,10 +230,10 @@ export function ChatSidebar(props: ChatSidebarProps) {
                     <div className="mt-3 space-y-2">
                       <p className="text-xs text-indigo-600/80 dark:text-indigo-300/80">Paste this code into any website to add Valley Net AI chat:</p>
                       <div className="relative">
-                        <pre className="text-[11px] bg-white dark:bg-zinc-950 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap break-all text-zinc-800 dark:text-zinc-200 font-mono select-all">{`<script src="https://mattyjacks.com/embed.js"></script>`}</pre>
+                        <pre className="text-[11px] bg-white dark:bg-zinc-950 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap break-all text-zinc-800 dark:text-zinc-200 font-mono select-all">{`<div id="mattyjacks-embed" style="position:fixed;bottom:24px;right:24px;z-index:40"></div>\n<script src="https://mattyjacks.com/embed.js"><\/script>`}</pre>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText('<script src="https://mattyjacks.com/embed.js"></script>');
+                            navigator.clipboard.writeText('<div id="mattyjacks-embed" style="position:fixed;bottom:24px;right:24px;z-index:40"></div>\n<script src="https://mattyjacks.com/embed.js"></script>');
                             setEmbedCopied(true);
                             setTimeout(() => setEmbedCopied(false), 2000);
                           }}
