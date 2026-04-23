@@ -147,17 +147,44 @@ export default function AnythingButton() {
   });
 
   const isSpeakingRef = useRef(false);
-  // Queue of pre-fetched audio blob URLs ready to play
-  const audioBlobQueueRef = useRef<string[]>([]);
-  // Track in-flight fetches so we don't lose them
+  // Ordered slots: each fetch writes its blob URL to its assigned index
+  const audioSlotsRef = useRef<(string | null)[]>([]);
+  // Next slot index to assign to a new fetch
+  const nextSlotRef = useRef(0);
+  // Next slot index to play
+  const playSlotRef = useRef(0);
+  // Track in-flight fetches
   const fetchCountRef = useRef(0);
 
-  // Play the next pre-fetched audio blob from the queue
+  // Play the next slot if it's ready
   const playNextAudio = useCallback(() => {
-    if (isSpeakingRef.current || audioBlobQueueRef.current.length === 0) return;
+    if (isSpeakingRef.current) return;
+    
+    const slot = playSlotRef.current;
+    const url = audioSlotsRef.current[slot];
+    
+    // Not ready yet (still fetching) or no more slots
+    if (slot >= nextSlotRef.current) {
+      // If everything is done and nothing left to play, resume recording
+      if (fetchCountRef.current === 0 && isAliveMode) {
+        startRecording();
+      }
+      return;
+    }
+    if (!url) return; // Still fetching this slot, wait
+    
+    // Skip errored slots
+    if (url === '__skip__') {
+      playSlotRef.current = slot + 1;
+      audioSlotsRef.current[slot] = null;
+      playNextAudio();
+      return;
+    }
     
     isSpeakingRef.current = true;
-    const url = audioBlobQueueRef.current.shift()!;
+    playSlotRef.current = slot + 1;
+    // Clear the slot to free memory
+    audioSlotsRef.current[slot] = null;
     
     const audio = new Audio(url);
     currentAudioRef.current = audio;
@@ -165,24 +192,21 @@ export default function AnythingButton() {
     audio.onended = () => { 
       isSpeakingRef.current = false;
       URL.revokeObjectURL(url);
-      if (audioBlobQueueRef.current.length > 0) {
-        playNextAudio();
-      } else if (fetchCountRef.current === 0 && isAliveMode) {
-        startRecording(); 
-      }
+      playNextAudio();
     };
     
     audio.play().catch(e => {
       console.error(e);
       isSpeakingRef.current = false;
       URL.revokeObjectURL(url);
-      if (audioBlobQueueRef.current.length > 0) playNextAudio();
-      else if (fetchCountRef.current === 0 && isAliveMode) startRecording();
+      playNextAudio();
     });
   }, [isAliveMode, startRecording]);
 
-  // Fire-and-forget: fetch TTS audio in parallel, queue the blob, trigger playback
+  // Fire-and-forget: fetch TTS audio in parallel, store in correct slot
   const playSynthesizedSpeech = useCallback((text: string) => {
+    const slot = nextSlotRef.current++;
+    audioSlotsRef.current[slot] = null; // Reserve the slot
     fetchCountRef.current++;
     
     fetch("/api/speech/synthesize", {
@@ -193,19 +217,19 @@ export default function AnythingButton() {
         fetchCountRef.current--;
         if (res.ok) {
           const url = URL.createObjectURL(await res.blob());
-          audioBlobQueueRef.current.push(url);
-          // If nothing is currently playing, start playback
+          audioSlotsRef.current[slot] = url;
+          // Try to play if this completed slot is the one we're waiting for
           if (!isSpeakingRef.current) playNextAudio();
         }
       })
       .catch((err) => {
         fetchCountRef.current--;
         console.error("TTS fetch error:", err);
-        if (fetchCountRef.current === 0 && audioBlobQueueRef.current.length === 0 && isAliveMode) {
-          setTimeout(startRecording, 1000);
-        }
+        // Skip this slot on error so playback doesn't stall
+        audioSlotsRef.current[slot] = '__skip__';
+        if (!isSpeakingRef.current) playNextAudio();
       });
-  }, [isAliveMode, startRecording, playNextAudio]);
+  }, [playNextAudio]);
 
   // --- Turbo & Wicked Age Gate ---
   const [showAgeWarning, setShowAgeWarning] = useState(false);
