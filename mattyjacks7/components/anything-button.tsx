@@ -147,60 +147,65 @@ export default function AnythingButton() {
   });
 
   const isSpeakingRef = useRef(false);
-  const audioQueueRef = useRef<string[]>([]);
+  // Queue of pre-fetched audio blob URLs ready to play
+  const audioBlobQueueRef = useRef<string[]>([]);
+  // Track in-flight fetches so we don't lose them
+  const fetchCountRef = useRef(0);
 
-  const processAudioQueue = useCallback(async () => {
-    if (isSpeakingRef.current || audioQueueRef.current.length === 0) return;
+  // Play the next pre-fetched audio blob from the queue
+  const playNextAudio = useCallback(() => {
+    if (isSpeakingRef.current || audioBlobQueueRef.current.length === 0) return;
     
     isSpeakingRef.current = true;
-    const text = audioQueueRef.current.shift()!;
+    const url = audioBlobQueueRef.current.shift()!;
     
-    try {
-      if (currentAudioRef.current) currentAudioRef.current.pause();
-      
-      const res = await fetch("/api/speech/synthesize", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, model: "tts-1", voice: "nova" })
-      });
-      
-      if (res.ok) {
-        const url = URL.createObjectURL(await res.blob());
-        const audio = new Audio(url);
-        currentAudioRef.current = audio;
-        
-        audio.onended = () => { 
-          isSpeakingRef.current = false;
-          if (audioQueueRef.current.length > 0) {
-            processAudioQueue();
-          } else if (isAliveMode) {
-            startRecording(); 
-          }
-        };
-        
-        audio.play().catch(e => {
-          console.error(e);
-          isSpeakingRef.current = false;
-          if (audioQueueRef.current.length > 0) processAudioQueue();
-          else if (isAliveMode) startRecording();
-        });
-      } else {
-        isSpeakingRef.current = false;
-        if (audioQueueRef.current.length > 0) processAudioQueue();
-      }
-    } catch (err) {
-      console.error("TTS error:", err);
+    const audio = new Audio(url);
+    currentAudioRef.current = audio;
+    
+    audio.onended = () => { 
       isSpeakingRef.current = false;
-      if (audioQueueRef.current.length > 0) processAudioQueue();
-      else if (isAliveMode) setTimeout(startRecording, 1000);
-    }
+      URL.revokeObjectURL(url);
+      if (audioBlobQueueRef.current.length > 0) {
+        playNextAudio();
+      } else if (fetchCountRef.current === 0 && isAliveMode) {
+        startRecording(); 
+      }
+    };
+    
+    audio.play().catch(e => {
+      console.error(e);
+      isSpeakingRef.current = false;
+      URL.revokeObjectURL(url);
+      if (audioBlobQueueRef.current.length > 0) playNextAudio();
+      else if (fetchCountRef.current === 0 && isAliveMode) startRecording();
+    });
   }, [isAliveMode, startRecording]);
 
+  // Fire-and-forget: fetch TTS audio in parallel, queue the blob, trigger playback
   const playSynthesizedSpeech = useCallback((text: string) => {
-    audioQueueRef.current.push(text);
-    if (!isSpeakingRef.current) {
-      processAudioQueue();
-    }
-  }, [processAudioQueue]);
+    fetchCountRef.current++;
+    
+    fetch("/api/speech/synthesize", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, model: "tts-1", voice: "nova" })
+    })
+      .then(async (res) => {
+        fetchCountRef.current--;
+        if (res.ok) {
+          const url = URL.createObjectURL(await res.blob());
+          audioBlobQueueRef.current.push(url);
+          // If nothing is currently playing, start playback
+          if (!isSpeakingRef.current) playNextAudio();
+        }
+      })
+      .catch((err) => {
+        fetchCountRef.current--;
+        console.error("TTS fetch error:", err);
+        if (fetchCountRef.current === 0 && audioBlobQueueRef.current.length === 0 && isAliveMode) {
+          setTimeout(startRecording, 1000);
+        }
+      });
+  }, [isAliveMode, startRecording, playNextAudio]);
 
   // --- Turbo & Wicked Age Gate ---
   const [showAgeWarning, setShowAgeWarning] = useState(false);
