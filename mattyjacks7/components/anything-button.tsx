@@ -1264,6 +1264,7 @@ Create a summary that another AI can use to understand the context and continue 
       let streamDone = false;
       let sseBuffer = '';
       let lastTtsIndex = 0;
+      let ttsChunksSent = 0;
 
       // Add a placeholder assistant message immediately
       updateCurrentSession([...newMessages, { id: streamMsgId, role: 'assistant', content: '▍', timestamp: Date.now() }]);
@@ -1284,20 +1285,39 @@ Create a summary that another AI can use to understand the context and continue 
               streamedText += parsed.delta;
               
               if (isAliveMode) {
-                const punctuationRegex = /(\n+)/g;
-                let match;
-                let lastMatchIndex = -1;
                 let searchString = streamedText.slice(lastTtsIndex);
-                while ((match = punctuationRegex.exec(searchString)) !== null) {
-                  lastMatchIndex = match.index + match[0].length;
-                }
-                if (lastMatchIndex > 0) {
-                  const chunkEndIndex = lastTtsIndex + lastMatchIndex;
-                  const chunk = streamedText.slice(lastTtsIndex, chunkEndIndex).trim();
-                  if (chunk.length > 0) {
-                    playSynthesizedSpeech(chunk);
+                const punctuationRegex = /(\n+)/g;
+                
+                while (true) {
+                  let requiredParagraphs = 1;
+                  if (ttsChunksSent === 1 || ttsChunksSent === 2) {
+                    requiredParagraphs = 2;
+                  } else if (ttsChunksSent >= 3) {
+                    requiredParagraphs = 3;
                   }
-                  lastTtsIndex = chunkEndIndex;
+
+                  let match;
+                  let matches = [];
+                  punctuationRegex.lastIndex = 0;
+                  while ((match = punctuationRegex.exec(searchString)) !== null) {
+                    matches.push(match);
+                  }
+
+                  if (matches.length >= requiredParagraphs) {
+                    const targetMatch = matches[requiredParagraphs - 1];
+                    const matchIndex = targetMatch.index + targetMatch[0].length;
+                    
+                    const chunkEndIndex = lastTtsIndex + matchIndex;
+                    const chunk = streamedText.slice(lastTtsIndex, chunkEndIndex).trim();
+                    if (chunk.length > 0) {
+                      playSynthesizedSpeech(chunk);
+                      ttsChunksSent++;
+                    }
+                    lastTtsIndex = chunkEndIndex;
+                    searchString = streamedText.slice(lastTtsIndex);
+                  } else {
+                    break;
+                  }
                 }
               }
 

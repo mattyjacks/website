@@ -684,7 +684,7 @@ export async function POST(request: NextRequest) {
 
   // Validate Content-Length to reject oversized requests early
   const contentLength = request.headers.get("content-length");
-  if (contentLength && parseInt(contentLength, 10) > 100000) {
+  if (contentLength && parseInt(contentLength, 10) > 5000000) {
     addLog(`[CHAT] Content-Length too large: ${contentLength}`);
     return NextResponse.json(
       { error: "Request too large, Boss.", debugLogs, requestId },
