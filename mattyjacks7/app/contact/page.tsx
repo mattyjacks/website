@@ -54,7 +54,7 @@ export default function ContactPage() {
                 </div>
                 <h2 className="font-semibold text-lg">Phone</h2>
               </div>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">603 999 9420</p>
+              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">603 999 9420 <span className="text-xs text-zinc-400 dark:text-zinc-500">(call only - no texts)</span></p>
               <a
                 href="tel:+16039999420"
                 className="group/btn mt-4 inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border-2 border-zinc-200 dark:border-zinc-700 shadow-md hover:shadow-lg hover:border-sky-500 dark:hover:border-sky-400 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-zinc-500/50"

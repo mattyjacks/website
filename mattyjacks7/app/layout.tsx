@@ -439,6 +439,9 @@ export default function RootLayout({
                       <div className="text-sm text-zinc-600 dark:text-zinc-400">
                         Call 24/7/365 Any Time
                       </div>
+                      <div className="text-xs text-zinc-500 dark:text-zinc-500">
+                        Call only - no texts
+                      </div>
                       <a
                         href="mailto:Matt@MattyJacks.com"
                         className="block text-zinc-900 dark:text-zinc-100 hover:text-blue-600 dark:hover:text-sky-400 transition-colors duration-200 underline decoration-sky-500/30 hover:decoration-sky-500 underline-offset-4"

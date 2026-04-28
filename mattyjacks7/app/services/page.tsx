@@ -264,6 +264,7 @@ export default function ServicesPage() {
               >
                 <Phone className="mr-2 w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 (603) 999-9420
+                <span className="ml-1.5 text-xs text-zinc-400 dark:text-zinc-500">(no texts)</span>
               </a>
             </div>
             

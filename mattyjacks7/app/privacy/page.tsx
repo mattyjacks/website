@@ -321,7 +321,7 @@ export default function PrivacyPolicyPage() {
                     Email: <a href="mailto:Matt@MattyJacks.com" className="text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 underline">Matt@MattyJacks.com</a>
                   </p>
                   <p className="text-zinc-600 dark:text-zinc-300">
-                    Phone: <a href="tel:+16039999420" className="text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 underline">603 999 9420</a>
+                    Phone: <a href="tel:+16039999420" className="text-emerald-600 dark:text-emerald-400 hover:text-blue-600 dark:hover:text-sky-400 underline">603 999 9420</a> <span className="text-xs text-zinc-400 dark:text-zinc-500">(call only - no texts)</span>
                   </p>
                 </div>
               </div>

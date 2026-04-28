@@ -22,7 +22,7 @@ export default function ResumeCTAButtons() {
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
-        Call Matt
+        Call Matt <span className="ml-1 text-xs text-zinc-400 dark:text-zinc-500">(no texts)</span>
       </motion.a>
     </div>
   );

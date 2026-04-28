@@ -323,6 +323,7 @@ export default function Home() {
                 </svg>
                 Call Us
                 <span className="ml-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors hidden xs:inline">(603) 999-9420</span>
+                <span className="ml-1.5 text-[10px] sm:text-xs text-zinc-400 dark:text-zinc-500 hidden sm:inline">(no texts)</span>
               </a>
             </div>
 
@@ -1306,8 +1307,9 @@ export default function Home() {
                 <ArrowRight className="relative z-10 ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                 <div className="absolute inset-0 bg-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
-              <a href="tel:+16039999420" className="inline-flex items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm text-white border border-white/20 px-8 py-4 text-lg font-bold hover:bg-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105">
+              <a href="tel:+16039999420" className="inline-flex flex-col items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm text-white border border-white/20 px-8 py-4 text-lg font-bold hover:bg-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105">
                 Call (603) 999-9420
+                <span className="text-xs font-normal text-white/60">Call only - no texts</span>
               </a>
             </div>
             <div className="flex flex-wrap justify-center gap-6 text-emerald-200/70 text-sm pt-4">

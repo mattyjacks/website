@@ -286,6 +286,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               >
                 (603) 999-9420
               </a>
+              <span className="block text-xs text-zinc-400 dark:text-zinc-500">Call only - no texts</span>
               <a
                 href="mailto:Matt@MattyJacks.com"
                 className="block mt-1 hover:text-blue-600 dark:hover:text-sky-400 transition-colors"
